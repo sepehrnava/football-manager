@@ -1,4 +1,6 @@
 # football-manager
+kir kos kon
+
 
 پروژه ساده TypeScript با Expo SDK 57، React Native 0.86.3 و React 19.2.3 است.
 Node.js موجود هنگام راه‌اندازی: 22.22.3، npm: 10.9.8، ویندوز 11 نسخه 64 بیتی.
