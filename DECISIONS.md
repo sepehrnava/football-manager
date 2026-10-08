@@ -21,3 +21,15 @@ Accepted by the user's 2026-10-05 SDD request. Separate agent instructions, curr
 product scope, tasks, and durable decisions; read feature specs on demand.
 Reference stable acceptance IDs instead of copying requirements.
 Revisit document structure only when project size makes retrieval difficult.
+
+## D004: Single game state with useReducer and AsyncStorage
+
+Accepted for S002. All game data is one serializable `GameState`, changed only by a
+pure reducer (src/game/game.ts) and saved to AsyncStorage after each change.
+Screens switch with local state and a custom tab bar; no router yet.
+Revisit when a backend, accounts, or deep links are needed.
+
+## D005: Seeded randomness in the state
+
+Accepted for S002. Match results and generated players use a seeded generator whose
+seed is stored in `GameState`, so reducer actions stay pure and results are reproducible.

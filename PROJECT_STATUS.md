@@ -1,30 +1,25 @@
 # Project status
 
-Updated: 2026-10-05. Replace outdated entries; keep this as a snapshot.
+Updated: 2026-10-08. Replace outdated entries; keep this as a snapshot.
 
 ## Implemented
 
-- Minimal Expo/TypeScript app: Persian welcome screen in App.tsx.
-- Android Expo Go startup and browser preview; Windows helper: Start-Expo.ps1.
+- Pocket Manager mockup (S002): club creation, formation builder, transfers, fast
+  season simulation, season-end finances, local save. Generated data only.
+- Game rules in src/game (pure TypeScript); screens in src/screens; theme in src/ui.
 - npm lockfile, lint configuration, and setup instructions in README.md.
-- Source uploaded to sepehrnava/football-manager, main branch.
-- Spec-driven documentation and selective context-reading workflow prepared.
+- Spec-driven documentation and selective context-reading workflow.
 
 ## Evidence
 
-- Initial setup: TypeScript, ESLint, Expo compatibility checks passed; Doctor 21/21.
-- Android bundle generated successfully; phone/emulator display remains unconfirmed.
-- Browser welcome screen observed; web export passed.
-- Starter upload verified by matching local and remote commit c11eb6c.
-  That identifies the starter upload, not later documentation commits.
+- 2026-10-08: tsc and lint pass; web export builds; full flow played in headless Chrome
+  (create club, pick slot, buy, simulate, season end, reload keeps the save).
+- 40 headless careers: starting club finishes 4th–10th, typically loses money.
+- Android display of the mockup not yet observed (S002-AC08, S001-AC03).
 
 ## Limits and next step
 
-- No football-management behavior defined or implemented. Define the first feature spec next.
-- User observation is needed for S001-AC03 (Android display).
+- Next: confirm on Android (T007), then plan the real player database.
+- Developed on macOS; README setup steps still describe the original Windows setup.
 - Initial npm audit: 23 warnings (7 moderate, 16 high). Historical result, not a fresh audit.
-  Breaking downgrade fixes were not applied.
-- Android Studio/SDK/emulator execution not validated.
-- GitHub CLI credential works in the user's Windows session; the restricted agent shell
-  cannot use it. A local commit is not proof of a push.
 - Work queue: [TASKS.md](TASKS.md). Product scope: [SPECS.md](SPECS.md).

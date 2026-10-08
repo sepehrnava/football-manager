@@ -1,6 +1,6 @@
 # Agent instructions
 
-Communicate with the user in Persian. Keep repository documents concise.
+Communicate with the user in English. Keep repository documents and app text in English and concise.
 
 ## Context budget
 
@@ -28,7 +28,8 @@ replace obsolete entries instead of appending session history.
 ## Facts and checks
 
 - Expo + React Native + TypeScript; npm and package-lock.json.
-- Entry: index.ts -> App.tsx. No Router or native project directories currently exist.
+- Entry: index.ts -> App.tsx -> src/screens. Game rules: src/game (pure, no UI).
+  No Router or native project directories currently exist.
 - Versions are authoritative in package.json; avoid repeating them in every document.
 - Android preview uses Expo Go; browser preview is supported. Add routing/native modules
   only when a spec needs them; unsupported native modules require a development build.

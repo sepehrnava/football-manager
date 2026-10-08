@@ -1,6 +1,6 @@
 # S001: Expo starter and previews
 
-State: Implemented; Android device observation pending.
+State: Implemented; Android device observation pending. The welcome screen was replaced by S002.
 Source: initial setup request and subsequent computer-preview request.
 
 ## Problem and scope
@@ -15,7 +15,7 @@ and source in the specified GitHub repository. No football features are implied.
 | --- | --- | --- |
 | S001-AC01 | Install with compatible Node and project-local tools | Passed during setup; lockfile committed |
 | S001-AC02 | TypeScript, lint, Expo compatibility pass | Passed; Doctor 21/21 during setup |
-| S001-AC03 | Android Expo Go shows the Persian welcome screen | Bundle passed; phone observation pending |
+| S001-AC03 | Android Expo Go shows the app screen | Bundle passed; phone observation pending |
 | S001-AC04 | Computer browser shows the welcome screen | Passed; screen observed and web export generated |
 | S001-AC05 | Source is on sepehrnava/football-manager | Passed; remote matched starter commit c11eb6c |
 

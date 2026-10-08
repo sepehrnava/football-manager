@@ -1,23 +1,23 @@
 # football-manager
 kir kos kon
 
-## توسعه بر اساس مشخصات
+## Spec-driven development
 
-- [AGENTS.md](AGENTS.md): راهنمای عامل و خواندن انتخابی برای مصرف کمتر توکن.
-- [SPECS.md](SPECS.md): محدوده محصول و فهرست مشخصات قابلیت‌ها.
-- [PROJECT_STATUS.md](PROJECT_STATUS.md): وضعیت فعلی، شواهد بررسی و قدم بعدی.
-- [TASKS.md](TASKS.md): کارهای کوچک مرتبط با معیارهای پذیرش.
-- [DECISIONS.md](DECISIONS.md): تصمیم‌های معماری ماندگار.
-- [قالب مشخصات](specs/_template.md): یک فایل شماره‌دار برای هر قابلیت جدید.
+- [AGENTS.md](AGENTS.md): agent guide and selective reading to save tokens.
+- [SPECS.md](SPECS.md): product scope and the list of feature specs.
+- [PROJECT_STATUS.md](PROJECT_STATUS.md): current status, verification evidence and next step.
+- [TASKS.md](TASKS.md): small tasks tied to acceptance criteria.
+- [DECISIONS.md](DECISIONS.md): lasting architecture decisions.
+- [Spec template](specs/_template.md): one numbered file per new feature.
 
-چرخه کار: مشخصات → معیار پذیرش → کارهای کوچک → پیاده‌سازی → بررسی → به‌روزرسانی وضعیت.
+Workflow: spec → acceptance criteria → small tasks → implementation → verification → status update.
 
 
-پروژه ساده TypeScript با Expo SDK 57، React Native 0.86.3 و React 19.2.3 است.
-Node.js موجود هنگام راه‌اندازی: 22.22.3، npm: 10.9.8، ویندوز 11 نسخه 64 بیتی.
-نسخه سازگار Node طبق مستندات SDK 57 حداقل 22.13.x است.
+A simple TypeScript project built with Expo SDK 57, React Native 0.86.3 and React 19.2.3.
+Node.js available at setup time: 22.22.3, npm: 10.9.8, Windows 11 64-bit.
+According to the SDK 57 documentation, the minimum compatible Node version is 22.13.x.
 
-## دریافت پروژه از GitHub
+## Getting the project from GitHub
 
 ```powershell
 git clone https://github.com/sepehrnava/football-manager.git
@@ -25,75 +25,75 @@ cd football-manager
 npm.cmd ci
 ```
 
-## اجرای دوباره
+## Running again
 
-در PowerShell وارد همین پوشه شوید و اجرا کنید:
+In PowerShell, go to this folder and run:
 
 ```powershell
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\Start-Expo.ps1
 ```
 
-این دستور فقط برای همین اجرا اجازه اجرای اسکریپت را می‌دهد و تنظیم امنیتی دائمی ویندوز را تغییر نمی‌دهد. اسکریپت آدرس فعلی Wi-Fi را انتخاب می‌کند تا آدرس VPN در QR قرار نگیرد. اگر Node در ترمینال عادی شناخته نشد، اسکریپت از Node موجود همراه Codex استفاده می‌کند و مسیر آن را فقط برای همین اجرا اضافه می‌کند:
+This command allows the script to run for this invocation only and does not change any permanent Windows security setting. The script picks the current Wi-Fi address so the VPN address does not end up in the QR code. If Node is not found in a normal terminal, the script falls back to the Node bundled with Codex and adds its path for this run only:
 
 ```text
 %LOCALAPPDATA%\hermes\node
 ```
 
-روی شبکه بدون VPN می‌توان از دستور استاندارد هم استفاده کرد:
+On a network without a VPN you can also use the standard command:
 
 ```powershell
 npm.cmd start -- --go --lan
 ```
 
-## نمایش روی همین کامپیوتر
+## Viewing on this computer
 
-برای نسخه وب برنامه، ابتدا دستور زیر را اجرا کنید و سپس در مرورگر همین کامپیوتر http://localhost:8082 را باز کنید:
+For the web version of the app, run the command below first, then open http://localhost:8082 in this computer's browser:
 
 ```powershell
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\Start-Expo.ps1 -Web
 ```
 
-می‌توانید این سرور را در یک پنجره PowerShell جدا از سرور گوشی اجرا کنید. برای توقف Ctrl+C بزنید. نسخه وب پیش‌نمایش مرورگری همان کد React Native است. اگر ظاهر و رفتار دقیق اندروید را روی کامپیوتر می‌خواهید، باید شبیه‌ساز اندروید را راه‌اندازی کنید.
+You can run this server in a separate PowerShell window from the phone server. Press Ctrl+C to stop it. The web version is a browser preview of the same React Native code. If you want the exact look and behavior of Android on the computer, you need to set up an Android emulator.
 
-QR جدید در ترمینال نمایش داده می‌شود؛ پس از تغییر شبکه از QR قدیمی استفاده نکنید. ترمینال را باز نگه دارید. برای توقف Ctrl+C بزنید.
+A new QR code is shown in the terminal; after a network change, do not use the old QR code. Keep the terminal open. Press Ctrl+C to stop.
 
-## روی گوشی اندرویدی
+## On an Android phone
 
-1. Expo Go را از https://expo.dev/go یا Google Play نصب کنید.
-2. گوشی و کامپیوتر را به یک شبکه Wi-Fi وصل کنید.
-3. در Expo Go گزینه Scan QR code را بزنید و QR ترمینال را اسکن کنید.
-4. صفحه باید «سلام! برنامه شما آماده است» را نشان بدهد.
+1. Install Expo Go from https://expo.dev/go or Google Play.
+2. Connect the phone and the computer to the same Wi-Fi network.
+3. In Expo Go, tap Scan QR code and scan the QR code in the terminal.
+4. The app should open on the "Pocket Manager" club creation screen.
 
-Android Studio برای این پروژه و اجرای Expo Go روی گوشی لازم نیست. برای شبیه‌ساز و ساخت native محلی ابزارهای Android SDK لازم خواهند شد. Android Studio، SDK، adb و Java در بررسی اولیه یافت نشدند. مجازی‌سازی firmware فعال و hypervisor موجود است، اما قابلیت اجرای شبیه‌ساز هنوز آزمایش نشده است. نصب سیستم با دسترسی Administrator انجام نشده است.
+Android Studio is not needed for this project or for running Expo Go on a phone. For an emulator and local native builds you will need the Android SDK tools. Android Studio, the SDK, adb and Java were not found during the initial check. Firmware virtualization is enabled and a hypervisor is available, but running an emulator has not been tested yet. System installation was not done with Administrator access.
 
-## اگر اتصال برقرار نشد
+## If the connection fails
 
-آدرس نمایش‌داده‌شده در QR باید آدرس Wi-Fi باشد. در مرورگر گوشی آدرس HTTP همین میزبان با پسوند /status را باز کنید؛ در نمونه زیر YOUR_WIFI_IP را با آدرس Wi-Fi کامپیوتر جایگزین کنید:
+The address shown in the QR code must be the Wi-Fi address. In the phone's browser, open this host's HTTP address with the /status suffix; in the example below, replace YOUR_WIFI_IP with the computer's Wi-Fi address:
 
 ```text
 http://YOUR_WIFI_IP:8081/status
 ```
 
-پاسخ صحیح: packager-status:running. اگر این صفحه باز نشد، متن خطا را برای بررسی VPN، فایروال و جدا بودن دستگاه‌های شبکه ارسال کنید. فایروال را خاموش نکنید. اگر ویندوز درخواست اجازه Node.js نشان داد، فقط روی شبکه قابل اعتماد اجازه دهید.
-طبق مستندات رسمی Expo، اتصال tunnel نیز برای شبکه‌هایی که ارتباط دستگاه‌ها را مسدود می‌کنند قابل استفاده است؛ باید جداگانه آماده و آزمایش شود و هنوز در این راه‌اندازی آزمایش نشده است.
+The correct response is: packager-status:running. If this page does not open, send the error text so the VPN, firewall and network device isolation can be checked. Do not turn off the firewall. If Windows asks for Node.js permission, allow it on trusted networks only.
+According to the official Expo documentation, a tunnel connection can also be used on networks that block communication between devices; it must be prepared and tested separately and has not yet been tested in this setup.
 
-## بررسی‌های انجام‌شده
+## Checks performed
 
-- نصب وابستگی‌ها با npm و ایجاد package-lock.json.
-- expo install --check: موفق.
-- Expo Doctor: هر 21 بررسی موفق.
-- TypeScript در حالت strict: موفق.
-- ESLint: طبق راهنمای AGENTS.md نصب و اجرا شد.
-- پاسخ سرور روی localhost و آدرس Wi-Fi: HTTP 200.
-- تولید بسته اندروید با Metro: موفق.
-- تولید نسخه وب و پاسخ صفحه در مرورگر محلی: موفق.
-- نمایش واقعی روی گوشی یا شبیه‌ساز: در انتظار تأیید کاربر.
+- Installed dependencies with npm and created package-lock.json.
+- expo install --check: passed.
+- Expo Doctor: all 21 checks passed.
+- TypeScript in strict mode: passed.
+- ESLint: installed and run as described in AGENTS.md.
+- Server response on localhost and the Wi-Fi address: HTTP 200.
+- Android bundle generation with Metro: passed.
+- Web build generation and page response in a local browser: passed.
+- Real display on a phone or emulator: awaiting user confirmation.
 
-قالب رسمی در npm audit دارای 23 هشدار (7 متوسط و 16 شدید) در زنجیره وابستگی‌هاست. برخی اصلاحات پیشنهادی npm نسخه Expo یا React Native را به نسخه‌های بسیار قدیمی کاهش می‌دهند؛ audit fix --force اجرا نشده است.
+The official template has 23 warnings in npm audit (7 moderate and 16 high) in the dependency chain. Some of npm's suggested fixes downgrade Expo or React Native to very old versions; audit fix --force has not been run.
 
-برای نصب مجدد دقیق وابستگی‌ها فقط در صورت نیاز npm.cmd ci را اجرا کنید. برای افزودن کتابخانه‌های بعدی از npx.cmd expo install استفاده کنید.
+To reinstall dependencies exactly, run npm.cmd ci only when needed. To add libraries later, use npx.cmd expo install.
 
-منابع رسمی:
+Official sources:
 - https://docs.expo.dev/get-started/create-a-project/
 - https://docs.expo.dev/more/create-expo/
 - https://docs.expo.dev/versions/v57.0.0/
