@@ -1,4 +1,4 @@
-import { LINE_OF, MARKET, PENALTY, RELATED } from './constants';
+import { LINE_OF, MARKET, PENALTY, RELATED, RETIRE_ALWAYS_AT, RETIRE_CHANCE } from './constants';
 import { NATIONS } from './names';
 import type { Rng } from './rng';
 import type { Line, Player, Position } from './types';
@@ -119,7 +119,7 @@ export function makePlayer(rng: Rng, id: string, spec: PlayerSpec): Player {
  * true value, positioned by the player's hidden bias.
  */
 export function ratingRange(p: Pick<Player, 'rating' | 'scoutBias'>, level: number): [number, number] {
-  const width = MARKET.ratingWidth[Math.min(level, 2)];
+  const width = MARKET.ratingWidth[Math.min(level, 1)];
   const lo = p.rating - Math.round(p.scoutBias * width);
   return [lo, lo + width];
 }
@@ -128,7 +128,7 @@ export function potentialRange(
   p: Pick<Player, 'potential' | 'scoutBias'>,
   level: number,
 ): [number, number] | null {
-  const width = MARKET.potentialWidth[Math.min(level, 2)];
+  const width = MARKET.potentialWidth[Math.min(level, 1)];
   if (width >= 99) return null;
   const lo = p.potential - Math.round(((p.scoutBias * 7) % 1) * width);
   return [lo, lo + width];
@@ -167,16 +167,17 @@ export function positionsForLine(line: Line | 'ALL'): Position[] {
 }
 
 /**
- * Season-end development: young players grow toward potential, veterans decline.
+ * Season-end development: players grow toward their potential until 26, hold
+ * their peak until 30, then decline gently, faster from 33.
  */
 export function develop(rng: Rng, p: Player): Player {
   const age = p.age + 1;
   let delta: number;
-  if (age <= 21) delta = rng.int(2, 5);
-  else if (age <= 24) delta = rng.int(1, 3);
-  else if (age <= 28) delta = rng.int(-1, 1);
-  else if (age <= 31) delta = rng.int(-2, 0);
-  else delta = rng.int(-4, -1);
+  if (age <= 21) delta = rng.int(2, 4);
+  else if (age <= 26) delta = rng.int(1, 3);
+  else if (age <= 30) delta = rng.int(-1, 1);
+  else if (age <= 32) delta = rng.int(-2, -1);
+  else delta = rng.int(-3, -2);
   const rating = delta > 0 ? Math.min(p.potential, p.rating + delta) : Math.max(40, p.rating + delta);
   return {
     ...p,
@@ -186,4 +187,22 @@ export function develop(rng: Rng, p: Player): Player {
     seasonsAtClub: p.seasonsAtClub + 1,
     goals: 0,
   };
+}
+
+/** Decide who retires at the end of the coming season (players are already a season older). */
+export function markRetirements<T extends Player>(rng: Rng, players: T[]): T[] {
+  return players.map((p) => {
+    const chance = p.age >= RETIRE_ALWAYS_AT ? 1 : (RETIRE_CHANCE[p.age] ?? 0);
+    return chance > 0 && rng.chance(chance) ? { ...p, retiring: true } : { ...p, retiring: false };
+  });
+}
+
+export type Trend = 'rising' | 'peak' | 'declining' | 'retiring';
+
+/** Where a player is in their career, for a simple tag in the UI. */
+export function trend(p: Pick<Player, 'age' | 'rating' | 'potential' | 'retiring'>): Trend {
+  if (p.retiring) return 'retiring';
+  if (p.age >= 31) return 'declining';
+  if (p.age <= 26 && p.rating < p.potential) return 'rising';
+  return 'peak';
 }

@@ -1,4 +1,4 @@
-import { AI_SQUAD, LINE_MIN, LINE_OF, MARKET, RETIRE_AGE, SQUAD_MAX, SQUAD_MIN } from './constants';
+import { AI_SQUAD, LINE_MIN, LINE_OF, MARKET, SQUAD_MAX, SQUAD_MIN } from './constants';
 import {
   clamp,
   develop,
@@ -11,7 +11,7 @@ import {
 } from './players';
 import type { Rng } from './rng';
 import { autoPick, teamStrength } from './team';
-import type { Club, GameState, Line, Player, Position, Style } from './types';
+import type { Club, GameState, Line, Offer, Player, Position, Style } from './types';
 
 export const USER_ID = 'user';
 export const STYLE_IDS: Style[] = ['attack', 'bus', 'possession'];
@@ -35,7 +35,7 @@ function hash(text: string) {
 
 // ---------------------------------------------------------------- world setup
 
-function makeClubSquad(rng: Rng, clubId: string, level: number, nextId: () => string): Player[] {
+export function makeClubSquad(rng: Rng, clubId: string, level: number, nextId: () => string): Player[] {
   return TEMPLATE.slice(0, AI_SQUAD).map((position, i) =>
     makePlayer(rng, nextId(), {
       position,
@@ -47,19 +47,7 @@ function makeClubSquad(rng: Rng, clubId: string, level: number, nextId: () => st
   );
 }
 
-function makeFreeAgent(rng: Rng, id: string): Player {
-  const young = rng.chance(0.3);
-  const p = makePlayer(rng, id, {
-    position: rng.pick(positionsForLine('ALL')),
-    rating: young ? rng.int(50, 62) : rng.int(56, 74),
-    age: young ? rng.int(18, 20) : rng.int(28, 34),
-    clubId: null,
-  });
-  // Free agents know they cost no fee, so they ask for more wage.
-  return { ...p, greed: 1.15 + rng.next() * 0.35 };
-}
-
-/** AI squads plus a pool of free agents. */
+/** A squad for every AI club. Every player in the world belongs to a club. */
 export function buildWorld(rng: Rng, clubs: Club[], startId: number) {
   let nextId = startId;
   const id = () => `p${nextId++}`;
@@ -67,7 +55,6 @@ export function buildWorld(rng: Rng, clubs: Club[], startId: number) {
   for (const c of clubs) {
     if (c.id !== USER_ID) world.push(...makeClubSquad(rng, c.id, c.level, id));
   }
-  for (let i = 0; i < MARKET.freeAgents; i++) world.push(makeFreeAgent(rng, id()));
   return { world, nextId };
 }
 
@@ -105,7 +92,7 @@ function isKeyPlayer(state: GameState, p: Player) {
   return autoPick(squad, '4-4-2').includes(p.id);
 }
 
-/** The selling club's public asking price. Free agents cost no fee. */
+/** The selling club's public asking price. */
 export function askingPrice(state: GameState, p: Player) {
   if (!p.clubId) return 0;
   const key = isKeyPlayer(state, p) ? 1.25 : 1;
@@ -123,18 +110,17 @@ export function successFactor(state: GameState) {
   return last === undefined ? 1 : last <= 2 ? 1.25 : last <= 4 ? 1.12 : 1;
 }
 
+/** A renewed wage follows the player's current rating, so it falls as they decline. */
 export function renewalDemand(state: GameState, p: Player) {
-  return Math.max(p.contract.wage, wageDemand(p, successFactor(state)));
+  return wageDemand(p, successFactor(state));
 }
 
 // ---------------------------------------------------------------- searching
 
 /** Up to ten players matching a fee budget and position line. */
 export function search(state: GameState, rng: Rng, maxFee: number, line: Line | 'ALL'): GameState {
-  const freeOnly = maxFee === 0;
   const candidates = state.world.filter((p) => {
     if (line !== 'ALL' && LINE_OF[p.positions[0]] !== line) return false;
-    if (freeOnly) return p.clubId === null;
     if (!p.clubId) return false;
     const price = askingPrice(state, p);
     return price <= maxFee && price >= maxFee * 0.15;
@@ -148,14 +134,11 @@ export function search(state: GameState, rng: Rng, maxFee: number, line: Line | 
 }
 
 export function scoutPlayer(state: GameState, playerId: string): GameState {
-  const level = state.scouting[playerId] ?? 0;
-  if (level >= 2) return state;
-  const cost = MARKET.scoutCost[level];
-  if (cost > state.money) return state;
+  if ((state.scouting[playerId] ?? 0) >= 1 || MARKET.scoutCost > state.money) return state;
   return {
     ...state,
-    money: state.money - cost,
-    scouting: { ...state.scouting, [playerId]: level + 1 },
+    money: state.money - MARKET.scoutCost,
+    scouting: { ...state.scouting, [playerId]: 1 },
   };
 }
 
@@ -175,7 +158,7 @@ function sign(state: GameState, p: Player, fee: number, years: number): GameStat
     squad: [...state.squad, signed],
     world: state.world.filter((w) => w.id !== p.id),
     search: state.search.filter((id) => id !== p.id),
-    scouting: { ...state.scouting, [p.id]: 2 },
+    scouting: { ...state.scouting, [p.id]: 1 },
     talks: { ...state.talks, [p.id]: { attempts: 0, counter: null, last: 'accepted' } },
   };
   return p.clubId ? refreshClubs(next, p.clubId) : next;
@@ -192,7 +175,8 @@ export function placeBid(state: GameState, playerId: string, fee: number, years:
   const talk = state.talks[p.id] ?? { attempts: 0, counter: null, last: null };
   if (talk.last === 'broken') return state;
   const price = hiddenPrice(state, p);
-  if (!p.clubId || fee >= price) return sign(state, p, fee, years);
+  if (!p.clubId) return state;
+  if (fee >= price) return sign(state, p, fee, years);
   const attempts = talk.attempts + 1;
   const last =
     fee < price * MARKET.insultBelow || attempts >= MARKET.maxAttempts
@@ -204,38 +188,70 @@ export function placeBid(state: GameState, playerId: string, fee: number, years:
   return { ...state, talks: { ...state.talks, [p.id]: { attempts, counter, last } } };
 }
 
+// ---------------------------------------------------------------- academy
+
+/**
+ * Academy youngsters for the user's club: first for any line below its
+ * minimum, then up to a full matchday squad, and at least `atLeast`.
+ */
+export function academyFill(squad: Player[], rng: Rng, startId: number, atLeast = 0) {
+  let nextId = startId;
+  const needed: Position[] = [];
+  for (const line of Object.keys(LINE_MIN) as Line[]) {
+    const have = squad.filter((p) => LINE_OF[p.positions[0]] === line).length;
+    for (let i = have; i < LINE_MIN[line]; i++) needed.push(rng.pick(positionsForLine(line)));
+  }
+  const count = Math.min(Math.max(atLeast, needed.length, SQUAD_MIN - squad.length), SQUAD_MAX - squad.length);
+  const players: Player[] = [];
+  for (let i = 0; i < count; i++) {
+    const youth = makePlayer(rng, `p${nextId++}`, {
+      position: needed[i] ?? rng.pick(positionsForLine('ALL')),
+      rating: rng.int(48, 60),
+      age: rng.int(16, 18),
+      clubId: USER_ID,
+    });
+    youth.potential = clamp(youth.rating + rng.int(8, 28), youth.rating, 92);
+    // Academy players sign cheap first contracts.
+    youth.contract = { wage: 50_000, years: 3 };
+    youth.seasonsAtClub = 1;
+    players.push(youth);
+  }
+  return { players, nextId };
+}
+
 // ---------------------------------------------------------------- selling
 
 /**
- * Why a player can't leave right now, or null if they can. The squad must keep
- * a full matchday squad and enough cover in every line.
+ * Why a player can't leave right now, or null if they can. Selling is always
+ * allowed in a window: academy youngsters fill any gap it leaves.
  */
-export function releaseBlocker(state: GameState, p: Player): string | null {
-  if (!canTrade(state)) return 'Players can only leave during a transfer window';
-  if (state.squad.length <= SQUAD_MIN) {
-    return `You need ${SQUAD_MIN} players: 11 starters and a full bench. Sign someone first.`;
-  }
-  const line = LINE_OF[p.positions[0]];
-  const inLine = state.squad.filter((m) => LINE_OF[m.positions[0]] === line).length;
-  if (inLine <= LINE_MIN[line]) {
-    const name = { GK: 'goalkeepers', DF: 'defenders', MD: 'midfielders', AT: 'attackers' }[line];
-    return `You need at least ${LINE_MIN[line]} ${name}. Sign a replacement first.`;
-  }
-  return null;
+export function releaseBlocker(state: GameState, _p: Player): string | null {
+  return canTrade(state) ? null : 'Players can only leave during a transfer window';
 }
 
-function leave(state: GameState, p: Player, clubId: string | null, fee: number): GameState {
+/** Will selling this player call up an academy youngster to fill the gap? */
+export function needsCover(state: GameState, p: Player) {
+  const line = LINE_OF[p.positions[0]];
+  const inLine = state.squad.filter((m) => LINE_OF[m.positions[0]] === line).length;
+  return state.squad.length <= SQUAD_MIN || inLine <= LINE_MIN[line];
+}
+
+function leave(state: GameState, rng: Rng, p: Player, clubId: string | null, fee: number): GameState {
   const moved: Player = {
     ...p,
+    listed: false,
     clubId,
     seasonsAtClub: 0,
     goals: 0,
     contract: { wage: wageDemand(p), years: clubId ? 3 : 0 },
   };
+  const remaining = state.squad.filter((m) => m.id !== p.id);
+  const cover = academyFill(remaining, rng, state.nextId);
   const next: GameState = {
     ...state,
     money: state.money + fee,
-    squad: state.squad.filter((m) => m.id !== p.id),
+    squad: [...remaining, ...cover.players],
+    nextId: cover.nextId,
     world: [...state.world, moved],
     lineup: state.lineup.map((id) => (id === p.id ? null : id)),
     captainId: state.captainId === p.id ? null : state.captainId,
@@ -244,11 +260,12 @@ function leave(state: GameState, p: Player, clubId: string | null, fee: number):
   return clubId ? refreshClubs(next, clubId) : next;
 }
 
-export function acceptOffer(state: GameState, offerId: string): GameState {
+/** Club bids arrive when a window opens and can be accepted until it closes. */
+export function acceptOffer(state: GameState, rng: Rng, offerId: string): GameState {
   const offer = state.offers.find((o) => o.id === offerId);
   const p = offer && state.squad.find((m) => m.id === offer.playerId);
-  if (!offer || !p || releaseBlocker(state, p)) return state;
-  return leave(state, p, offer.clubId, offer.fee);
+  if (!offer || !p || !canTrade(state)) return state;
+  return leave(state, rng, p, offer.clubId, offer.fee);
 }
 
 export function rejectOffer(state: GameState, offerId: string): GameState {
@@ -264,17 +281,55 @@ export function quickSale(state: GameState, rng: Rng, playerId: string): GameSta
   const p = state.squad.find((m) => m.id === playerId);
   if (!p || releaseBlocker(state, p)) return state;
   const buyer = rng.pick(state.clubs.filter((c) => c.id !== USER_ID));
-  return leave(state, p, buyer.id, quickSalePrice(p));
+  return leave(state, rng, p, buyer.id, quickSalePrice(p));
 }
 
-/** AI clubs bid for the user's most attractive players when a window opens. */
+/** 1–2 fair bids (85–110% of value) for a listed player: certainty, not a premium. */
+function listedOffers(state: GameState, rng: Rng, p: Player, startId: number) {
+  let n = startId;
+  const clubs = state.clubs.filter((c) => c.id !== USER_ID);
+  const keen = clubs.filter((c) => c.level >= p.rating - 8);
+  const pool = keen.length ? keen : clubs;
+  const offers: Offer[] = [];
+  for (let i = 0; i < rng.int(1, 2); i++) {
+    const club = rng.pick(pool);
+    if (offers.some((o) => o.clubId === club.id)) continue;
+    const fee = roundMoney(playerValue(p) * contractFactor(p.contract.years) * (0.85 + rng.next() * 0.25));
+    offers.push({ id: `o${n++}`, playerId: p.id, clubId: club.id, fee });
+  }
+  return { offers, nextId: n };
+}
+
+/** Put a player on (or take them off) the transfer list. Listing in a window brings bids at once. */
+export function setListed(state: GameState, rng: Rng, playerId: string, listed: boolean): GameState {
+  const p = state.squad.find((m) => m.id === playerId);
+  if (!p) return state;
+  const squad = state.squad.map((m) => (m.id === playerId ? { ...m, listed } : m));
+  const next = { ...state, squad };
+  if (!listed || !canTrade(state) || state.offers.some((o) => o.playerId === playerId)) return next;
+  const extra = listedOffers(next, rng, p, state.nextId);
+  return { ...next, offers: [...state.offers, ...extra.offers], nextId: extra.nextId };
+}
+
+/**
+ * When a window opens: listed players get fair bids for sure, and AI clubs may
+ * also bid (sometimes generously) for the user's most attractive players.
+ */
 export function makeOffers(state: GameState, rng: Rng): GameState {
   const appeal = (p: Player) => p.rating + (p.potential - p.rating) * 0.6 + (p.age <= 23 ? 3 : 0);
-  const targets = [...state.squad].sort((a, b) => appeal(b) - appeal(a)).slice(0, 6);
-  const offers = [];
+  const targets = [...state.squad]
+    .filter((p) => !p.listed)
+    .sort((a, b) => appeal(b) - appeal(a))
+    .slice(0, 6);
+  const offers: Offer[] = [];
   let n = state.nextId;
+  for (const p of state.squad.filter((m) => m.listed)) {
+    const extra = listedOffers(state, rng, p, n);
+    offers.push(...extra.offers);
+    n = extra.nextId;
+  }
   for (const p of targets) {
-    if (offers.length >= 3 || !rng.chance(0.4)) continue;
+    if (offers.filter((o) => !state.squad.find((m) => m.id === o.playerId)?.listed).length >= 3 || !rng.chance(0.4)) continue;
     const buyers = state.clubs.filter((c) => c.id !== USER_ID && c.level >= p.rating - 6);
     if (!buyers.length) continue;
     const club = rng.pick(buyers);
@@ -284,41 +339,27 @@ export function makeOffers(state: GameState, rng: Rng): GameState {
   return { ...state, offers, nextId: n };
 }
 
-// ---------------------------------------------------------------- contracts
-
-export function renew(state: GameState, playerId: string, years: number): GameState {
-  const p = state.squad.find((m) => m.id === playerId);
-  if (!p || !canTrade(state) || p.contract.years > 1) return state;
-  const wage = renewalDemand(state, p);
-  return {
-    ...state,
-    squad: state.squad.map((m) => (m.id === p.id ? { ...m, contract: { wage, years } } : m)),
-  };
-}
-
 // ---------------------------------------------------------------- season end
 
 /**
- * Ages, develops and re-contracts every AI and free-agent player, refills AI
- * squads, refreshes the free-agent pool and recomputes club strength.
+ * Ages, develops and re-contracts every AI player, refills AI squads and
+ * recomputes club strength. Players without a club (from older saves) leave.
  */
 export function advanceWorld(state: GameState, rng: Rng): GameState {
   let nextId = state.nextId;
   const id = () => `p${nextId++}`;
   const world: Player[] = [];
   for (const p of state.world) {
-    if (p.age + 1 >= RETIRE_AGE && rng.chance(0.7)) continue;
-    const grown = develop(rng, p);
+    if (p.retiring || !p.clubId) continue;
     const years = p.contract.years - 1;
-    if (!p.clubId) {
-      world.push(grown);
-    } else if (years > 0) {
-      world.push({ ...grown, contract: { ...p.contract, years } });
-    } else if (rng.chance(0.7)) {
-      world.push({ ...grown, contract: { wage: marketWage(grown), years: rng.int(1, 3) } });
-    } else {
-      world.push({ ...grown, clubId: null, seasonsAtClub: 0 });
-    }
+    // When a contract ends, most players renew; the rest leave the league
+    // (they never become free agents). This turnover keeps clubs stable.
+    if (years <= 0 && !rng.chance(0.7)) continue;
+    const grown = develop(rng, p);
+    world.push({
+      ...grown,
+      contract: years > 0 ? { ...p.contract, years } : { wage: marketWage(grown), years: rng.int(1, 3) },
+    });
   }
 
   const clubs = state.clubs.map((c) => {
@@ -328,17 +369,18 @@ export function advanceWorld(state: GameState, rng: Rng): GameState {
     return { ...c, level: clamp(Math.round(c.level + pull + rng.int(-2, 2)), 58, 84), style };
   });
 
-  // Keep every AI squad at its size: sign replacements around the club level,
-  // release the weakest extras.
+  // Keep every AI squad at its size: sign replacements around the club level;
+  // the weakest extras leave the league.
+  const leaving = new Set<string>();
   for (const c of clubs) {
     if (c.id === USER_ID) continue;
     const squad = world.filter((p) => p.clubId === c.id).sort((a, b) => b.rating - a.rating);
-    for (const extra of squad.slice(AI_SQUAD + 2)) extra.clubId = null;
+    for (const extra of squad.slice(AI_SQUAD + 2)) leaving.add(extra.id);
     for (let i = squad.length; i < AI_SQUAD; i++) {
       world.push(
         makePlayer(rng, id(), {
           position: TEMPLATE[i % TEMPLATE.length],
-          rating: c.level - 3 + rng.int(-5, 3),
+          rating: c.level - 1 + rng.int(-4, 3),
           age: rng.int(18, 30),
           clubId: c.id,
         }),
@@ -346,8 +388,6 @@ export function advanceWorld(state: GameState, rng: Rng): GameState {
     }
   }
 
-  const free = world.filter((p) => !p.clubId).length;
-  for (let i = free; i < MARKET.freeAgents; i++) world.push(makeFreeAgent(rng, id()));
 
   const changedStyle = new Set(
     clubs.filter((c, i) => c.style !== state.clubs[i].style).map((c) => c.id),
@@ -355,7 +395,7 @@ export function advanceWorld(state: GameState, rng: Rng): GameState {
   return refreshClubs({
     ...state,
     clubs,
-    world,
+    world: world.filter((p) => !leaving.has(p.id)),
     nextId,
     knownStyles: state.knownStyles.filter((cid) => !changedStyle.has(cid)),
   });

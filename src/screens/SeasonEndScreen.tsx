@@ -34,12 +34,15 @@ export function SeasonEndScreen() {
         {!champion ? <Text style={s.sub}>Champions: {sum.championName}</Text> : null}
       </FadeIn>
 
-      {sacked ? (
+      {sum.board === 'sacked' || sum.board === 'warning' ? (
         <Card style={s.sacked}>
-          <Text style={s.sackedTitle}>The board has sacked you</Text>
+          <Text style={s.sackedTitle}>
+            {sacked ? 'The board has sacked you' : '🚨 Final warning from the board'}
+          </Text>
           <Text style={s.sackedText}>
-            The club finished the season at {formatMoney(sum.moneyAfter)}. The board steps in below{' '}
-            {formatMoney(ECONOMY.sackedBelow)}.
+            {sacked
+              ? `Two seasons in a row below ${formatMoney(ECONOMY.debtLimit)}. Your time at the club is over.`
+              : `The club ended the season at ${formatMoney(sum.moneyAfter)}. Finish next season above ${formatMoney(ECONOMY.debtLimit)}, or you are sacked. Selling players is the quickest fix.`}
           </Text>
         </Card>
       ) : null}
@@ -49,9 +52,11 @@ export function SeasonEndScreen() {
       <Card>
         <Row label="Prize money" value={`+${formatMoney(sum.prize)}`} color={colors.green} />
         <Row label="Fan revenue" value={`+${formatMoney(sum.fanIncome)}`} color={colors.green} />
-        <Row label="Players' yearly cost" value={`-${formatMoney(sum.wages)}`} color={colors.red} />
-        <Row label="Fixed costs" value={`-${formatMoney(sum.fixedCosts)}`} color={colors.red} />
-        <Row label="Stakeholder cashout" value={`-${formatMoney(sum.stakeholder)}`} color={colors.red} />
+        <Row label="Wages" value={`-${formatMoney(sum.wages)}`} color={colors.red} />
+        <Row label="Running the club" value={`-${formatMoney(sum.fixedCosts)}`} color={colors.red} />
+        {sum.stakeholder ? (
+          <Row label="Owners' share of profit" value={`-${formatMoney(sum.stakeholder)}`} color={colors.red} />
+        ) : null}
         {sum.bonuses ? (
           <Row label="Top-finish bonuses" value={`-${formatMoney(sum.bonuses)}`} color={colors.red} />
         ) : null}
@@ -85,13 +90,10 @@ export function SeasonEndScreen() {
             ) : null}
           </Card>
 
-          {sum.retired.length || sum.academy.length || sum.expired.length ? (
+          {sum.retired.length || sum.academy.length ? (
             <>
               <SectionTitle>SQUAD CHANGES</SectionTitle>
               <Card>
-                {sum.expired.map((n) => (
-                  <Row key={`x${n}`} label={n} value="Left on a free" color={colors.red} />
-                ))}
                 {sum.retired.map((n) => (
                   <Row key={n} label={n} value="Retired" color={colors.muted} />
                 ))}

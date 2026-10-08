@@ -53,6 +53,10 @@ export interface Player {
   scoutBias: number;
   /** Wage demand multiplier: how greedy the player is (0.9–1.4). */
   greed: number;
+  /** Decided at the start of a season: this player retires when it ends. */
+  retiring?: boolean;
+  /** On the user's transfer list: clubs make offers when a window is open. */
+  listed?: boolean;
 }
 
 export interface Club {
@@ -66,6 +70,8 @@ export interface Club {
   style: Style;
   /** Typical rating of the club's starters; guides who it signs. */
   level: number;
+  /** User club only: how big the club is, which sets sponsor income. */
+  size?: number;
 }
 
 export interface MatchResult {
@@ -111,8 +117,11 @@ export interface SeasonSummary {
   championName: string;
   prize: number;
   fanIncome: number;
+  /** Sponsor income (bigger clubs earn more). Missing in older saves. */
+  sponsor?: number;
   wages: number;
   fixedCosts: number;
+  /** Stakeholders' share of the profit (0 in a loss-making season). */
   stakeholder: number;
   bonuses: number;
   net: number;
@@ -123,9 +132,12 @@ export interface SeasonSummary {
   changes: PlayerChange[];
   retired: string[];
   academy: string[];
-  /** Players who left because their contract ran out. */
-  expired: string[];
+  /** The board's verdict after this season. */
+  board: BoardStatus;
 }
+
+/** ok: money ≥ 0 · debt: below 0 · warning: final warning · sacked: game over. */
+export type BoardStatus = 'ok' | 'debt' | 'warning' | 'sacked';
 
 export interface GameState {
   version: 2;
@@ -160,4 +172,6 @@ export interface GameState {
   nextId: number;
   summary: SeasonSummary | null;
   history: { season: number; position: number }[];
+  /** Money at the season end that earned a final warning; null when there is none. */
+  warning?: number | null;
 }

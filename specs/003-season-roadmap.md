@@ -22,7 +22,7 @@ Excluded: new game mechanics, AI transfers, real player data.
 | S003-AC01 | Club screen shows every matchday, both windows and the finish; results colored W/D/L; current stop pulses and is scrolled into view | Web screenshots | Passed (web) |
 | S003-AC02 | Tapping a played round shows its score, scorers and other results | Web flow | Passed (web) |
 | S003-AC03 | Tapping a future round shows win/draw/loss odds and a tactic tip, and can play up to that round | Web flow ("play 3 matches" stopped at MD3) | Passed (web) |
-| S003-AC04 | Open-ended simulation pauses before key matches (losing streak, leaders, six-pointer, title race), about 3 times per season | Headless: 60 seasons, avg 3.4 stops; web flow stopped | Passed |
+| S003-AC04 | ~~Simulation pauses before key matches~~ Removed by user request (S005-AC13): matches run until a window or season end | Web: no stops before the window | Superseded |
 | S003-AC05 | Tabs slide/fade in, sheets spring up, results pop in, table rows animate, season end reveals in steps | Web observation | Passed (web) |
 | S003-AC06 | All of the above on Android | Device observation | Pending |
 

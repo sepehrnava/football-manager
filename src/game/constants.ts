@@ -14,21 +14,39 @@ export const SQUAD_MAX = 25;
 /** Fewest players per line, so every position (and its bench cover) can be filled. */
 export const LINE_MIN: Record<Line, number> = { GK: 2, DF: 5, MD: 5, AT: 3 };
 export const AI_SQUAD = 20;
-export const RETIRE_AGE = 35;
+/**
+ * Chance a player decides, at the start of a season, to retire when it ends.
+ * By age at that point; 37 and older always retire.
+ */
+export const RETIRE_CHANCE: Record<number, number> = { 34: 0.2, 35: 0.5, 36: 0.8 };
+export const RETIRE_ALWAYS_AT = 37;
 
 // Economy, all in dollars per season. Tuned so the starting club loses money.
 export const ECONOMY = {
   startMoney: 10_000_000,
   startFans: 400_000,
-  fixedCosts: 4_000_000,
-  stakeholderCashout: 2_000_000,
+  /** Running the club costs a base amount plus a little per fan: bigger clubs cost more. */
+  runningCostBase: 2_000_000,
+  runningCostPerFan: 8,
+  /** Stakeholders take this share of a season's profit, and nothing in a loss. */
+  stakeholderShare: 0.25,
+  /** Loyal supporters who never leave, so income can't collapse to nothing. */
+  fansFloor: 250_000,
   revenuePerFan: 5,
+  /**
+   * Sponsors pay bigger clubs more: scale × e^(0.14 × (size − 60)) − offset,
+   * never below zero. A size-64 club (a new club) gets nothing.
+   */
+  sponsorScale: 1_300_000,
+  sponsorOffset: 3_500_000,
+  /** The size of a brand-new user club (its typical starter rating). */
+  newClubSize: 64,
   /** Prize money by final position, 1st first. */
   prize: [20, 15, 12, 10, 9, 8, 7, 6, 5, 4].map((m) => m * 1_000_000),
   /** Share of the wage bill paid as bonuses for a top-3 finish. */
   topFinishBonus: [0.15, 0.1, 0.05],
-  /** The board sacks you when money ends a season below this. */
-  sackedBelow: -5_000_000,
+  /** Ending a season below this earns a final warning; twice in a row is the sack. */
+  debtLimit: -5_000_000,
 };
 
 export const LINE_OF: Record<Position, Line> = {
@@ -255,11 +273,11 @@ export const STYLES: Record<Style, { label: string; text: string; beatenBy: Tact
 export const COUNTER_BONUS = 3;
 
 export const MARKET = {
-  /** Cost to raise scouting on one player to level 1 and level 2. */
-  scoutCost: [150_000, 350_000],
-  /** Rating range width at scouting levels 0, 1 and 2. */
-  ratingWidth: [10, 4, 0],
-  potentialWidth: [99, 10, 0],
+  /** One scouting report reveals a player's exact rating and potential. */
+  scoutCost: 250_000,
+  /** Rating range width before (0) and after (1) scouting. */
+  ratingWidth: [10, 0],
+  potentialWidth: [99, 0],
   /** Bids per player per window before the club stops talking. */
   maxAttempts: 3,
   /** An offer at or above this share of the hidden price gets a counter. */
@@ -269,5 +287,4 @@ export const MARKET = {
   /** A quick sale returns this share of value. */
   quickSale: 0.6,
   searchSize: 10,
-  freeAgents: 14,
 };

@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 
 import { MARKET, SQUAD_MAX } from '../game/constants';
 import { canTrade, clubById } from '../game/game';
-import { askingPrice, quickSalePrice, releaseBlocker, renewalDemand } from '../game/market';
+import { askingPrice, needsCover, quickSalePrice, releaseBlocker } from '../game/market';
 import {
   chemistry,
   playerValue,
@@ -11,15 +11,14 @@ import {
   rangeLabel,
   ratingRange,
   roundMoney,
+  trend,
   wageDemand,
 } from '../game/players';
 import type { Player } from '../game/types';
 import { useCareer } from '../state/GameContext';
-import { Bar, Button, ClubCrest, PosTags, RangeBadge, RatingBadge, Row, Sheet } from '../ui/components';
+import { Bar, Button, ClubCrest, PosTags, RangeBadge, RatingBadge, Row, Sheet, TrendTag } from '../ui/components';
 import { FadeIn } from '../ui/motion';
 import { colors, formatMoney } from '../ui/theme';
-
-const YEARS = [1, 2, 3, 4];
 
 /** A squad player (contract, renew, sell) or a market target (scout, negotiate). */
 export function PlayerSheet({
@@ -37,7 +36,8 @@ export function PlayerSheet({
   const other = state.world.find((p) => p.id === playerId);
   // A market target that just joined us shows the welcome view.
   if (mode === 'market' && own) return <Signed player={own} onClose={onClose} />;
-  if (mode === 'market' && other) return <MarketView key={other.id} player={other} onClose={onClose} />;
+  // Every market player belongs to a club (older saves may hold clubless ones; skip them).
+  if (mode === 'market' && other?.clubId) return <MarketView key={other.id} player={other} onClose={onClose} />;
   if (own) return <SquadView key={own.id} player={own} onClose={onClose} />;
   return null;
 }
@@ -57,33 +57,31 @@ function Signed({ player, onClose }: { player: Player; onClose: () => void }) {
   );
 }
 
+/** Offer levels as a share of the asking price: cheap but risky, to safe. */
+const OFFERS = [
+  { label: 'CHEEKY', share: 0.75 },
+  { label: 'FAIR', share: 0.9 },
+  { label: 'FULL PRICE', share: 1 },
+];
+
 function MarketView({ player: p, onClose }: { player: Player; onClose: () => void }) {
   const { state, dispatch } = useCareer();
   const asking = askingPrice(state, p);
-  const step = Math.max(50_000, roundMoney(asking * 0.05));
-  const [fee, setFee] = useState(() => roundMoney(asking * 0.9));
-  const [years, setYears] = useState(3);
-  const level = state.scouting[p.id] ?? 0;
+  const scouted = (state.scouting[p.id] ?? 0) >= 1;
   const talk = state.talks[p.id];
-  const club = p.clubId ? clubById(state, p.clubId) : null;
+  const club = clubById(state, p.clubId!);
   const wage = wageDemand(p);
-  const open = canTrade(state);
-  const broken = talk?.last === 'broken';
-  const triesLeft = MARKET.maxAttempts - (talk?.attempts ?? 0);
-  const pot = potentialRange(p, level);
-  const offerFee = club ? fee : 0;
+  const pot = potentialRange(p, scouted ? 1 : 0);
 
-  const blocked = !open
+  const blocked = !canTrade(state)
     ? 'The transfer window is closed'
     : state.squad.length >= SQUAD_MAX
       ? `Squad is full (${SQUAD_MAX})`
-      : offerFee > state.money
-        ? `You need ${formatMoney(offerFee - state.money)} more`
-        : broken
-          ? `${club?.name ?? 'The club'} ended talks this window`
-          : null;
+      : talk?.last === 'broken'
+        ? `${club.name} stopped talking to you until the next window`
+        : null;
 
-  const bid = (amount: number) => dispatch({ type: 'bid', playerId: p.id, fee: amount, years });
+  const bid = (fee: number) => dispatch({ type: 'bid', playerId: p.id, fee, years: 3 });
 
   return (
     <Sheet
@@ -93,27 +91,40 @@ function MarketView({ player: p, onClose }: { player: Player; onClose: () => voi
       footer={
         <View style={s.footer}>
           {blocked ? <Text style={s.reason}>{blocked}</Text> : null}
-          <Button
-            label={club ? `OFFER ${formatMoney(fee)}` : `SIGN FOR ${formatMoney(wage)}/YR`}
-            variant="green"
-            disabled={!!blocked}
-            onPress={() => bid(offerFee)}
-          />
+          <View style={s.actions}>
+              {OFFERS.map((o) => {
+                const fee = roundMoney(asking * o.share);
+                return (
+                  <View key={o.label} style={s.flex}>
+                    <Button
+                      label={formatMoney(fee)}
+                      variant={o.share === 1 ? 'green' : 'light'}
+                      small
+                      disabled={!!blocked || fee > state.money}
+                      onPress={() => bid(fee)}
+                    />
+                    <Text style={s.offerLabel}>{o.label}</Text>
+                  </View>
+                );
+              })}
+          </View>
         </View>
       }
     >
       <View style={s.hero}>
-        <RangeBadge range={ratingRange(p, level)} size={64} />
+        <RangeBadge range={ratingRange(p, scouted ? 1 : 0)} size={64} />
         <View style={s.heroText}>
           <PosTags positions={p.positions} size={18} />
           <Text style={s.meta}>
             {p.flag} Age {p.age}
           </Text>
+          {/* Rising vs peak would hint at potential, so it shows only once scouted. */}
+          {scouted || trend(p) === 'declining' || trend(p) === 'retiring' ? (
+            <TrendTag trend={trend(p)} size={12} />
+          ) : null}
           <View style={s.clubLine}>
-            {club ? <ClubCrest club={club} size={18} /> : null}
-            <Text style={s.meta}>
-              {club ? `${club.name} · ${p.contract.years} yr${p.contract.years > 1 ? 's' : ''} left` : 'Free agent'}
-            </Text>
+            <ClubCrest club={club} size={18} />
+            <Text style={s.meta}>{club.name}</Text>
           </View>
         </View>
         <View style={s.pot}>
@@ -123,23 +134,22 @@ function MarketView({ player: p, onClose }: { player: Player; onClose: () => voi
       </View>
 
       <View style={s.box}>
-        <View style={s.scoutRow}>
-          <View style={s.flex}>
-            <Text style={s.boxTitle}>Scouting: {['Rough guess', 'Good estimate', 'Exact'][level]}</Text>
-            <Text style={s.hint}>
-              {level < 2 ? 'Scout to narrow the rating and reveal potential.' : 'You know exactly what you are buying.'}
-            </Text>
-          </View>
-          {level < 2 ? (
+        <Row label="Price" value={formatMoney(asking)} bold />
+        <Row label="Wage" value={`${formatMoney(wage)} per season`} />
+        {scouted ? (
+          <Text style={s.hint}>✓ Scouted: rating and potential are exact.</Text>
+        ) : (
+          <View style={s.scoutRow}>
+            <Text style={[s.hint, s.flex]}>The rating is a guess. Scout to see exactly how good the player is.</Text>
             <Button
-              label={`SCOUT ${formatMoney(MARKET.scoutCost[level])}`}
+              label={`SCOUT ${formatMoney(MARKET.scoutCost)}`}
               variant="light"
               small
-              disabled={MARKET.scoutCost[level] > state.money}
+              disabled={MARKET.scoutCost > state.money}
               onPress={() => dispatch({ type: 'scoutPlayer', playerId: p.id })}
             />
-          ) : null}
-        </View>
+          </View>
+        )}
       </View>
 
       {talk?.last && talk.last !== 'accepted' ? (
@@ -147,21 +157,22 @@ function MarketView({ player: p, onClose }: { player: Player; onClose: () => voi
           <View style={[s.reply, talk.last === 'countered' ? s.replyCounter : s.replyNo]}>
             <Text style={s.replyTitle}>
               {talk.last === 'countered'
-                ? `They'll sell for ${formatMoney(talk.counter ?? 0)}`
+                ? `They want ${formatMoney(talk.counter ?? 0)}`
                 : talk.last === 'rejected'
                   ? 'Offer rejected'
-                  : 'Talks broken off'}
+                  : 'They walked away'}
             </Text>
             <Text style={s.replyText}>
               {talk.last === 'countered'
-                ? 'Accept their price, or try your luck with another offer.'
+                ? 'Close! Pay their price to sign the player.'
                 : talk.last === 'rejected'
-                  ? `Too low. ${triesLeft} ${triesLeft === 1 ? 'try' : 'tries'} left before they stop talking.`
-                  : 'You pushed too hard. Try again next window.'}
+                  ? 'Too low. Try a higher offer.'
+                  : 'You offered too little too often. Try again next window.'}
             </Text>
             {talk.last === 'countered' && talk.counter && !blocked ? (
               <Button
-                label={`ACCEPT ${formatMoney(talk.counter)}`}
+                label={`PAY ${formatMoney(talk.counter)}`}
+                variant="green"
                 small
                 disabled={talk.counter > state.money}
                 onPress={() => bid(talk.counter!)}
@@ -171,48 +182,8 @@ function MarketView({ player: p, onClose }: { player: Player; onClose: () => voi
         </FadeIn>
       ) : null}
 
-      <View style={s.box}>
-        {club ? (
-          <>
-            <Row label="Asking price" value={formatMoney(asking)} />
-            <Text style={s.boxTitle}>Your offer</Text>
-            <View style={s.stepper}>
-              <StepButton label="−" onPress={() => setFee(Math.max(0, fee - step))} />
-              <Text style={s.feeText}>{formatMoney(fee)}</Text>
-              <StepButton label="+" onPress={() => setFee(fee + step)} />
-            </View>
-            <View style={s.chips}>
-              {[0.7, 0.85, 1, 1.1].map((f) => (
-                <Pressable key={f} onPress={() => setFee(roundMoney(asking * f))} style={s.chip}>
-                  <Text style={s.chipText}>{f === 1 ? 'Asking' : `${Math.round(f * 100)}%`}</Text>
-                </Pressable>
-              ))}
-            </View>
-          </>
-        ) : (
-          <Text style={s.hint}>No transfer fee, but free agents ask for a higher wage.</Text>
-        )}
-        <Text style={s.boxTitle}>Contract length</Text>
-        <View style={s.chips}>
-          {YEARS.map((y) => (
-            <Pressable key={y} onPress={() => setYears(y)} style={[s.chip, years === y && s.chipOn]}>
-              <Text style={[s.chipText, years === y && s.chipTextOn]}>
-                {y} yr{y > 1 ? 's' : ''}
-              </Text>
-            </Pressable>
-          ))}
-        </View>
-        <Row label="Wage demand" value={`${formatMoney(wage)}/yr`} />
-        <Row label={`Total cost over ${years} yr${years > 1 ? 's' : ''}`} value={formatMoney(offerFee + wage * years)} bold />
-        <Row
-          label="Money after the fee"
-          value={formatMoney(state.money - offerFee)}
-          color={state.money - offerFee < 0 ? colors.red : undefined}
-        />
-      </View>
       <Text style={s.hint}>
-        Clubs accept somewhere around their asking price. Lowball too hard, or try {MARKET.maxAttempts} times, and
-        they walk away.
+        A cheeky offer saves money but may be rejected. Too many low offers and the club stops talking.
       </Text>
     </Sheet>
   );
@@ -221,11 +192,7 @@ function MarketView({ player: p, onClose }: { player: Player; onClose: () => voi
 function SquadView({ player: p, onClose }: { player: Player; onClose: () => void }) {
   const { state, dispatch } = useCareer();
   const [confirmSell, setConfirmSell] = useState(false);
-  const [years, setYears] = useState(3);
-  const open = canTrade(state);
   const isCaptain = state.captainId === p.id;
-  const expiring = p.contract.years === 1;
-  const demand = renewalDemand(state, p);
   const sale = quickSalePrice(p);
   const sellBlocked = releaseBlocker(state, p);
   const chem = chemistry(p);
@@ -237,6 +204,12 @@ function SquadView({ player: p, onClose }: { player: Player; onClose: () => void
       onClose={onClose}
       footer={
         <View style={s.footer}>
+          <Button
+            label={p.listed ? 'TAKE OFF TRANSFER LIST' : 'PUT ON TRANSFER LIST'}
+            variant={p.listed ? 'light' : 'green'}
+            small
+            onPress={() => dispatch({ type: 'list', playerId: p.id, listed: !p.listed })}
+          />
           <View style={s.actions}>
             <Button
               label={isCaptain ? 'CAPTAIN ✓' : 'MAKE CAPTAIN'}
@@ -260,7 +233,14 @@ function SquadView({ player: p, onClose }: { player: Player; onClose: () => void
             />
           </View>
           <Text style={s.reason}>
-            {sellBlocked ?? 'A quick sale goes to whoever pays now, well below value. Offers in Transfers pay more.'}
+            {p.listed
+              ? canTrade(state)
+                ? 'Listed: offers are waiting in Transfers.'
+                : 'Listed: clubs will make offers when the next window opens.'
+              : (sellBlocked ??
+                `Transfer list = fair offers from clubs. Quick sale = instant cash, but less money.${
+                  needsCover(state, p) ? ' An academy youngster fills any gap.' : ''
+                }`)}
           </Text>
         </View>
       }
@@ -273,6 +253,7 @@ function SquadView({ player: p, onClose }: { player: Player; onClose: () => void
             {p.flag} Age {p.age}
             {isCaptain ? ' · Captain' : ''}
           </Text>
+          <TrendTag trend={trend(p)} size={12} />
         </View>
         <View style={s.pot}>
           <Text style={s.potValue}>{p.potential}</Text>
@@ -280,44 +261,24 @@ function SquadView({ player: p, onClose }: { player: Player; onClose: () => void
         </View>
       </View>
 
-      <View style={s.box}>
-        <Row label="Wage" value={`${formatMoney(p.contract.wage)}/yr`} />
-        <Row
-          label="Contract"
-          value={`${p.contract.years} season${p.contract.years > 1 ? 's' : ''} left`}
-          color={expiring ? colors.red : undefined}
-        />
-        <Row label="Value" value={formatMoney(playerValue(p))} />
-        <Row label="Goals this season" value={String(p.goals)} />
-      </View>
-
-      {expiring ? (
-        <View style={[s.box, s.renewBox]}>
-          <Text style={s.boxTitle}>Contract ends this season</Text>
+      {p.retiring ? (
+        <View style={[s.box, s.retireBox]}>
+          <Text style={s.retireTitle}>Retiring at the end of this season</Text>
           <Text style={s.hint}>
-            Wants {formatMoney(demand)}/yr to stay
-            {demand > p.contract.wage ? ` (+${formatMoney(demand - p.contract.wage)})` : ''}. Without a renewal, the
-            player leaves for free when the season ends.
+            After this season the player is gone for nothing. Sell during a transfer window to get something back.
           </Text>
-          <View style={s.chips}>
-            {YEARS.map((y) => (
-              <Pressable key={y} onPress={() => setYears(y)} style={[s.chip, years === y && s.chipOn]}>
-                <Text style={[s.chipText, years === y && s.chipTextOn]}>
-                  {y} yr{y > 1 ? 's' : ''}
-                </Text>
-              </Pressable>
-            ))}
-          </View>
-          <Button
-            label={`RENEW · ${formatMoney(demand)}/YR`}
-            variant="green"
-            small
-            disabled={!open}
-            onPress={() => dispatch({ type: 'renew', playerId: p.id, years })}
-          />
-          {!open ? <Text style={s.reason}>Renew when the transfer window opens.</Text> : null}
         </View>
       ) : null}
+
+      <View style={s.box}>
+        <Row label="Wage" value={`${formatMoney(p.contract.wage)} per season`} />
+        <Row label="Value" value={formatMoney(playerValue(p))} />
+        <Row label="Goals this season" value={String(p.goals)} />
+        <Text style={s.hint}>
+          Contracts renew automatically. The new wage follows the player&apos;s rating: up when they improve,
+          down as they age.
+        </Text>
+      </View>
 
       <View style={s.box}>
         <Row label="Chemistry" value={`${chem}`} />
@@ -327,14 +288,6 @@ function SquadView({ player: p, onClose }: { player: Player; onClose: () => void
         </Text>
       </View>
     </Sheet>
-  );
-}
-
-function StepButton({ label, onPress }: { label: string; onPress: () => void }) {
-  return (
-    <Pressable onPress={onPress} style={({ pressed }) => [s.step, pressed && { opacity: 0.6 }]} accessibilityRole="button">
-      <Text style={s.stepText}>{label}</Text>
-    </Pressable>
   );
 }
 
@@ -356,36 +309,19 @@ const s = StyleSheet.create({
     marginBottom: 12,
     gap: 6,
   },
-  renewBox: { borderColor: '#F6C9CB', backgroundColor: '#FFF8F8' },
-  boxTitle: { fontSize: 15, fontWeight: '900', color: colors.ink },
+  hint: { fontSize: 13, color: colors.muted, fontWeight: '600', lineHeight: 18 },
+  footer: { gap: 8, paddingTop: 8 },
+  actions: { flexDirection: 'row', gap: 10 },
+  flex: { flex: 1 },
   scoutRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   reply: { borderRadius: 16, padding: 14, gap: 6, marginBottom: 12 },
   replyCounter: { backgroundColor: '#FFF3D6' },
   replyNo: { backgroundColor: colors.redSoft },
   replyTitle: { fontSize: 17, fontWeight: '900', color: colors.ink },
   replyText: { fontSize: 13, fontWeight: '600', color: colors.muted },
-  stepper: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  step: {
-    width: 48,
-    height: 44,
-    borderRadius: 14,
-    backgroundColor: colors.faint,
-    borderWidth: 2,
-    borderColor: colors.border,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  stepText: { fontSize: 24, fontWeight: '900', color: colors.ink },
-  feeText: { fontSize: 28, fontWeight: '900', color: colors.ink },
-  chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-  chip: { paddingVertical: 7, paddingHorizontal: 12, borderRadius: 12, backgroundColor: colors.faint, borderWidth: 2, borderColor: colors.border },
-  chipOn: { backgroundColor: colors.ink, borderColor: colors.ink },
-  chipText: { fontWeight: '800', color: colors.ink, fontSize: 13 },
-  chipTextOn: { color: '#FFFFFF' },
-  hint: { fontSize: 13, color: colors.muted, fontWeight: '600', lineHeight: 18 },
-  footer: { gap: 8, paddingTop: 8 },
-  actions: { flexDirection: 'row', gap: 10 },
-  flex: { flex: 1 },
+  retireBox: { borderColor: '#F6C9CB', backgroundColor: '#FFF8F8' },
+  retireTitle: { fontSize: 15, fontWeight: '900', color: colors.red },
+  offerLabel: { textAlign: 'center', fontSize: 11, fontWeight: '900', color: colors.muted, marginTop: 4, letterSpacing: 0.5 },
   reason: { textAlign: 'center', color: colors.muted, fontWeight: '700', fontSize: 12 },
   signed: { alignItems: 'center', gap: 8, paddingVertical: 12 },
   signedEmoji: { fontSize: 56 },

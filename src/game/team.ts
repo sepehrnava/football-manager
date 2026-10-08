@@ -1,6 +1,6 @@
 import { FORMATIONS, SLOT_WEIGHTS, TACTICS } from './constants';
 import { chemistry, clamp, ratingAt } from './players';
-import type { FormationId, GameState, Player, Tactic } from './types';
+import type { FormationId, GameState, Player, Position, Tactic } from './types';
 
 export interface TeamStrength {
   attack: number;
@@ -63,9 +63,17 @@ export function userStrength(state: GameState) {
   return teamStrength(state.squad, state.lineup, state.formation, state.tactic, state.captainId);
 }
 
+/** Small bonus so a natural-position player wins a tie on rating. */
+const NATURAL_BONUS = 0.5;
+
+function fitScore(p: Player, pos: Position) {
+  return ratingAt(p, pos) + (p.positions.includes(pos) ? NATURAL_BONUS : 0);
+}
+
 /**
- * Best XI for a formation: fill the hardest slots first with the
- * highest effective rating available. Slots already set in `base` are kept.
+ * Best XI for a formation: the assignment of players to slots with the highest
+ * total rating (Hungarian algorithm), preferring natural positions on ties.
+ * Slots already set in `base` are kept.
  */
 export function autoPick(
   squad: Player[],
@@ -75,32 +83,75 @@ export function autoPick(
   const slots = FORMATIONS[formationId].slots;
   const lineup: (string | null)[] = slots.map((_, i) => base?.[i] ?? null);
   const used = new Set(lineup.filter((id): id is string => id !== null));
-  // GK first, then strikers and centre-backs, then the rest.
-  const order = slots
-    .map((s, i) => ({ s, i }))
-    .filter(({ i }) => lineup[i] === null)
-    .sort((a, b) => slotPriority(a.s.pos) - slotPriority(b.s.pos));
-  for (const { s, i } of order) {
-    let best: Player | null = null;
-    let bestR = -1;
-    for (const p of squad) {
-      if (used.has(p.id)) continue;
-      const r = ratingAt(p, s.pos);
-      if (r > bestR) {
-        best = p;
-        bestR = r;
-      }
-    }
-    if (best) {
-      used.add(best.id);
-      lineup[i] = best.id;
-    }
-  }
+  const open = slots.map((s, i) => ({ pos: s.pos, i })).filter(({ i }) => lineup[i] === null);
+  const pool = squad.filter((p) => !used.has(p.id));
+  if (!open.length || !pool.length) return lineup;
+  const score = open.map(({ pos }) => pool.map((p) => fitScore(p, pos)));
+  const match = maxAssignment(score);
+  match.forEach((col, row) => {
+    if (col >= 0) lineup[open[row].i] = pool[col].id;
+  });
   return lineup;
 }
 
-function slotPriority(pos: string) {
-  return pos === 'GK' ? 0 : pos === 'ST' || pos === 'CB' ? 1 : 2;
+/**
+ * Rows-to-columns assignment maximizing the total score (rows ≤ columns or
+ * not). Returns the matched column for each row, or -1. O(n³) Hungarian method.
+ */
+function maxAssignment(score: number[][]): number[] {
+  const rows = score.length;
+  const cols = score[0].length;
+  const n = Math.max(rows, cols);
+  const max = Math.max(...score.flat());
+  // Square cost matrix for minimization; padding cells cost the same as a zero score.
+  const cost = (r: number, c: number) => (r < rows && c < cols ? max - score[r][c] : max);
+  const u = new Array(n + 1).fill(0);
+  const v = new Array(n + 1).fill(0);
+  const p = new Array(n + 1).fill(0);
+  const way = new Array(n + 1).fill(0);
+  for (let i = 1; i <= n; i++) {
+    p[0] = i;
+    let j0 = 0;
+    const minv = new Array(n + 1).fill(Infinity);
+    const usedCol = new Array(n + 1).fill(false);
+    do {
+      usedCol[j0] = true;
+      const i0 = p[j0];
+      let delta = Infinity;
+      let j1 = 0;
+      for (let j = 1; j <= n; j++) {
+        if (usedCol[j]) continue;
+        const cur = cost(i0 - 1, j - 1) - u[i0] - v[j];
+        if (cur < minv[j]) {
+          minv[j] = cur;
+          way[j] = j0;
+        }
+        if (minv[j] < delta) {
+          delta = minv[j];
+          j1 = j;
+        }
+      }
+      for (let j = 0; j <= n; j++) {
+        if (usedCol[j]) {
+          u[p[j]] += delta;
+          v[j] -= delta;
+        } else {
+          minv[j] -= delta;
+        }
+      }
+      j0 = j1;
+    } while (p[j0] !== 0);
+    do {
+      const j1 = way[j0];
+      p[j0] = p[j1];
+      j0 = j1;
+    } while (j0);
+  }
+  const result = new Array(rows).fill(-1);
+  for (let j = 1; j <= n; j++) {
+    if (p[j] - 1 < rows && j - 1 < cols) result[p[j] - 1] = j - 1;
+  }
+  return result;
 }
 
 /**

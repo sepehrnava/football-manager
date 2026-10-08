@@ -3,12 +3,7 @@ import {
   ECONOMY,
   FIRST_SEASON,
   MID_WINDOW_ROUND,
-  RETIRE_AGE,
   ROUNDS,
-  LINE_MIN,
-  LINE_OF,
-  SQUAD_MAX,
-  SQUAD_MIN,
   STYLES,
 } from './constants';
 import { leagueTable, makeFixtures, pickScorers, playMatch } from './league';
@@ -16,24 +11,28 @@ import {
   acceptOffer,
   advanceWorld,
   buildWorld,
+  makeClubSquad,
   canTrade,
+  academyFill,
   makeOffers,
   placeBid,
+  renewalDemand,
   quickSale,
   refreshClubs,
   rejectOffer,
-  renew,
   scoutPlayer,
   search,
+  setListed,
   STYLE_IDS,
   topUpClubs,
   USER_ID,
 } from './market';
 import { AI_CLUBS } from './names';
-import { clamp, develop, makePlayer, positionsForLine } from './players';
+import { develop, makePlayer, markRetirements } from './players';
 import { createRng, type Rng } from './rng';
 import { autoPick, remapLineup, teamStrength, userStrength, wageBill } from './team';
 import type {
+  BoardStatus,
   Club,
   Crest,
   FormationId,
@@ -56,7 +55,7 @@ export function clubById(state: GameState, id: string) {
 }
 
 export type Action =
-  | { type: 'new'; name: string; short: string; crest: Crest; seed: number }
+  | { type: 'new'; name: string; short: string; crest: Crest; seed: number; takeOver?: number | null }
   | { type: 'load'; state: GameState }
   | { type: 'reset' }
   | { type: 'formation'; formation: FormationId }
@@ -71,7 +70,7 @@ export type Action =
   | { type: 'acceptOffer'; offerId: string }
   | { type: 'rejectOffer'; offerId: string }
   | { type: 'quickSale'; playerId: string }
-  | { type: 'renew'; playerId: string; years: number }
+  | { type: 'list'; playerId: string; listed: boolean }
   | { type: 'startSeason' }
   | { type: 'playRound' }
   | { type: 'simToStop' }
@@ -99,43 +98,77 @@ const STARTING_SQUAD: [Position, number, number][] = [
   ['CM', 57, 34],
 ];
 
-/** Typical starter rating for each AI club, strongest first. */
-const AI_LEVEL = [77, 75, 73, 71, 69, 67, 65, 63, 61];
-
 const PATTERNS = ['solid', 'stripes', 'half', 'band'] as const;
 
+/** Each league club always has the same crest, so pickers can show it. */
+export function clubCrest(index: number): Crest {
+  const c = AI_CLUBS[index];
+  return { primary: c.primary, secondary: c.secondary, pattern: PATTERNS[index % PATTERNS.length] };
+}
+
+/** Sponsor income per season for a club of this size. */
+export function sponsorFor(size: number) {
+  const raw = ECONOMY.sponsorScale * Math.exp(0.14 * (size - 60)) - ECONOMY.sponsorOffset;
+  return Math.max(0, Math.round(raw / 50_000) * 50_000);
+}
+
+/** Starting budget, fan base and sponsor income for a club of this size. */
+export function clubEconomy(size: number) {
+  const d = size - ECONOMY.newClubSize;
+  return {
+    money: Math.round((ECONOMY.startMoney * Math.exp(0.06 * d)) / 500_000) * 500_000,
+    fans: Math.round((ECONOMY.startFans * Math.exp(0.06 * d)) / 1000) * 1000,
+    sponsor: sponsorFor(size),
+  };
+}
+
+/**
+ * New career: either a brand-new club with a modest squad (taking the place of
+ * the league's weakest club), or `takeOver` one of the existing clubs, with its
+ * squad, budget and expectations.
+ */
 export function createGame(action: Extract<Action, { type: 'new' }>): GameState {
   const rng = createRng(action.seed);
   let nextId = 1;
-  const squad = STARTING_SQUAD.map(([position, rating, age]) =>
-    makePlayer(rng, `p${nextId++}`, {
-      position,
-      rating,
-      age,
-      seasonsAtClub: rng.int(0, 4),
-      clubId: USER_ID,
-    }),
-  );
-  const user: Club = {
-    id: USER_ID,
-    name: action.name.trim() || 'My Club',
-    short: action.short.trim().toUpperCase() || 'FC',
-    crest: action.crest,
-    attack: 0,
-    defense: 0,
-    style: 'possession',
-    level: 64,
-  };
-  const ai: Club[] = AI_CLUBS.map((c, i) => ({
+  const nextPlayerId = () => `p${nextId++}`;
+  const league: Club[] = AI_CLUBS.map((c, i) => ({
     id: `ai${i}`,
     name: c.name,
     short: c.short,
-    crest: { primary: c.primary, secondary: c.secondary, pattern: rng.pick(PATTERNS) },
+    crest: clubCrest(i),
     attack: 0,
     defense: 0,
     style: rng.pick(STYLE_IDS),
-    level: AI_LEVEL[i] + rng.int(-2, 2),
+    level: c.level + rng.int(-1, 1),
   }));
+
+  const takeOver = action.takeOver ?? null;
+  let user: Club;
+  let squad: Player[];
+  let ai: Club[];
+  if (takeOver !== null && league[takeOver]) {
+    const chosen = league[takeOver];
+    user = { ...chosen, id: USER_ID, size: AI_CLUBS[takeOver].level };
+    squad = makeClubSquad(rng, USER_ID, chosen.level, nextPlayerId);
+    ai = league.filter((_, i) => i !== takeOver);
+  } else {
+    user = {
+      id: USER_ID,
+      name: action.name.trim() || 'My Club',
+      short: action.short.trim().toUpperCase() || 'FC',
+      crest: action.crest,
+      attack: 0,
+      defense: 0,
+      style: 'possession',
+      level: ECONOMY.newClubSize,
+      size: ECONOMY.newClubSize,
+    };
+    squad = STARTING_SQUAD.map(([position, rating, age]) =>
+      makePlayer(rng, nextPlayerId(), { position, rating, age, seasonsAtClub: rng.int(0, 4), clubId: USER_ID }),
+    );
+    ai = league.slice(0, league.length - 1);
+  }
+  const economy = clubEconomy(user.size ?? ECONOMY.newClubSize);
   const clubs = [user, ...ai];
   const built = buildWorld(rng, clubs, nextId);
   const formation: FormationId = '4-4-2';
@@ -158,8 +191,8 @@ export function createGame(action: Extract<Action, { type: 'new' }>): GameState 
       rng,
       clubs.map((c) => c.id),
     ),
-    money: ECONOMY.startMoney,
-    fans: ECONOMY.startFans,
+    money: economy.money,
+    fans: economy.fans,
     world: built.world,
     search: [],
     scouting: {},
@@ -171,6 +204,7 @@ export function createGame(action: Extract<Action, { type: 'new' }>): GameState 
     summary: null,
     history: [],
   };
+  state = { ...state, squad: markRetirements(rng, state.squad), world: markRetirements(rng, state.world) };
   state = refreshClubs(state);
   state = makeOffers(state, rng);
   state = search(state, rng, defaultSearchBudget(state.money), 'ALL');
@@ -181,11 +215,11 @@ function withSeed(state: GameState, rng: Rng): GameState {
   return { ...state, seed: rng.seed() };
 }
 
-/** Fee budgets offered in the search; 0 means free agents only. */
-export const SEARCH_BUDGETS = [0, 1, 2, 5, 10, 20, 40].map((m) => m * 1_000_000);
+/** Fee budgets offered in the search. */
+export const SEARCH_BUDGETS = [1, 2, 5, 10, 20, 40].map((m) => m * 1_000_000);
 
 export function defaultSearchBudget(money: number) {
-  const steps = SEARCH_BUDGETS.filter((b) => b > 0 && b <= Math.max(money, SEARCH_BUDGETS[1]));
+  const steps = SEARCH_BUDGETS.filter((b) => b <= Math.max(money, SEARCH_BUDGETS[0]));
   return steps[steps.length - 1];
 }
 
@@ -261,35 +295,39 @@ export function projectedPosition(state: GameState) {
 
 export function seasonCosts(state: GameState) {
   const wages = wageBill(state.squad);
-  return {
-    wages,
-    fixedCosts: ECONOMY.fixedCosts,
-    stakeholder: ECONOMY.stakeholderCashout,
-    total: wages + ECONOMY.fixedCosts + ECONOMY.stakeholderCashout,
-  };
+  const fixedCosts = Math.round(ECONOMY.runningCostBase + state.fans * ECONOMY.runningCostPerFan);
+  return { wages, fixedCosts, total: wages + fixedCosts };
 }
 
-export function seasonIncome(position: number, fans: number) {
+/** Stakeholders share in profit only, so a loss is never made worse by them. */
+export function stakeholderShare(profit: number) {
+  return Math.round(Math.max(0, profit) * ECONOMY.stakeholderShare);
+}
+
+/** Where the club stands with the board right now, in one word. */
+export function moneyStatus(state: GameState): 'ok' | 'debt' | 'warning' {
+  if (state.warning != null) return 'warning';
+  return state.money < 0 ? 'debt' : 'ok';
+}
+
+/** Plain-language explanation for the money status. */
+export const MONEY_STATUS_TEXT = {
+  ok: null,
+  debt: 'You are in debt, so you cannot pay transfer fees. Sell players to get back above $0.',
+  warning: `Final warning! Finish this season above -$${-ECONOMY.debtLimit / 1_000_000}M or the board sacks you. Sell players to raise money.`,
+} as const;
+
+/** The board's verdict on a season ending with `moneyAfter`: two in a row below the limit is the sack. */
+export function boardVerdict(state: GameState, moneyAfter: number): BoardStatus {
+  if (moneyAfter >= 0) return 'ok';
+  if (moneyAfter >= ECONOMY.debtLimit) return 'debt';
+  return state.warning != null ? 'sacked' : 'warning';
+}
+
+export function seasonIncome(position: number, fans: number, sponsor = 0) {
   const prize = ECONOMY.prize[position - 1] ?? 0;
   const fanIncome = Math.round(fans * ECONOMY.revenuePerFan);
-  return { prize, fanIncome, total: prize + fanIncome };
-}
-
-/**
- * Money at season end if the club finishes where it stands now (or where its
- * strength projects before a ball is kicked), plus how worried the board is.
- */
-export function seasonProjection(state: GameState) {
-  const table = leagueTable(state.clubs, state.fixtures);
-  const row = table.find((r) => r.clubId === USER_ID)!;
-  const position = row.played ? table.indexOf(row) + 1 : projectedPosition(state);
-  const costs = seasonCosts(state);
-  const income = seasonIncome(position, state.fans);
-  const net = income.total - costs.total;
-  const moneyAfter = state.money + net;
-  const risk: 'ok' | 'warning' | 'danger' =
-    moneyAfter < ECONOMY.sackedBelow ? 'danger' : moneyAfter < 0 ? 'warning' : 'ok';
-  return { position, current: row.played > 0, costs, income, net, moneyAfter, risk };
+  return { prize, fanIncome, sponsor, total: prize + fanIncome + sponsor };
 }
 
 function endSeason(state: GameState, rng: Rng): GameState {
@@ -297,57 +335,41 @@ function endSeason(state: GameState, rng: Rng): GameState {
   const position = table.findIndex((r) => r.clubId === USER_ID) + 1;
   const champion = state.clubs.find((c) => c.id === table[0].clubId)!;
   const costs = seasonCosts(state);
-  const income = seasonIncome(position, state.fans);
+  const income = seasonIncome(position, state.fans, sponsorFor(userClub(state).size ?? ECONOMY.newClubSize));
   const bonuses = Math.round(costs.wages * (ECONOMY.topFinishBonus[position - 1] ?? 0));
-  const net = income.total - costs.total - bonuses;
+  const profit = income.total - costs.total - bonuses;
+  const stakeholder = stakeholderShare(profit);
+  const net = profit - stakeholder;
   const money = state.money + net;
+  const board = boardVerdict(state, money);
   const fansFactor = 1 + (5.5 - position) * 0.04 + (position === 1 ? 0.1 : 0);
-  const fans = Math.max(50_000, Math.round((state.fans * fansFactor) / 1000) * 1000);
+  const fans = Math.max(ECONOMY.fansFloor, Math.round((state.fans * fansFactor) / 1000) * 1000);
 
   // Development, expiring contracts, retirements and academy graduates.
   const changes: SeasonSummary['changes'] = [];
   const retired: string[] = [];
-  const expired: string[] = [];
-  const leavers: Player[] = [];
   const squad: Player[] = [];
+  // Raises reflect this season's finish, so count it before renewing.
+  const withResult = { ...state, history: [...state.history, { season: state.season, position }] };
   for (const p of state.squad) {
-    if (p.age + 1 >= RETIRE_AGE && rng.chance(0.7)) {
+    if (p.retiring) {
       retired.push(p.name);
       continue;
     }
     const grown = develop(rng, p);
     if (grown.rating !== p.rating) changes.push({ name: p.name, from: p.rating, to: grown.rating });
+    // Contracts renew automatically; the player's (possibly higher) demand applies.
     const years = p.contract.years - 1;
-    if (years <= 0) {
-      expired.push(p.name);
-      leavers.push({ ...grown, clubId: null, seasonsAtClub: 0, contract: { ...p.contract, years: 0 } });
-      continue;
-    }
-    squad.push({ ...grown, contract: { ...p.contract, years } });
-  }
-  let nextId = state.nextId;
-  const academy: string[] = [];
-  // Graduates fill any line that is short first, then the squad up to a full
-  // matchday squad. At least one graduate joins every season.
-  const needed: Position[] = [];
-  for (const line of Object.keys(LINE_MIN) as (keyof typeof LINE_MIN)[]) {
-    const have = squad.filter((p) => LINE_OF[p.positions[0]] === line).length;
-    for (let i = have; i < LINE_MIN[line]; i++) needed.push(rng.pick(positionsForLine(line)));
-  }
-  const academyCount = Math.max(1, needed.length, SQUAD_MIN - squad.length);
-  for (let i = 0; i < academyCount && squad.length < SQUAD_MAX; i++) {
-    const youth = makePlayer(rng, `p${nextId++}`, {
-      position: needed[i] ?? rng.pick(positionsForLine('ALL')),
-      rating: rng.int(48, 60),
-      age: rng.int(16, 18),
-      clubId: USER_ID,
+    squad.push({
+      ...grown,
+      contract: years > 0 ? { ...p.contract, years } : { wage: renewalDemand(withResult, grown), years: 2 },
     });
-    youth.potential = clamp(youth.rating + rng.int(8, 28), youth.rating, 92);
-    // Academy players sign cheap first contracts.
-    youth.contract = { wage: 50_000, years: 3 };
-    squad.push(youth);
-    academy.push(youth.name);
   }
+  // At least one academy graduate joins every season, more if the squad is short.
+  const graduates = academyFill(squad, rng, state.nextId, 1);
+  squad.push(...graduates.players);
+  const nextId = graduates.nextId;
+  const academy = graduates.players.map((p) => p.name);
   changes.sort((a, b) => b.to - b.from - (a.to - a.from));
 
   const summary: SeasonSummary = {
@@ -356,9 +378,10 @@ function endSeason(state: GameState, rng: Rng): GameState {
     championName: champion.name,
     prize: income.prize,
     fanIncome: income.fanIncome,
+    sponsor: income.sponsor,
     wages: costs.wages,
     fixedCosts: costs.fixedCosts,
-    stakeholder: costs.stakeholder,
+    stakeholder,
     bonuses,
     net,
     moneyBefore: state.money,
@@ -368,16 +391,17 @@ function endSeason(state: GameState, rng: Rng): GameState {
     changes,
     retired,
     academy,
-    expired,
+    board,
   };
   const keep = new Set(squad.map((p) => p.id));
   const scouting = { ...state.scouting };
-  for (const p of squad) scouting[p.id] = 2;
+  for (const p of squad) scouting[p.id] = 1;
   const next: GameState = {
     ...state,
-    phase: money < ECONOMY.sackedBelow ? 'gameover' : 'summary',
+    phase: board === 'sacked' ? 'gameover' : 'summary',
+    // A warning stands until a season ends above the debt limit.
+    warning: board === 'warning' || board === 'sacked' ? money : null,
     squad,
-    world: [...state.world, ...leavers],
     lineup: state.lineup.map((id) => (id && keep.has(id) ? id : null)),
     captainId: state.captainId && keep.has(state.captainId) ? state.captainId : null,
     money,
@@ -388,15 +412,15 @@ function endSeason(state: GameState, rng: Rng): GameState {
     plans: {},
     history: [...state.history, { season: state.season, position }],
   };
-  // The rest of the world ages too (the leavers are already aged).
-  const leaverIds = new Set(leavers.map((p) => p.id));
-  const aged = advanceWorld({ ...next, world: next.world.filter((p) => !leaverIds.has(p.id)) }, rng);
-  return { ...aged, world: [...aged.world, ...leavers] };
+  // The rest of the world ages too.
+  return advanceWorld(next, rng);
 }
 
 function nextSeason(state: GameState, rng: Rng): GameState {
   const next: GameState = {
     ...state,
+    squad: markRetirements(rng, state.squad),
+    world: markRetirements(rng, state.world),
     season: state.season + 1,
     window: 'pre',
     round: 0,
@@ -448,13 +472,13 @@ export function reducer(state: GameState | null, action: Action): GameState | nu
     case 'bid':
       return placeBid(state, action.playerId, action.fee, action.years);
     case 'acceptOffer':
-      return acceptOffer(state, action.offerId);
+      return done(acceptOffer(state, rng, action.offerId));
     case 'rejectOffer':
       return rejectOffer(state, action.offerId);
+    case 'list':
+      return done(setListed(state, rng, action.playerId, action.listed));
     case 'quickSale':
       return done(quickSale(state, rng, action.playerId));
-    case 'renew':
-      return renew(state, action.playerId, action.years);
     case 'startSeason': {
       if (state.phase !== 'window') return state;
       const topped = topUpClubs(state, rng);

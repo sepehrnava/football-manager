@@ -3,7 +3,7 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { BENCH_SIZE, FORMATION_IDS, FORMATIONS, SQUAD_MIN, TACTICS } from '../game/constants';
 import { userClub } from '../game/game';
-import { lineOf, ratingAt, surname } from '../game/players';
+import { lineOf, ratingAt, surname, trend } from '../game/players';
 import { benchFor, starters, userStrength } from '../game/team';
 import type { Player, Position, Tactic } from '../game/types';
 import { useCareer } from '../state/GameContext';
@@ -16,6 +16,7 @@ import {
   RatingBadge,
   SectionTitle,
   Stat,
+  TrendTag,
 } from '../ui/components';
 import { animateNextLayout, FadeIn } from '../ui/motion';
 import { colors, lineColors } from '../ui/theme';
@@ -164,6 +165,7 @@ export function SquadScreen() {
                     <Text style={s.tokenName} numberOfLines={1}>
                       {surname(p.name)}
                     </Text>
+                    {p.retiring ? <Text style={s.retiring}>LAST SEASON</Text> : null}
                   </>
                 ) : (
                   <>
@@ -198,7 +200,7 @@ export function SquadScreen() {
           ))}
         </Card>
         <Text style={s.legend}>
-          {`Your squad needs at least ${SQUAD_MIN} players (11 starters + ${BENCH_SIZE} subs), with 2 goalkeepers, 5 defenders, 5 midfielders and 3 attackers.`}
+          {`You always have at least ${SQUAD_MIN} players (11 starters + ${BENCH_SIZE} subs). Sell someone and an academy youngster fills the gap.`}
         </Text>
 
         {reserves.length ? (
@@ -275,7 +277,8 @@ function PlayerRow({
         <View style={s.rowMeta}>
           <PosTags positions={player.positions} size={12} />
           <Text style={s.rowAge}>Age {player.age}</Text>
-          {player.contract.years === 1 ? <Text style={s.expiring}>LAST YEAR</Text> : null}
+          <TrendTag trend={trend(player)} />
+          {player.listed ? <Text style={s.forSale}>FOR SALE</Text> : null}
         </View>
       </View>
       {target ? (
@@ -418,6 +421,17 @@ const s = StyleSheet.create({
     justifyContent: 'center',
   },
   fitText: { color: '#FFFFFF', fontWeight: '900', fontSize: 10 },
+  retiring: {
+    marginTop: 2,
+    backgroundColor: colors.red,
+    color: '#FFFFFF',
+    fontSize: 8,
+    fontWeight: '900',
+    paddingHorizontal: 5,
+    paddingVertical: 1,
+    borderRadius: 6,
+    overflow: 'hidden',
+  },
   tokenName: {
     color: '#FFFFFF',
     fontWeight: '800',
@@ -462,6 +476,6 @@ const s = StyleSheet.create({
   rowName: { fontSize: 16, fontWeight: '800', color: colors.ink },
   rowMeta: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   rowAge: { fontSize: 12, color: colors.muted, fontWeight: '700' },
-  expiring: { fontSize: 11, color: colors.red, fontWeight: '900' },
+  forSale: { fontSize: 11, color: colors.blue, fontWeight: '900' },
 });
 

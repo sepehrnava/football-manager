@@ -21,7 +21,9 @@ or hosting. These are not approved features.
 | S001 | [Starter and previews](specs/001-expo-starter.md) | Implemented; device observation pending |
 | S002 | [Pocket manager mockup](specs/002-pocket-manager-mockup.md) | Implemented; device observation pending |
 | S003 | [Season roadmap and motion](specs/003-season-roadmap.md) | Implemented; device observation pending |
-| S004 | [Transfer market and contracts](specs/004-transfer-market-contracts.md) | Implemented; device observation pending |
+| S004 | [Transfer market and contracts](specs/004-transfer-market-contracts.md) | Implemented; partly revised by S005 |
+| S005 | [Simple and fair](specs/005-simple-and-fair.md) | Implemented; device observation pending |
+| S006 | [Club choice and transfer list](specs/006-club-choice-and-transfer-list.md) | Implemented; device observation pending |
 
 Use [the template](specs/_template.md) for the next feature. Number specs sequentially.
 Keep IDs stable; criteria use S002-AC01 style IDs referenced by tasks and evidence.
@@ -32,6 +34,6 @@ Superseded specs name their replacement. Status labels alone are not evidence.
 
 ## Next product questions
 
-Product direction (user, 2026-10-08): the challenge is managing squad and money, not
-match play. No divisions, levels or fatigue. Candidate next features: a continental cup
+Product direction (user, 2026-10-08/09): the challenge is managing squad and money, not
+match play. Keep it very simple to play. No divisions, levels or fatigue. Candidate next features: a continental cup
 for top finishers, choice of league, and a real player database.

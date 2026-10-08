@@ -2,19 +2,18 @@ import { useEffect, useState } from 'react';
 import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { MID_WINDOW_ROUND, ROUNDS } from '../game/constants';
+import { ROUNDS } from '../game/constants';
 import { clubById, USER_ID } from '../game/game';
-import { keyMoment, userFixture } from '../game/insights';
 import { leagueTable } from '../game/league';
-import { surname } from '../game/players';
+import { playerValue, surname } from '../game/players';
 import type { Fixture } from '../game/types';
 import { useCareer } from '../state/GameContext';
 import { Bar, Button, Card, ClubCrest } from '../ui/components';
 import { animateNextLayout, FadeIn } from '../ui/motion';
-import { colors } from '../ui/theme';
-import { MatchPreview } from './MatchSheet';
+import { colors, formatMoney } from '../ui/theme';
 
-const SPEEDS = { normal: 900, fast: 300 };
+/** Time between matchdays: quick, but slow enough to follow the table. */
+const STEP_MS = 650;
 
 /**
  * Plays rounds on a timer until the next stop (transfer window or season end),
@@ -25,41 +24,34 @@ export function SimScreen({ until: initialUntil, onClose }: { until?: number; on
   const { state, dispatch } = useCareer();
   const insets = useSafeAreaInsets();
   const [running, setRunning] = useState(true);
-  const [speed, setSpeed] = useState<keyof typeof SPEEDS>('normal');
   const [until, setUntil] = useState(initialUntil);
   const [startRound] = useState(state.round);
-  // The round whose key moment the user already saw (or started from).
-  const [ackRound, setAckRound] = useState(state.round);
   const inSeason = state.phase === 'season';
   const reached = until !== undefined && state.round >= until;
-  // Key moments only interrupt open-ended runs, never an explicit "play to here".
-  const moment =
-    inSeason && until === undefined && state.round !== ackRound ? keyMoment(state) : null;
-  const active = running && inSeason && !reached && !moment;
+  // When a window opens, clubs' bids are shown right here, one at a time.
+  const offer = state.phase === 'window' ? state.offers[0] : undefined;
+  // Matches run without interruption until a transfer window or the season end.
+  const active = running && inSeason && !reached;
 
   useEffect(() => {
     if (!active) return;
     // The first match of a run starts quickly; later ones follow the speed.
-    const delay = state.round === startRound ? 250 : SPEEDS[speed];
+    const delay = state.round === startRound ? 250 : STEP_MS;
     const t = setTimeout(() => {
       animateNextLayout();
       dispatch({ type: 'playRound' });
     }, delay);
     return () => clearTimeout(t);
-  }, [active, speed, state.round, startRound, dispatch]);
+  }, [active, state.round, startRound, dispatch]);
 
   const playOn = () => {
-    setAckRound(state.round);
     setUntil(undefined);
     setRunning(true);
   };
-  const nextMatch = () => {
-    setAckRound(state.round);
-    setRunning(false);
+  const skip = () => {
     animateNextLayout();
-    dispatch({ type: 'playRound' });
+    dispatch({ type: 'simToStop' });
   };
-  const nextFixture = userFixture(state, state.round);
 
   const played = state.round;
   const lastRound = played - 1;
@@ -70,7 +62,9 @@ export function SimScreen({ until: initialUntil, onClose }: { until?: number; on
 
   const stopText =
     state.phase === 'window'
-      ? 'Transfer window is open'
+      ? state.offers.length
+        ? `Transfer window is open · ${state.offers.length} ${state.offers.length > 1 ? 'offers' : 'offer'} for your players`
+        : 'Transfer window is open'
       : state.phase === 'summary' || state.phase === 'gameover'
         ? 'Season finished'
         : null;
@@ -88,38 +82,27 @@ export function SimScreen({ until: initialUntil, onClose }: { until?: number; on
             </Text>
             <Bar value={(played / ROUNDS) * 100} color={colors.ink} />
           </View>
-          <Pressable
-            onPress={() => setSpeed(speed === 'normal' ? 'fast' : 'normal')}
-            style={[s.close, speed === 'fast' && s.speedOn]}
-            accessibilityLabel="Toggle speed"
-          >
-            <Text style={[s.closeText, speed === 'fast' && { color: '#FFFFFF' }]}>
-              {speed === 'fast' ? '3×' : '1×'}
-            </Text>
-          </Pressable>
+          {stopText ? (
+            <View style={s.close} />
+          ) : (
+            <Pressable onPress={skip} style={s.close} accessibilityLabel="Skip to the end">
+              <Text style={s.closeText}>⏭</Text>
+            </Pressable>
+          )}
         </View>
 
         <ScrollView contentContainerStyle={s.content}>
-          {moment && nextFixture && inSeason ? (
-            <FadeIn key={`m${state.round}`} from="scale">
-              <View style={s.moment}>
-                <Text style={s.momentKicker}>KEY MATCH · MATCHDAY {state.round + 1}</Text>
-                <Text style={s.momentTitle}>{moment.title}</Text>
-                <Text style={s.momentText}>{moment.text}</Text>
-              </View>
-              <MatchPreview fixture={nextFixture} />
-            </FadeIn>
-          ) : null}
+          {offer ? <OfferCard key={offer.id} offerId={offer.id} /> : null}
 
           {mine ? (
             <FadeIn key={`r${lastRound}`} from="scale" duration={220}>
               <MyMatch fixture={mine} />
             </FadeIn>
-          ) : !moment ? (
+          ) : (
             <Text style={s.wait}>Kick-off…</Text>
-          ) : null}
+          )}
 
-          {others.length && !moment ? (
+          {others.length ? (
             <FadeIn key={`o${lastRound}`} delay={80}>
               <Card style={s.others}>
                 {others.map((f, i) => (
@@ -154,35 +137,65 @@ export function SimScreen({ until: initialUntil, onClose }: { until?: number; on
               <Text style={s.stop}>{stopText}</Text>
               <Button label="CONTINUE" variant="green" onPress={onClose} />
             </>
+          ) : reached ? (
+            <Button label="DONE" variant="green" onPress={onClose} />
           ) : active ? (
             <Button label="⏸  PAUSE" variant="light" onPress={() => setRunning(false)} />
-          ) : reached ? (
-            <View style={s.row}>
-              <Button label="▶ PLAY ON" variant="light" style={s.flex} onPress={playOn} />
-              <Button label="DONE" variant="green" style={s.flex} onPress={onClose} />
-            </View>
           ) : (
-            <View style={s.row}>
-              <Button label={moment ? 'PLAY MATCH' : 'NEXT MATCH'} variant="light" style={s.flex} onPress={nextMatch} />
-              <Button label="▶ PLAY ON" style={s.flex} onPress={playOn} />
-            </View>
+            <Button label="▶  CONTINUE" variant="green" onPress={playOn} />
           )}
-          {!stopText ? (
-            <Pressable
-              onPress={() => {
-                animateNextLayout();
-                dispatch({ type: 'simToStop' });
-              }}
-              style={s.skip}
-            >
-              <Text style={s.skipText}>
-                Skip to {state.round < MID_WINDOW_ROUND ? 'transfer window' : 'end of season'} ⏭
-              </Text>
-            </Pressable>
-          ) : null}
         </View>
       </View>
     </Modal>
+  );
+}
+
+/** "A club wants your player": sell now, or keep and play on. */
+function OfferCard({ offerId }: { offerId: string }) {
+  const { state, dispatch } = useCareer();
+  const o = state.offers.find((x) => x.id === offerId);
+  const p = o && state.squad.find((m) => m.id === o.playerId);
+  if (!o || !p) return null;
+  const club = clubById(state, o.clubId);
+  const value = playerValue(p);
+  const diff = o.fee - value;
+  return (
+    <FadeIn from="scale">
+      <View style={s.offer}>
+        <Text style={s.momentKicker}>TRANSFER OFFER</Text>
+        <View style={s.offerTop}>
+          <ClubCrest club={club} size={44} />
+          <Text style={s.offerTitle}>
+            {club.name} want {p.name}
+          </Text>
+        </View>
+        <Text style={s.offerFee}>{formatMoney(o.fee)}</Text>
+        <Text style={s.momentText}>
+          Rated {p.rating}, age {p.age}, worth about {formatMoney(value)}. This offer is{' '}
+          <Text style={{ color: diff >= 0 ? '#7EE2A0' : '#FF9A9D' }}>
+            {diff >= 0 ? `${formatMoney(diff)} above` : `${formatMoney(-diff)} below`}
+          </Text>{' '}
+          that.
+        </Text>
+        <View style={s.offerButtons}>
+          <Button
+            label="KEEP"
+            variant="light"
+            style={s.offerButton}
+            onPress={() => dispatch({ type: 'rejectOffer', offerId: o.id })}
+          />
+          <Button
+            label={`SELL ${formatMoney(o.fee)}`}
+            variant="green"
+            style={s.offerButton}
+            onPress={() => {
+              animateNextLayout();
+              dispatch({ type: 'acceptOffer', offerId: o.id });
+            }}
+          />
+        </View>
+      </View>
+    </FadeIn>
   );
 }
 
@@ -258,18 +271,15 @@ const s = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  speedOn: { backgroundColor: colors.ink, borderColor: colors.ink },
   closeText: { fontSize: 15, fontWeight: '900', color: colors.muted },
   content: { gap: 12, paddingBottom: 12 },
-  moment: {
-    backgroundColor: colors.ink,
-    borderRadius: 20,
-    padding: 16,
-    gap: 4,
-    marginBottom: 12,
-  },
+  offer: { backgroundColor: colors.ink, borderRadius: 20, padding: 16, gap: 8 },
+  offerTop: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  offerTitle: { flex: 1, color: '#FFFFFF', fontWeight: '900', fontSize: 19 },
+  offerFee: { color: colors.gold, fontWeight: '900', fontSize: 34 },
+  offerButtons: { flexDirection: 'row', gap: 10, marginTop: 4 },
+  offerButton: { flex: 1 },
   momentKicker: { color: colors.gold, fontWeight: '900', fontSize: 12, letterSpacing: 1.5 },
-  momentTitle: { color: '#FFFFFF', fontWeight: '900', fontSize: 24 },
   momentText: { color: '#CFCFC8', fontWeight: '600', fontSize: 14 },
   wait: { textAlign: 'center', fontSize: 18, fontWeight: '800', color: colors.muted, marginVertical: 40 },
   myMatch: { alignItems: 'center', gap: 10 },
@@ -294,9 +304,5 @@ const s = StyleSheet.create({
   gd: { width: 34, textAlign: 'right', fontSize: 12, fontWeight: '700', color: colors.muted },
   pts: { width: 28, textAlign: 'right', fontWeight: '900', color: colors.ink },
   controls: { gap: 8, paddingTop: 8 },
-  row: { flexDirection: 'row', gap: 10 },
-  flex: { flex: 1 },
   stop: { textAlign: 'center', fontSize: 16, fontWeight: '900', color: colors.ink },
-  skip: { alignItems: 'center', paddingVertical: 6 },
-  skipText: { color: colors.muted, fontWeight: '800' },
 });

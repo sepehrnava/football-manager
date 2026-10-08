@@ -40,3 +40,10 @@ Accepted for S004. Every AI club owns a squad in `GameState.world`; its attack a
 defense are derived from its best XI. Transfers move player objects between clubs, so
 the market changes the league. Negotiation prices are hidden but derived from a hash,
 so no extra state is stored. Revisit when real player data replaces generated squads.
+
+## D007: Fair money floor
+
+Accepted for S005. Running costs scale with fans (floor 250K fans) and owners take a share of
+profit only, so a cheap squad can break even anywhere in the table and debt always traces back
+to the player's spending. Selling is never blocked; academy call-ups keep the squad legal.
+Revisit if real league finances replace the generated economy.

@@ -1,6 +1,7 @@
 # S004: Transfer market, contracts and tactic counters
 
-State: Implemented; Android device observation pending.
+State: Implemented; Android device observation pending. Contract renewal, scouting levels
+and the selling limits were simplified by [S005](005-simple-and-fair.md).
 Source: user request (2026-10-08): the challenge should be managing the squad and money,
 not playing matches. No divisions, levels or fatigue. Builds on S002/S003.
 

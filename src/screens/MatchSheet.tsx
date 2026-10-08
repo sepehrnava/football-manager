@@ -130,7 +130,6 @@ export function MatchPreview({ fixture, compact }: { fixture: Fixture; compact?:
   const base = teamStrength(state.squad, state.lineup, state.formation, report.tactic, state.captainId);
   const mine = { attack: base.attack + report.effect, defense: base.defense + report.effect };
   const style = report.style ? STYLES[report.style] : null;
-  const planned = state.plans[fixture.round] !== undefined;
   const { win, draw, loss } = report.odds;
 
   return (
@@ -187,7 +186,7 @@ export function MatchPreview({ fixture, compact }: { fixture: Fixture; compact?:
             : 'You learn how a club plays after facing them once.'}
         </Text>
         <Text style={s.planLabel}>
-          {planned ? 'Plan for this match' : `Plan for this match (default: ${TACTICS[state.tactic].label})`}
+          Tactic for this match
         </Text>
         <View style={s.tactics}>
           {(Object.keys(TACTICS) as Tactic[]).map((t) => (

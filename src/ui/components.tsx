@@ -143,6 +143,19 @@ export function RangeBadge({ range, size = 34 }: { range: [number, number]; size
   );
 }
 
+const TRENDS = {
+  rising: { label: '▲ RISING', color: '#25A55A' },
+  peak: { label: '● PEAK', color: '#B58A1E' },
+  declining: { label: '▼ DECLINING', color: '#E07B12' },
+  retiring: { label: 'RETIRING', color: '#E5484D' },
+} as const;
+
+/** Career stage tag: rising, at peak, declining, or retiring after this season. */
+export function TrendTag({ trend, size = 11 }: { trend: keyof typeof TRENDS; size?: number }) {
+  const t = TRENDS[trend];
+  return <Text style={[styles.trend, { color: t.color, fontSize: size }]}>{t.label}</Text>;
+}
+
 export function penaltyTone(drop: number): 'gold' | 'orange' | 'red' {
   return drop <= 0 ? 'gold' : drop <= 3 ? 'orange' : 'red';
 }
@@ -367,6 +380,7 @@ export const styles = StyleSheet.create({
   },
   rangeText: { color: '#A2700F', fontWeight: '900' },
   tags: { flexDirection: 'row', gap: 6 },
+  trend: { fontWeight: '900', letterSpacing: 0.3 },
   tag: { fontWeight: '800' },
   crest: { overflow: 'hidden', borderColor: '#141414', alignItems: 'center', justifyContent: 'center' },
   crestText: {

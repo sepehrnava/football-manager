@@ -3,8 +3,8 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { userClub } from '../game/game';
-import { useCareer } from '../state/GameContext';
-import { ClubCrest } from '../ui/components';
+import { useCareer, useGame } from '../state/GameContext';
+import { Button, ClubCrest, Sheet } from '../ui/components';
 import { FadeIn } from '../ui/motion';
 import { colors, formatMoney, seasonLabel } from '../ui/theme';
 import { ClubScreen } from './ClubScreen';
@@ -36,6 +36,7 @@ export function MainScreen() {
     setNav({ tab: next, from: order.indexOf(next) < order.indexOf(tab) ? 'left' : 'right' });
   };
   const [sim, setSim] = useState<{ until?: number } | null>(null);
+  const [settings, setSettings] = useState(false);
 
   if (!sim && (state.phase === 'summary' || state.phase === 'gameover')) {
     return <SeasonEndScreen />;
@@ -46,7 +47,6 @@ export function MainScreen() {
     setSim({ until });
   };
   const club = userClub(state);
-  const playLabel = state.phase === 'window' ? 'KICK OFF' : 'PLAY';
 
   return (
     <View style={[s.root, { paddingTop: insets.top }]}>
@@ -65,6 +65,10 @@ export function MainScreen() {
             {state.phase === 'window' ? '🔁 Window' : `📅 ${seasonLabel(state.season)}`}
           </Text>
         </View>
+        <View style={s.spacer} />
+        <Pressable onPress={() => setSettings(true)} style={s.gear} accessibilityLabel="Settings">
+          <Text style={s.gearText}>⚙️</Text>
+        </Pressable>
       </View>
 
       <FadeIn key={tab} from={from} distance={24} duration={220} style={s.body}>
@@ -73,6 +77,7 @@ export function MainScreen() {
             onPlay={play}
             onOpenTransfers={() => setTab('transfers')}
             onOpenLeague={() => setTab('league')}
+            onOpenSquad={() => setTab('squad')}
           />
         )}
         {tab === 'squad' && <SquadScreen />}
@@ -86,12 +91,12 @@ export function MainScreen() {
         ))}
         <Pressable
           onPress={() => play()}
-          style={({ pressed }) => [s.play, pressed && { transform: [{ translateY: 2 }] }]}
+          style={({ pressed }) => [s.play, pressed && { opacity: 0.85 }]}
           accessibilityRole="button"
-          accessibilityLabel={playLabel}
+          accessibilityLabel={state.phase === 'window' ? 'Kick off' : 'Play'}
         >
-          <Text style={s.playIcon}>⚽</Text>
-          <Text style={s.playText}>{playLabel}</Text>
+          <Text style={s.playIcon}>▶</Text>
+          <Text style={s.playText}>{state.phase === 'window' ? 'KICK OFF' : 'PLAY'}</Text>
         </Pressable>
         {TABS.slice(2).map((t) => (
           <TabButton key={t.id} {...t} active={tab === t.id} onPress={() => setTab(t.id)} />
@@ -99,7 +104,31 @@ export function MainScreen() {
       </View>
 
       {sim ? <SimScreen until={sim.until} onClose={() => setSim(null)} /> : null}
+      <SettingsSheet visible={settings} onClose={() => setSettings(false)} />
     </View>
+  );
+}
+
+/** Rarely used options, kept out of the way. */
+function SettingsSheet({ visible, onClose }: { visible: boolean; onClose: () => void }) {
+  const { resetCareer } = useGame();
+  const [confirm, setConfirm] = useState(false);
+  if (!visible) return null;
+  const close = () => {
+    setConfirm(false);
+    onClose();
+  };
+  return (
+    <Sheet visible title="Settings" onClose={close}>
+      <Text style={s.settingsText}>
+        Starting a new career deletes this one. You can create a new club or manage another one.
+      </Text>
+      <Button
+        label={confirm ? 'TAP AGAIN TO DELETE THIS CAREER' : 'START A NEW CAREER'}
+        variant={confirm ? 'red' : 'light'}
+        onPress={() => (confirm ? resetCareer() : setConfirm(true))}
+      />
+    </Sheet>
   );
 }
 
@@ -146,6 +175,23 @@ const s = StyleSheet.create({
   chipOpen: { backgroundColor: colors.greenSoft, borderColor: '#BFE6CC', borderBottomColor: '#9ED6B1' },
   chipText: { fontWeight: '900', fontSize: 15, color: colors.ink },
   body: { flex: 1 },
+  spacer: { flex: 1 },
+  gear: { width: 38, height: 38, alignItems: 'center', justifyContent: 'center' },
+  gearText: { fontSize: 20, opacity: 0.6 },
+  play: {
+    flex: 1.15,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.green,
+    borderRadius: 16,
+    marginHorizontal: 4,
+    marginBottom: 2,
+    paddingVertical: 6,
+    gap: 1,
+  },
+  playIcon: { color: '#FFFFFF', fontSize: 18, fontWeight: '900' },
+  playText: { color: '#FFFFFF', fontSize: 10, fontWeight: '900', letterSpacing: 0.5 },
+  settingsText: { fontSize: 14, fontWeight: '600', color: colors.muted, marginBottom: 14, lineHeight: 20 },
   tabs: {
     flexDirection: 'row',
     alignItems: 'flex-end',
@@ -159,20 +205,4 @@ const s = StyleSheet.create({
   inactive: { opacity: 0.45 },
   tabText: { fontSize: 10, fontWeight: '900', color: colors.muted, letterSpacing: 0.5 },
   tabTextActive: { color: colors.ink },
-  play: {
-    flex: 1.3,
-    marginTop: -28,
-    marginHorizontal: 4,
-    backgroundColor: '#1A1A1A',
-    borderRadius: 22,
-    borderWidth: 3,
-    borderColor: '#FFFFFF',
-    borderBottomWidth: 6,
-    borderBottomColor: '#000000',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 10,
-  },
-  playIcon: { fontSize: 26 },
-  playText: { color: '#FFFFFF', fontWeight: '900', fontSize: 15, fontStyle: 'italic', letterSpacing: 1 },
 });

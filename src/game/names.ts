@@ -63,14 +63,19 @@ export const NATIONS: { flag: string; first: string[]; last: string[] }[] = [
   },
 ];
 
-export const AI_CLUBS: { name: string; short: string; primary: string; secondary: string }[] = [
-  { name: 'Northport United', short: 'NPU', primary: '#C8102E', secondary: '#FFFFFF' },
-  { name: 'Riverside Athletic', short: 'RIV', primary: '#1D428A', secondary: '#FFC72C' },
-  { name: 'Kingsbridge City', short: 'KGC', primary: '#6CABDD', secondary: '#1C2C5B' },
-  { name: 'Harbor Rovers', short: 'HRR', primary: '#00553E', secondary: '#FFFFFF' },
-  { name: 'Ashford Wanderers', short: 'ASW', primary: '#F58025', secondary: '#111111' },
-  { name: 'Eastgate FC', short: 'EGF', primary: '#6A1B9A', secondary: '#F5F5F5' },
-  { name: 'Millbrook Town', short: 'MBT', primary: '#222222', secondary: '#E3C770' },
-  { name: 'Stonehill Albion', short: 'STA', primary: '#D7263D', secondary: '#1B1B3A' },
-  { name: 'Westwood Rangers', short: 'WWR', primary: '#0077B6', secondary: '#90E0EF' },
+/**
+ * The league's clubs, strongest first. `level` is the typical rating of their
+ * starters. A user-created club takes the place of the last one.
+ */
+export const AI_CLUBS: { name: string; short: string; primary: string; secondary: string; level: number }[] = [
+  { name: 'Northport United', short: 'NPU', primary: '#C8102E', secondary: '#FFFFFF', level: 77 },
+  { name: 'Riverside Athletic', short: 'RIV', primary: '#1D428A', secondary: '#FFC72C', level: 75 },
+  { name: 'Kingsbridge City', short: 'KGC', primary: '#6CABDD', secondary: '#1C2C5B', level: 73 },
+  { name: 'Harbor Rovers', short: 'HRR', primary: '#00553E', secondary: '#FFFFFF', level: 71 },
+  { name: 'Ashford Wanderers', short: 'ASW', primary: '#F58025', secondary: '#111111', level: 69 },
+  { name: 'Eastgate FC', short: 'EGF', primary: '#6A1B9A', secondary: '#F5F5F5', level: 67 },
+  { name: 'Millbrook Town', short: 'MBT', primary: '#222222', secondary: '#E3C770', level: 65 },
+  { name: 'Stonehill Albion', short: 'STA', primary: '#D7263D', secondary: '#1B1B3A', level: 63 },
+  { name: 'Westwood Rangers', short: 'WWR', primary: '#0077B6', secondary: '#90E0EF', level: 61 },
+  { name: 'Bayside Harriers', short: 'BYH', primary: '#2B9348', secondary: '#F2B544', level: 60 },
 ];
