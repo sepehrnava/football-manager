@@ -1,26 +1,38 @@
 import {
+  COUNTER_BONUS,
   ECONOMY,
   FIRST_SEASON,
   MID_WINDOW_ROUND,
   RETIRE_AGE,
   ROUNDS,
+  LINE_MIN,
+  LINE_OF,
   SQUAD_MAX,
   SQUAD_MIN,
-  SQUAD_TOPUP,
+  STYLES,
 } from './constants';
 import { leagueTable, makeFixtures, pickScorers, playMatch } from './league';
-import { AI_CLUBS } from './names';
 import {
-  clamp,
-  develop,
-  makePlayer,
-  playerValue,
-  positionsForLine,
-  ratingForValue,
-  type PlayerSpec,
-} from './players';
+  acceptOffer,
+  advanceWorld,
+  buildWorld,
+  canTrade,
+  makeOffers,
+  placeBid,
+  quickSale,
+  refreshClubs,
+  rejectOffer,
+  renew,
+  scoutPlayer,
+  search,
+  STYLE_IDS,
+  topUpClubs,
+  USER_ID,
+} from './market';
+import { AI_CLUBS } from './names';
+import { clamp, develop, makePlayer, positionsForLine } from './players';
 import { createRng, type Rng } from './rng';
-import { autoPick, remapLineup, userStrength, wageBill } from './team';
+import { autoPick, remapLineup, teamStrength, userStrength, wageBill } from './team';
 import type {
   Club,
   Crest,
@@ -33,7 +45,7 @@ import type {
   Tactic,
 } from './types';
 
-export const USER_ID = 'user';
+export { canTrade, USER_ID };
 
 export function userClub(state: GameState) {
   return state.clubs.find((c) => c.id === USER_ID)!;
@@ -49,12 +61,17 @@ export type Action =
   | { type: 'reset' }
   | { type: 'formation'; formation: FormationId }
   | { type: 'tactic'; tactic: Tactic }
+  | { type: 'plan'; round: number; tactic: Tactic }
   | { type: 'assign'; slot: number; playerId: string | null }
   | { type: 'autoPick' }
   | { type: 'captain'; playerId: string }
-  | { type: 'scout'; maxPrice: number; line: Line | 'ALL' }
-  | { type: 'buy'; playerId: string }
-  | { type: 'sell'; playerId: string }
+  | { type: 'search'; maxFee: number; line: Line | 'ALL' }
+  | { type: 'scoutPlayer'; playerId: string }
+  | { type: 'bid'; playerId: string; fee: number; years: number }
+  | { type: 'acceptOffer'; offerId: string }
+  | { type: 'rejectOffer'; offerId: string }
+  | { type: 'quickSale'; playerId: string }
+  | { type: 'renew'; playerId: string; years: number }
   | { type: 'startSeason' }
   | { type: 'playRound' }
   | { type: 'simToStop' }
@@ -82,14 +99,22 @@ const STARTING_SQUAD: [Position, number, number][] = [
   ['CM', 57, 34],
 ];
 
-const AI_POWER = [80, 77, 75, 72, 70, 68, 66, 64, 62];
+/** Typical starter rating for each AI club, strongest first. */
+const AI_LEVEL = [77, 75, 73, 71, 69, 67, 65, 63, 61];
+
+const PATTERNS = ['solid', 'stripes', 'half', 'band'] as const;
 
 export function createGame(action: Extract<Action, { type: 'new' }>): GameState {
   const rng = createRng(action.seed);
   let nextId = 1;
-  const id = () => `p${nextId++}`;
   const squad = STARTING_SQUAD.map(([position, rating, age]) =>
-    makePlayer(rng, id(), { position, rating, age, seasonsAtClub: rng.int(0, 4) }),
+    makePlayer(rng, `p${nextId++}`, {
+      position,
+      rating,
+      age,
+      seasonsAtClub: rng.int(0, 4),
+      clubId: USER_ID,
+    }),
   );
   const user: Club = {
     id: USER_ID,
@@ -98,23 +123,24 @@ export function createGame(action: Extract<Action, { type: 'new' }>): GameState 
     crest: action.crest,
     attack: 0,
     defense: 0,
+    style: 'possession',
+    level: 64,
   };
-  const ai: Club[] = AI_CLUBS.map((c, i) => {
-    const power = AI_POWER[i] + rng.int(-2, 2);
-    const tilt = rng.int(-4, 4);
-    return {
-      id: `ai${i}`,
-      name: c.name,
-      short: c.short,
-      crest: { primary: c.primary, secondary: c.secondary, pattern: rng.pick(PATTERNS) },
-      attack: power + tilt,
-      defense: power - tilt,
-    };
-  });
+  const ai: Club[] = AI_CLUBS.map((c, i) => ({
+    id: `ai${i}`,
+    name: c.name,
+    short: c.short,
+    crest: { primary: c.primary, secondary: c.secondary, pattern: rng.pick(PATTERNS) },
+    attack: 0,
+    defense: 0,
+    style: rng.pick(STYLE_IDS),
+    level: AI_LEVEL[i] + rng.int(-2, 2),
+  }));
   const clubs = [user, ...ai];
+  const built = buildWorld(rng, clubs, nextId);
   const formation: FormationId = '4-4-2';
-  const state: GameState = {
-    version: 1,
+  let state: GameState = {
+    version: 2,
     seed: 0,
     season: FIRST_SEASON,
     phase: 'window',
@@ -134,52 +160,33 @@ export function createGame(action: Extract<Action, { type: 'new' }>): GameState 
     ),
     money: ECONOMY.startMoney,
     fans: ECONOMY.startFans,
-    market: [],
-    nextId,
+    world: built.world,
+    search: [],
+    scouting: {},
+    talks: {},
+    offers: [],
+    knownStyles: [],
+    plans: {},
+    nextId: built.nextId,
     summary: null,
     history: [],
   };
-  return withSeed(scoutPlayers(state, rng, defaultScoutBudget(state.money), 'ALL'), rng);
+  state = refreshClubs(state);
+  state = makeOffers(state, rng);
+  state = search(state, rng, defaultSearchBudget(state.money), 'ALL');
+  return withSeed(state, rng);
 }
-
-const PATTERNS = ['solid', 'stripes', 'half', 'band'] as const;
 
 function withSeed(state: GameState, rng: Rng): GameState {
   return { ...state, seed: rng.seed() };
 }
 
-export function defaultScoutBudget(money: number) {
-  const steps = SCOUT_BUDGETS.filter((b) => b <= Math.max(money, SCOUT_BUDGETS[0]));
+/** Fee budgets offered in the search; 0 means free agents only. */
+export const SEARCH_BUDGETS = [0, 1, 2, 5, 10, 20, 40].map((m) => m * 1_000_000);
+
+export function defaultSearchBudget(money: number) {
+  const steps = SEARCH_BUDGETS.filter((b) => b > 0 && b <= Math.max(money, SEARCH_BUDGETS[1]));
   return steps[steps.length - 1];
-}
-
-export const SCOUT_BUDGETS = [1, 2, 5, 10, 20, 40, 80].map((m) => m * 1_000_000);
-
-function scoutPlayers(state: GameState, rng: Rng, maxPrice: number, line: Line | 'ALL'): GameState {
-  let nextId = state.nextId;
-  const positions = positionsForLine(line);
-  const market: Player[] = [];
-  for (let i = 0; i < 8; i++) {
-    const age = rng.pick([18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32]);
-    const target = maxPrice * (0.3 + rng.next() * 0.65);
-    const spec: PlayerSpec = {
-      position: rng.pick(positions),
-      age,
-      rating: clamp(Math.floor(ratingForValue(target, age)) - 1, 48, 92),
-    };
-    let p = makePlayer(rng, `p${nextId++}`, spec);
-    // Potential raises value, so step down until the asking price fits.
-    while (playerValue(p) > maxPrice && p.rating > 45) {
-      p = { ...p, rating: p.rating - 1, potential: Math.max(p.rating - 1, p.potential - 1) };
-    }
-    market.push(p);
-  }
-  market.sort((a, b) => b.rating - a.rating);
-  return { ...state, market, nextId };
-}
-
-export function canTrade(state: GameState) {
-  return state.phase === 'window';
 }
 
 function ensureLineup(state: GameState): GameState {
@@ -187,21 +194,43 @@ function ensureLineup(state: GameState): GameState {
   return { ...state, lineup: autoPick(state.squad, state.formation, state.lineup) };
 }
 
+/** The tactic the user plays in a given round. */
+export function tacticFor(state: GameState, round: number): Tactic {
+  return state.plans[round] ?? state.tactic;
+}
+
+/** +bonus for the right counter to a style, −bonus for the wrong one. */
+export function counterEffect(tactic: Tactic, style: Club['style']) {
+  const s = STYLES[style];
+  return s.beatenBy === tactic ? COUNTER_BONUS : s.weakAgainst === tactic ? -COUNTER_BONUS : 0;
+}
+
+/** The user's attack/defense for a round, including the tactic counter. */
+export function userSideFor(state: GameState, round: number, opponent: Club) {
+  const tactic = tacticFor(state, round);
+  const s = teamStrength(state.squad, state.lineup, state.formation, tactic, state.captainId);
+  const c = counterEffect(tactic, opponent.style);
+  return { attack: s.attack + c, defense: s.defense + c };
+}
+
 function playRound(state: GameState, rng: Rng): GameState {
   if (state.phase !== 'season' || state.round >= ROUNDS) return state;
   const s = ensureLineup(state);
-  const strength = userStrength(s);
-  const side = (id: string) => {
-    if (id === USER_ID) return { attack: strength.attack, defense: strength.defense };
-    const c = s.clubs.find((club) => club.id === id)!;
-    return { attack: c.attack, defense: c.defense };
-  };
   const goals = new Map<string, number>();
+  let knownStyles = s.knownStyles;
   const fixtures = s.fixtures.map((f) => {
     if (f.round !== s.round) return f;
-    const score = playMatch(rng, side(f.homeId), side(f.awayId));
-    if (f.homeId !== USER_ID && f.awayId !== USER_ID) return { ...f, result: score };
-    const own = f.homeId === USER_ID ? score.home : score.away;
+    const home = clubById(s, f.homeId);
+    const away = clubById(s, f.awayId);
+    const userHome = f.homeId === USER_ID;
+    const userAway = f.awayId === USER_ID;
+    const homeSide = userHome ? userSideFor(s, s.round, away) : home;
+    const awaySide = userAway ? userSideFor(s, s.round, home) : away;
+    const score = playMatch(rng, homeSide, awaySide);
+    if (!userHome && !userAway) return { ...f, result: score };
+    const opp = userHome ? away : home;
+    if (!knownStyles.includes(opp.id)) knownStyles = [...knownStyles, opp.id];
+    const own = userHome ? score.home : score.away;
     const scorers = pickScorers(rng, s.squad, s.lineup, s.formation, own);
     scorers.forEach((p) => goals.set(p.id, (goals.get(p.id) ?? 0) + 1));
     return { ...f, result: { ...score, scorers: scorers.map((p) => p.name) } };
@@ -210,14 +239,16 @@ function playRound(state: GameState, rng: Rng): GameState {
     ? s.squad.map((p) => (goals.has(p.id) ? { ...p, goals: p.goals + goals.get(p.id)! } : p))
     : s.squad;
   const round = s.round + 1;
-  let next: GameState = { ...s, fixtures, squad, round };
-  if (round === MID_WINDOW_ROUND) {
-    next = { ...next, phase: 'window', window: 'mid' };
-    next = scoutPlayers(next, rng, defaultScoutBudget(next.money), 'ALL');
-  } else if (round === ROUNDS) {
-    next = endSeason(next, rng);
-  }
+  let next: GameState = { ...s, fixtures, squad, round, knownStyles };
+  if (round === MID_WINDOW_ROUND) next = openWindow({ ...next, window: 'mid' }, rng);
+  else if (round === ROUNDS) next = endSeason(next, rng);
   return next;
+}
+
+function openWindow(state: GameState, rng: Rng): GameState {
+  let s: GameState = { ...state, phase: 'window', talks: {} };
+  s = makeOffers(s, rng);
+  return search(s, rng, defaultSearchBudget(s.money), 'ALL');
 }
 
 export function projectedPosition(state: GameState) {
@@ -244,6 +275,23 @@ export function seasonIncome(position: number, fans: number) {
   return { prize, fanIncome, total: prize + fanIncome };
 }
 
+/**
+ * Money at season end if the club finishes where it stands now (or where its
+ * strength projects before a ball is kicked), plus how worried the board is.
+ */
+export function seasonProjection(state: GameState) {
+  const table = leagueTable(state.clubs, state.fixtures);
+  const row = table.find((r) => r.clubId === USER_ID)!;
+  const position = row.played ? table.indexOf(row) + 1 : projectedPosition(state);
+  const costs = seasonCosts(state);
+  const income = seasonIncome(position, state.fans);
+  const net = income.total - costs.total;
+  const moneyAfter = state.money + net;
+  const risk: 'ok' | 'warning' | 'danger' =
+    moneyAfter < ECONOMY.sackedBelow ? 'danger' : moneyAfter < 0 ? 'warning' : 'ok';
+  return { position, current: row.played > 0, costs, income, net, moneyAfter, risk };
+}
+
 function endSeason(state: GameState, rng: Rng): GameState {
   const table = leagueTable(state.clubs, state.fixtures);
   const position = table.findIndex((r) => r.clubId === USER_ID) + 1;
@@ -256,10 +304,12 @@ function endSeason(state: GameState, rng: Rng): GameState {
   const fansFactor = 1 + (5.5 - position) * 0.04 + (position === 1 ? 0.1 : 0);
   const fans = Math.max(50_000, Math.round((state.fans * fansFactor) / 1000) * 1000);
 
-  // Development, retirements and academy graduates.
+  // Development, expiring contracts, retirements and academy graduates.
   const changes: SeasonSummary['changes'] = [];
   const retired: string[] = [];
-  let squad: Player[] = [];
+  const expired: string[] = [];
+  const leavers: Player[] = [];
+  const squad: Player[] = [];
   for (const p of state.squad) {
     if (p.age + 1 >= RETIRE_AGE && rng.chance(0.7)) {
       retired.push(p.name);
@@ -267,18 +317,34 @@ function endSeason(state: GameState, rng: Rng): GameState {
     }
     const grown = develop(rng, p);
     if (grown.rating !== p.rating) changes.push({ name: p.name, from: p.rating, to: grown.rating });
-    squad.push(grown);
+    const years = p.contract.years - 1;
+    if (years <= 0) {
+      expired.push(p.name);
+      leavers.push({ ...grown, clubId: null, seasonsAtClub: 0, contract: { ...p.contract, years: 0 } });
+      continue;
+    }
+    squad.push({ ...grown, contract: { ...p.contract, years } });
   }
   let nextId = state.nextId;
   const academy: string[] = [];
-  const academyCount = Math.max(1, SQUAD_TOPUP - squad.length);
+  // Graduates fill any line that is short first, then the squad up to a full
+  // matchday squad. At least one graduate joins every season.
+  const needed: Position[] = [];
+  for (const line of Object.keys(LINE_MIN) as (keyof typeof LINE_MIN)[]) {
+    const have = squad.filter((p) => LINE_OF[p.positions[0]] === line).length;
+    for (let i = have; i < LINE_MIN[line]; i++) needed.push(rng.pick(positionsForLine(line)));
+  }
+  const academyCount = Math.max(1, needed.length, SQUAD_MIN - squad.length);
   for (let i = 0; i < academyCount && squad.length < SQUAD_MAX; i++) {
     const youth = makePlayer(rng, `p${nextId++}`, {
-      position: rng.pick(positionsForLine('ALL')),
+      position: needed[i] ?? rng.pick(positionsForLine('ALL')),
       rating: rng.int(48, 60),
       age: rng.int(16, 18),
+      clubId: USER_ID,
     });
     youth.potential = clamp(youth.rating + rng.int(8, 28), youth.rating, 92);
+    // Academy players sign cheap first contracts.
+    youth.contract = { wage: 50_000, years: 3 };
     squad.push(youth);
     academy.push(youth.name);
   }
@@ -302,47 +368,45 @@ function endSeason(state: GameState, rng: Rng): GameState {
     changes,
     retired,
     academy,
+    expired,
   };
   const keep = new Set(squad.map((p) => p.id));
-  return {
+  const scouting = { ...state.scouting };
+  for (const p of squad) scouting[p.id] = 2;
+  const next: GameState = {
     ...state,
     phase: money < ECONOMY.sackedBelow ? 'gameover' : 'summary',
     squad,
+    world: [...state.world, ...leavers],
     lineup: state.lineup.map((id) => (id && keep.has(id) ? id : null)),
     captainId: state.captainId && keep.has(state.captainId) ? state.captainId : null,
     money,
     fans,
     nextId,
+    scouting,
     summary,
+    plans: {},
     history: [...state.history, { season: state.season, position }],
   };
+  // The rest of the world ages too (the leavers are already aged).
+  const leaverIds = new Set(leavers.map((p) => p.id));
+  const aged = advanceWorld({ ...next, world: next.world.filter((p) => !leaverIds.has(p.id)) }, rng);
+  return { ...aged, world: [...aged.world, ...leavers] };
 }
 
 function nextSeason(state: GameState, rng: Rng): GameState {
-  // AI clubs drift a little, pulled toward the middle of the league.
-  const clubs = state.clubs.map((c) => {
-    if (c.id === USER_ID) return c;
-    const pull = (70 - (c.attack + c.defense) / 2) * 0.15;
-    return {
-      ...c,
-      attack: clamp(Math.round(c.attack + pull + rng.int(-3, 3)), 55, 90),
-      defense: clamp(Math.round(c.defense + pull + rng.int(-3, 3)), 55, 90),
-    };
-  });
   const next: GameState = {
     ...state,
     season: state.season + 1,
-    phase: 'window',
     window: 'pre',
     round: 0,
-    clubs,
     fixtures: makeFixtures(
       rng,
-      clubs.map((c) => c.id),
+      state.clubs.map((c) => c.id),
     ),
     summary: null,
   };
-  return scoutPlayers(next, rng, defaultScoutBudget(next.money), 'ALL');
+  return openWindow(next, rng);
 }
 
 export function reducer(state: GameState | null, action: Action): GameState | null {
@@ -362,6 +426,8 @@ export function reducer(state: GameState | null, action: Action): GameState | nu
       };
     case 'tactic':
       return { ...state, tactic: action.tactic };
+    case 'plan':
+      return { ...state, plans: { ...state.plans, [action.round]: action.tactic } };
     case 'assign': {
       const lineup = [...state.lineup];
       if (action.playerId) {
@@ -375,35 +441,25 @@ export function reducer(state: GameState | null, action: Action): GameState | nu
       return { ...state, lineup: autoPick(state.squad, state.formation) };
     case 'captain':
       return { ...state, captainId: action.playerId };
-    case 'scout':
-      if (!canTrade(state)) return state;
-      return done(scoutPlayers(state, rng, action.maxPrice, action.line));
-    case 'buy': {
-      const p = state.market.find((m) => m.id === action.playerId);
-      if (!p || !canTrade(state) || state.squad.length >= SQUAD_MAX) return state;
-      const price = playerValue(p);
-      if (price > state.money) return state;
-      return {
-        ...state,
-        money: state.money - price,
-        squad: [...state.squad, { ...p, seasonsAtClub: 0, goals: 0 }],
-        market: state.market.filter((m) => m.id !== p.id),
-      };
-    }
-    case 'sell': {
-      const p = state.squad.find((m) => m.id === action.playerId);
-      if (!p || !canTrade(state) || state.squad.length <= SQUAD_MIN) return state;
-      return {
-        ...state,
-        money: state.money + playerValue(p),
-        squad: state.squad.filter((m) => m.id !== p.id),
-        lineup: state.lineup.map((id) => (id === p.id ? null : id)),
-        captainId: state.captainId === p.id ? null : state.captainId,
-      };
-    }
-    case 'startSeason':
+    case 'search':
+      return done(search(state, rng, action.maxFee, action.line));
+    case 'scoutPlayer':
+      return scoutPlayer(state, action.playerId);
+    case 'bid':
+      return placeBid(state, action.playerId, action.fee, action.years);
+    case 'acceptOffer':
+      return acceptOffer(state, action.offerId);
+    case 'rejectOffer':
+      return rejectOffer(state, action.offerId);
+    case 'quickSale':
+      return done(quickSale(state, rng, action.playerId));
+    case 'renew':
+      return renew(state, action.playerId, action.years);
+    case 'startSeason': {
       if (state.phase !== 'window') return state;
-      return ensureLineup({ ...state, phase: 'season', market: [] });
+      const topped = topUpClubs(state, rng);
+      return done(ensureLineup({ ...topped, phase: 'season', offers: [], talks: {} }));
+    }
     case 'playRound':
       return done(playRound(state, rng));
     case 'simToStop': {

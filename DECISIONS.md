@@ -33,3 +33,10 @@ Revisit when a backend, accounts, or deep links are needed.
 
 Accepted for S002. Match results and generated players use a seeded generator whose
 seed is stored in `GameState`, so reducer actions stay pure and results are reproducible.
+
+## D006: AI clubs are made of players
+
+Accepted for S004. Every AI club owns a squad in `GameState.world`; its attack and
+defense are derived from its best XI. Transfers move player objects between clubs, so
+the market changes the league. Negotiation prices are hidden but derived from a hash,
+so no extra state is stored. Revisit when real player data replaces generated squads.

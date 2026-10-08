@@ -5,6 +5,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { userClub } from '../game/game';
 import { useCareer } from '../state/GameContext';
 import { ClubCrest } from '../ui/components';
+import { FadeIn } from '../ui/motion';
 import { colors, formatMoney, seasonLabel } from '../ui/theme';
 import { ClubScreen } from './ClubScreen';
 import { LeagueScreen } from './LeagueScreen';
@@ -25,16 +26,24 @@ const TABS: { id: Tab; icon: string; label: string }[] = [
 export function MainScreen() {
   const { state, dispatch } = useCareer();
   const insets = useSafeAreaInsets();
-  const [tab, setTab] = useState<Tab>('club');
-  const [sim, setSim] = useState<'fast' | 'step' | null>(null);
+  // New tabs slide in from the side they sit on in the tab bar.
+  const [{ tab, from }, setNav] = useState<{ tab: Tab; from: 'left' | 'right' }>({
+    tab: 'club',
+    from: 'right',
+  });
+  const setTab = (next: Tab) => {
+    const order = TABS.map((t) => t.id);
+    setNav({ tab: next, from: order.indexOf(next) < order.indexOf(tab) ? 'left' : 'right' });
+  };
+  const [sim, setSim] = useState<{ until?: number } | null>(null);
 
   if (!sim && (state.phase === 'summary' || state.phase === 'gameover')) {
     return <SeasonEndScreen />;
   }
 
-  const play = (mode: 'fast' | 'step') => {
+  const play = (until?: number) => {
     if (state.phase === 'window') dispatch({ type: 'startSeason' });
-    setSim(mode);
+    setSim({ until });
   };
   const club = userClub(state);
   const playLabel = state.phase === 'window' ? 'KICK OFF' : 'PLAY';
@@ -58,19 +67,25 @@ export function MainScreen() {
         </View>
       </View>
 
-      <View style={s.body}>
-        {tab === 'club' && <ClubScreen onPlay={play} onOpenTransfers={() => setTab('transfers')} />}
+      <FadeIn key={tab} from={from} distance={24} duration={220} style={s.body}>
+        {tab === 'club' && (
+          <ClubScreen
+            onPlay={play}
+            onOpenTransfers={() => setTab('transfers')}
+            onOpenLeague={() => setTab('league')}
+          />
+        )}
         {tab === 'squad' && <SquadScreen />}
         {tab === 'transfers' && <TransfersScreen />}
         {tab === 'league' && <LeagueScreen />}
-      </View>
+      </FadeIn>
 
       <View style={[s.tabs, { paddingBottom: Math.max(insets.bottom, 8) }]}>
         {TABS.slice(0, 2).map((t) => (
           <TabButton key={t.id} {...t} active={tab === t.id} onPress={() => setTab(t.id)} />
         ))}
         <Pressable
-          onPress={() => play('fast')}
+          onPress={() => play()}
           style={({ pressed }) => [s.play, pressed && { transform: [{ translateY: 2 }] }]}
           accessibilityRole="button"
           accessibilityLabel={playLabel}
@@ -83,7 +98,7 @@ export function MainScreen() {
         ))}
       </View>
 
-      {sim ? <SimScreen mode={sim} onClose={() => setSim(null)} /> : null}
+      {sim ? <SimScreen until={sim.until} onClose={() => setSim(null)} /> : null}
     </View>
   );
 }

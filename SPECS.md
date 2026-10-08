@@ -20,6 +20,8 @@ or hosting. These are not approved features.
 | --- | --- | --- |
 | S001 | [Starter and previews](specs/001-expo-starter.md) | Implemented; device observation pending |
 | S002 | [Pocket manager mockup](specs/002-pocket-manager-mockup.md) | Implemented; device observation pending |
+| S003 | [Season roadmap and motion](specs/003-season-roadmap.md) | Implemented; device observation pending |
+| S004 | [Transfer market and contracts](specs/004-transfer-market-contracts.md) | Implemented; device observation pending |
 
 Use [the template](specs/_template.md) for the next feature. Number specs sequentially.
 Keep IDs stable; criteria use S002-AC01 style IDs referenced by tasks and evidence.
@@ -30,5 +32,6 @@ Superseded specs name their replacement. Status labels alone are not evidence.
 
 ## Next product questions
 
-Next likely feature: a real player database (see S002 open questions). Establish its
-data source and persistence needs before implementation.
+Product direction (user, 2026-10-08): the challenge is managing squad and money, not
+match play. No divisions, levels or fatigue. Candidate next features: a continental cup
+for top finishers, choice of league, and a real player database.

@@ -1,4 +1,4 @@
-import { LINE_OF, PENALTY, RELATED } from './constants';
+import { LINE_OF, MARKET, PENALTY, RELATED } from './constants';
 import { NATIONS } from './names';
 import type { Rng } from './rng';
 import type { Line, Player, Position } from './types';
@@ -22,12 +22,17 @@ export function playerValue(p: Pick<Player, 'rating' | 'age' | 'potential'>) {
   return roundMoney(base * (1 + growth / 40));
 }
 
-/** Yearly wage in dollars; depends on rating only. */
-export function playerWage(p: Pick<Player, 'rating'>) {
+/** The going yearly wage for a player of this rating, before personal demands. */
+export function marketWage(p: Pick<Player, 'rating'>) {
   return roundMoney(100_000 * Math.exp(0.14 * (p.rating - 60)));
 }
 
-function roundMoney(n: number) {
+/** What the player asks for to sign or renew. Winning clubs pay more. */
+export function wageDemand(p: Pick<Player, 'rating' | 'greed'>, success = 1) {
+  return roundMoney(marketWage(p) * p.greed * success);
+}
+
+export function roundMoney(n: number) {
   if (n >= 1_000_000) return Math.round(n / 50_000) * 50_000;
   return Math.round(n / 5_000) * 5_000;
 }
@@ -78,6 +83,7 @@ export interface PlayerSpec {
   rating: number;
   age: number;
   seasonsAtClub?: number;
+  clubId?: string | null;
 }
 
 export function makePlayer(rng: Rng, id: string, spec: PlayerSpec): Player {
@@ -97,7 +103,39 @@ export function makePlayer(rng: Rng, id: string, spec: PlayerSpec): Player {
     potential: clamp(rating + rng.int(0, headroom), rating, 96),
     seasonsAtClub: spec.seasonsAtClub ?? 0,
     goals: 0,
+    clubId: spec.clubId ?? null,
+    // Existing contracts vary: some players are bargains, some are overpaid.
+    contract: {
+      wage: roundMoney(marketWage({ rating }) * (0.8 + rng.next() * 0.5)),
+      years: rng.int(1, 4),
+    },
+    scoutBias: rng.next(),
+    greed: 0.9 + rng.next() * 0.5,
   };
+}
+
+/**
+ * What the user sees at a scouting level: a range that always contains the
+ * true value, positioned by the player's hidden bias.
+ */
+export function ratingRange(p: Pick<Player, 'rating' | 'scoutBias'>, level: number): [number, number] {
+  const width = MARKET.ratingWidth[Math.min(level, 2)];
+  const lo = p.rating - Math.round(p.scoutBias * width);
+  return [lo, lo + width];
+}
+
+export function potentialRange(
+  p: Pick<Player, 'potential' | 'scoutBias'>,
+  level: number,
+): [number, number] | null {
+  const width = MARKET.potentialWidth[Math.min(level, 2)];
+  if (width >= 99) return null;
+  const lo = p.potential - Math.round(((p.scoutBias * 7) % 1) * width);
+  return [lo, lo + width];
+}
+
+export function rangeLabel([lo, hi]: [number, number]) {
+  return lo === hi ? String(lo) : `${lo}–${hi}`;
 }
 
 /** Rating that makes a player of this age worth roughly `value`. */

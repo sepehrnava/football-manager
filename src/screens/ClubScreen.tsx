@@ -2,136 +2,166 @@ import { useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { MID_WINDOW_ROUND, ROUNDS } from '../game/constants';
-import {
-  clubById,
-  projectedPosition,
-  seasonCosts,
-  seasonIncome,
-  USER_ID,
-  userClub,
-} from '../game/game';
+import { seasonProjection, USER_ID, userClub } from '../game/game';
+import { userFixture } from '../game/insights';
 import { leagueTable } from '../game/league';
-import { userStrength } from '../game/team';
 import { useCareer, useGame } from '../state/GameContext';
-import { Bar, Button, Card, ClubCrest, Row, SectionTitle } from '../ui/components';
+import { Button, Card, ClubCrest, Row, SectionTitle } from '../ui/components';
+import { FadeIn } from '../ui/motion';
 import { colors, formatFans, formatMoney, ordinal, seasonLabel } from '../ui/theme';
+import { MatchPreview, MatchSheet } from './MatchSheet';
+import { Roadmap } from './Roadmap';
 
+/** Home: the season roadmap, what's next, and the club's finances. */
 export function ClubScreen({
   onPlay,
   onOpenTransfers,
+  onOpenLeague,
 }: {
-  onPlay: (mode: 'fast' | 'step') => void;
+  /** Play until `state.round` reaches `until`; without it, play to the next stop. */
+  onPlay: (until?: number) => void;
   onOpenTransfers: () => void;
+  onOpenLeague: () => void;
 }) {
   const { state } = useCareer();
   const { resetCareer } = useGame();
   const [confirmReset, setConfirmReset] = useState(false);
+  const [sheetRound, setSheetRound] = useState<number | null>(null);
 
   const club = userClub(state);
-  const strength = userStrength(state);
   const table = leagueTable(state.clubs, state.fixtures);
   const myRow = table.find((r) => r.clubId === USER_ID)!;
   const livePos = table.indexOf(myRow) + 1;
-  const projPos = myRow.played ? livePos : projectedPosition(state);
-  const costs = seasonCosts(state);
-  const income = seasonIncome(projPos, state.fans);
-  const net = income.total - costs.total;
-  const next = state.fixtures.find(
-    (f) => f.round === state.round && (f.homeId === USER_ID || f.awayId === USER_ID),
-  );
-  const nextStop = state.round < MID_WINDOW_ROUND ? 'transfer window' : 'end of season';
+  const proj = seasonProjection(state);
+  const { costs, income, net } = proj;
+  const projPos = proj.position;
+  const expiring = state.squad.filter((p) => p.contract.years === 1).length;
+  const desk = [
+    state.offers.length
+      ? { icon: '📨', text: `${state.offers.length} offer${state.offers.length > 1 ? 's' : ''} for your players`, tone: 'ok' }
+      : null,
+    expiring
+      ? {
+          icon: '✍️',
+          text: `${expiring} contract${expiring > 1 ? 's' : ''} end this season`,
+          tone: state.phase === 'window' ? 'warn' : 'ok',
+        }
+      : null,
+    proj.risk !== 'ok'
+      ? {
+          icon: '⚠️',
+          text:
+            proj.risk === 'danger'
+              ? `Board: on course for ${formatMoney(proj.moneyAfter)}. You will be sacked.`
+              : `Board: heading for ${formatMoney(proj.moneyAfter)} at season end`,
+          tone: 'bad',
+        }
+      : null,
+  ].filter((d): d is { icon: string; text: string; tone: string } => d !== null);
+  const next = userFixture(state, state.round);
+  const stopName = state.round < MID_WINDOW_ROUND ? 'WINDOW' : 'END';
 
   return (
     <ScrollView contentContainerStyle={s.content}>
-      <View style={s.hero}>
-        <ClubCrest club={club} size={64} />
+      <FadeIn style={s.hero}>
+        <ClubCrest club={club} size={56} />
         <View style={s.heroText}>
           <Text style={s.clubName} numberOfLines={1}>
             {club.name}
           </Text>
-          <Text style={s.heroMeta}>
-            Season {seasonLabel(state.season)} · Matchday {Math.min(state.round + 1, ROUNDS)}/{ROUNDS}
-          </Text>
+          <Text style={s.heroMeta}>Season {seasonLabel(state.season)}</Text>
         </View>
-      </View>
+        <View style={s.posBadge}>
+          <Text style={s.posValue}>{myRow.played ? ordinal(livePos) : '–'}</Text>
+          <Text style={s.posLabel}>{myRow.points} PTS</Text>
+        </View>
+      </FadeIn>
 
-      {state.phase === 'window' ? (
-        <Card style={s.windowCard}>
-          <Text style={s.windowTitle}>
-            {state.window === 'pre' ? 'Pre-season' : 'Mid-season'} transfer window
-          </Text>
-          <Text style={s.windowText}>
-            Set your XI and make signings. Matches simulate quickly until the next window.
-          </Text>
-          <View style={s.buttons}>
-            <Button label="TRANSFERS" variant="light" small style={s.flex} onPress={onOpenTransfers} />
-            <Button label="KICK OFF ▶" variant="green" small style={s.flex} onPress={() => onPlay('fast')} />
+      <FadeIn delay={60}>
+        <Card style={s.roadCard}>
+          <View style={s.roadHead}>
+            <Text style={s.roadTitle}>Season roadmap</Text>
+            <Text style={s.roadMeta}>
+              {Math.min(state.round, ROUNDS)}/{ROUNDS} played
+            </Text>
           </View>
+          <Roadmap onRound={setSheetRound} onWindow={onOpenTransfers} onFinish={onOpenLeague} />
+          <Text style={s.roadHint}>Tap any match to see it, or to play up to it.</Text>
         </Card>
-      ) : (
-        <View style={s.buttons}>
-          <Button label="NEXT MATCH" variant="light" style={s.flex} onPress={() => onPlay('step')} />
-          <Button label={`SIM TO ${nextStop.toUpperCase()} ⏩`} style={s.flex2} onPress={() => onPlay('fast')} />
-        </View>
-      )}
+      </FadeIn>
 
-      {next ? <NextMatch fixtureHome={next.homeId === USER_ID} opponentId={next.homeId === USER_ID ? next.awayId : next.homeId} power={strength.power} /> : null}
-
-      <SectionTitle>STANDING</SectionTitle>
-      <Card style={s.standing}>
-        <View style={s.bigStat}>
-          <Text style={s.bigValue}>{myRow.played ? ordinal(livePos) : '–'}</Text>
-          <Text style={s.bigLabel}>POSITION</Text>
-        </View>
-        <View style={s.bigStat}>
-          <Text style={s.bigValue}>{myRow.points}</Text>
-          <Text style={s.bigLabel}>POINTS</Text>
-        </View>
-        <View style={[s.bigStat, s.formStat]}>
-          <View style={s.form}>
-            {myRow.form.slice(-5).map((r, i) => (
-              <View
-                key={i}
-                style={[
-                  s.formDot,
-                  { backgroundColor: r === 'W' ? colors.green : r === 'L' ? colors.red : '#9A9A94' },
-                ]}
-              >
-                <Text style={s.formText}>{r}</Text>
-              </View>
-            ))}
-            {myRow.form.length === 0 ? <Text style={s.muted}>No games yet</Text> : null}
+      <FadeIn delay={120}>
+        {state.phase === 'window' ? (
+          <Card style={s.windowCard}>
+            <Text style={s.windowTitle}>
+              {state.window === 'pre' ? 'Pre-season' : 'Mid-season'} transfer window
+            </Text>
+            <Text style={s.windowText}>
+              Buy, sell and set your XI. Kick-off closes the window; matches then run until the
+              next stop, pausing for key games.
+            </Text>
+            <View style={s.buttons}>
+              <Button label="TRANSFERS" variant="light" small style={s.flex} onPress={onOpenTransfers} />
+              <Button label="KICK OFF ▶" variant="green" small style={s.flex} onPress={() => onPlay()} />
+            </View>
+          </Card>
+        ) : (
+          <View style={s.buttons}>
+            <Button label="NEXT MATCH" variant="light" style={s.flex} onPress={() => onPlay(state.round + 1)} />
+            <Button label={`PLAY TO ${stopName}`} style={s.flex2} onPress={() => onPlay()} />
           </View>
-          <Text style={s.bigLabel}>FORM</Text>
-        </View>
-      </Card>
+        )}
+      </FadeIn>
 
-      <SectionTitle>TEAM OVERVIEW</SectionTitle>
-      <Card>
-        <Row label="Money" value={formatMoney(state.money)} bold />
-        <Row label="Fans" value={formatFans(state.fans)} />
-        <View style={s.divider} />
-        <Text style={s.group}>Costs per season</Text>
-        <Row label="Fixed costs" value={formatMoney(costs.fixedCosts)} />
-        <Row label="Players' yearly cost" value={formatMoney(costs.wages)} />
-        <Row label="Stakeholder cashout" value={formatMoney(costs.stakeholder)} />
-        <Row label="Total cost" value={formatMoney(costs.total)} bold />
-        <View style={s.divider} />
-        <Text style={s.group}>
-          Income if you finish {ordinal(projPos)} {myRow.played ? '(current)' : '(projected)'}
-        </Text>
-        <Row label="Prize money" value={formatMoney(income.prize)} />
-        <Row label="Fan revenue" value={formatMoney(income.fanIncome)} />
-        <Row
-          label="Season result"
-          value={`${net >= 0 ? '+' : ''}${formatMoney(net)}`}
-          color={net >= 0 ? colors.green : colors.red}
-          bold
-        />
-        <Text style={s.note}>
-          A top-3 finish also pays player bonuses (5–15% of yearly cost).
-        </Text>
-      </Card>
+      {desk.length ? (
+        <FadeIn delay={150}>
+          <Card style={s.desk}>
+            {desk.map((d) => (
+              <Text
+                key={d.text}
+                onPress={onOpenTransfers}
+                style={[s.deskItem, d.tone === 'bad' && { color: colors.red }, d.tone === 'warn' && { color: colors.orange }]}
+              >
+                {d.icon} {d.text} ›
+              </Text>
+            ))}
+          </Card>
+        </FadeIn>
+      ) : null}
+
+      {next ? (
+        <FadeIn delay={180}>
+          <SectionTitle>{`NEXT · MATCHDAY ${next.round + 1}`}</SectionTitle>
+          <MatchPreview fixture={next} />
+        </FadeIn>
+      ) : null}
+
+      <FadeIn delay={240}>
+        <SectionTitle>TEAM OVERVIEW</SectionTitle>
+        <Card>
+          <Row label="Money" value={formatMoney(state.money)} bold />
+          <Row label="Fans" value={formatFans(state.fans)} />
+          <View style={s.divider} />
+          <Text style={s.group}>Costs per season</Text>
+          <Row label="Fixed costs" value={formatMoney(costs.fixedCosts)} />
+          <Row label="Players' yearly cost" value={formatMoney(costs.wages)} />
+          <Row label="Stakeholder cashout" value={formatMoney(costs.stakeholder)} />
+          <Row label="Total cost" value={formatMoney(costs.total)} bold />
+          <View style={s.divider} />
+          <Text style={s.group}>
+            Income if you finish {ordinal(projPos)} {myRow.played ? '(current)' : '(projected)'}
+          </Text>
+          <Row label="Prize money" value={formatMoney(income.prize)} />
+          <Row label="Fan revenue" value={formatMoney(income.fanIncome)} />
+          <Row
+            label="Season result"
+            value={`${net >= 0 ? '+' : ''}${formatMoney(net)}`}
+            color={net >= 0 ? colors.green : colors.red}
+            bold
+          />
+          <Text style={s.note}>A top-3 finish also pays player bonuses (5–15% of yearly cost).</Text>
+        </Card>
+      </FadeIn>
 
       {state.history.length ? (
         <>
@@ -154,85 +184,40 @@ export function ClubScreen({
         style={s.reset}
         onPress={() => (confirmReset ? resetCareer() : setConfirmReset(true))}
       />
-    </ScrollView>
-  );
-}
 
-function NextMatch({
-  fixtureHome,
-  opponentId,
-  power,
-}: {
-  fixtureHome: boolean;
-  opponentId: string;
-  power: number;
-}) {
-  const { state } = useCareer();
-  const opp = clubById(state, opponentId);
-  const me = userClub(state);
-  const oppPower = Math.round((opp.attack + opp.defense) / 2);
-  return (
-    <>
-      <SectionTitle>NEXT MATCH</SectionTitle>
-      <Card style={s.match}>
-        <View style={s.side}>
-          <ClubCrest club={me} size={44} />
-          <Text style={s.sideName} numberOfLines={1}>
-            {me.name}
-          </Text>
-          <Text style={s.power}>{power}</Text>
-        </View>
-        <View style={s.vs}>
-          <Text style={s.vsText}>VS</Text>
-          <Text style={s.muted}>{fixtureHome ? 'Home' : 'Away'}</Text>
-        </View>
-        <View style={s.side}>
-          <ClubCrest club={opp} size={44} />
-          <Text style={s.sideName} numberOfLines={1}>
-            {opp.name}
-          </Text>
-          <Text style={s.power}>{oppPower}</Text>
-        </View>
-      </Card>
-      <View style={s.compare}>
-        <Bar value={(power / (power + oppPower)) * 100} color={colors.green} />
-        <Text style={s.compareText}>
-          {power > oppPower + 2 ? 'You are favourites' : power < oppPower - 2 ? 'They are favourites' : 'Even match'}
-        </Text>
-      </View>
-    </>
+      <MatchSheet round={sheetRound} onClose={() => setSheetRound(null)} onPlayTo={onPlay} />
+    </ScrollView>
   );
 }
 
 const s = StyleSheet.create({
   content: { padding: 16, paddingBottom: 40, gap: 12 },
-  hero: { flexDirection: 'row', alignItems: 'center', gap: 14 },
+  hero: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   heroText: { flex: 1 },
-  clubName: { fontSize: 26, fontWeight: '900', color: colors.ink },
+  clubName: { fontSize: 24, fontWeight: '900', color: colors.ink },
   heroMeta: { fontSize: 14, fontWeight: '700', color: colors.muted, marginTop: 2 },
+  posBadge: {
+    alignItems: 'center',
+    backgroundColor: colors.ink,
+    borderRadius: 16,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+  },
+  posValue: { color: '#FFFFFF', fontSize: 20, fontWeight: '900' },
+  posLabel: { color: '#BDBDB6', fontSize: 10, fontWeight: '800', letterSpacing: 1 },
+  roadCard: { paddingHorizontal: 0, paddingBottom: 12, gap: 10 },
+  roadHead: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline', paddingHorizontal: 16 },
+  roadTitle: { fontSize: 18, fontWeight: '900', color: colors.ink },
+  roadMeta: { fontSize: 13, fontWeight: '800', color: colors.muted },
+  roadHint: { fontSize: 12, fontWeight: '700', color: colors.muted, textAlign: 'center' },
   windowCard: { backgroundColor: colors.greenSoft, borderColor: '#BFE6CC', borderBottomColor: '#9ED6B1', gap: 6 },
   windowTitle: { fontSize: 18, fontWeight: '900', color: colors.ink },
   windowText: { fontSize: 14, fontWeight: '600', color: colors.muted, marginBottom: 6 },
   buttons: { flexDirection: 'row', gap: 10 },
   flex: { flex: 1 },
-  flex2: { flex: 1.6 },
-  match: { flexDirection: 'row', alignItems: 'center' },
-  side: { flex: 1, alignItems: 'center', gap: 6 },
-  sideName: { fontSize: 14, fontWeight: '800', color: colors.ink },
-  power: { fontSize: 24, fontWeight: '900', color: colors.ink },
-  vs: { alignItems: 'center', paddingHorizontal: 8 },
-  vsText: { fontSize: 22, fontWeight: '900', fontStyle: 'italic', color: colors.ink },
-  compare: { gap: 6, paddingHorizontal: 4 },
-  compareText: { textAlign: 'center', fontWeight: '700', color: colors.muted, fontSize: 13 },
-  standing: { flexDirection: 'row', alignItems: 'center' },
-  bigStat: { flex: 1, alignItems: 'center', gap: 4 },
-  formStat: { flex: 1.6 },
-  bigValue: { fontSize: 28, fontWeight: '900', color: colors.ink },
-  bigLabel: { fontSize: 11, fontWeight: '800', letterSpacing: 1.2, color: colors.muted },
-  form: { flexDirection: 'row', gap: 4, minHeight: 34, alignItems: 'center' },
-  formDot: { width: 24, height: 24, borderRadius: 7, alignItems: 'center', justifyContent: 'center' },
-  formText: { color: '#FFFFFF', fontWeight: '900', fontSize: 12 },
-  muted: { color: colors.muted, fontWeight: '700', fontSize: 13 },
+  flex2: { flex: 1.3 },
+  desk: { gap: 10, paddingVertical: 12 },
+  deskItem: { fontSize: 15, fontWeight: '800', color: colors.ink },
   divider: { height: 2, backgroundColor: colors.faint, marginVertical: 8 },
   group: { fontSize: 12, fontWeight: '800', letterSpacing: 1, color: colors.muted, textTransform: 'uppercase' },
   note: { fontSize: 12, color: colors.muted, fontWeight: '600', marginTop: 4 },

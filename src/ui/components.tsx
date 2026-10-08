@@ -1,5 +1,7 @@
-import type { ReactNode } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import {
+  Animated,
+  Easing,
   Modal,
   Pressable,
   ScrollView,
@@ -13,6 +15,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { LINE_OF } from '../game/constants';
 import type { Club, Crest as CrestData, Position } from '../game/types';
+import { NATIVE, usePressScale } from './motion';
 import { colors, lineColors } from './theme';
 
 export function Card({ children, style }: { children: ReactNode; style?: StyleProp<ViewStyle> }) {
@@ -37,24 +40,28 @@ export function Button({
   style?: StyleProp<ViewStyle>;
 }) {
   const v = BUTTONS[variant];
+  const press = usePressScale();
   return (
-    <Pressable
-      accessibilityRole="button"
-      disabled={disabled}
-      onPress={onPress}
-      style={({ pressed }) => [
-        styles.button,
-        small && styles.buttonSmall,
-        { backgroundColor: v.bg, borderColor: v.border, borderBottomColor: v.shadow },
-        pressed && styles.pressed,
-        disabled && styles.disabled,
-        style,
-      ]}
-    >
-      <Text style={[styles.buttonText, small && styles.buttonTextSmall, { color: v.text }]}>
-        {label}
-      </Text>
-    </Pressable>
+    <Animated.View style={[press.style, style]}>
+      <Pressable
+        accessibilityRole="button"
+        disabled={disabled}
+        onPress={onPress}
+        onPressIn={press.onPressIn}
+        onPressOut={press.onPressOut}
+        style={({ pressed }) => [
+          styles.button,
+          small && styles.buttonSmall,
+          { backgroundColor: v.bg, borderColor: v.border, borderBottomColor: v.shadow },
+          pressed && styles.pressed,
+          disabled && styles.disabled,
+        ]}
+      >
+        <Text style={[styles.buttonText, small && styles.buttonTextSmall, { color: v.text }]}>
+          {label}
+        </Text>
+      </Pressable>
+    </Animated.View>
   );
 }
 
@@ -76,19 +83,20 @@ export function Pill({
   onPress?: () => void;
   color?: string;
 }) {
+  const press = usePressScale(0.92);
   return (
-    <Pressable
-      accessibilityRole="button"
-      accessibilityState={{ selected: active }}
-      onPress={onPress}
-      style={({ pressed }) => [
-        styles.pill,
-        active && styles.pillActive,
-        pressed && styles.pressed,
-      ]}
-    >
-      <Text style={[styles.pillText, { color: color ?? colors.ink }]}>{label}</Text>
-    </Pressable>
+    <Animated.View style={press.style}>
+      <Pressable
+        accessibilityRole="button"
+        accessibilityState={{ selected: active }}
+        onPress={onPress}
+        onPressIn={press.onPressIn}
+        onPressOut={press.onPressOut}
+        style={({ pressed }) => [styles.pill, active && styles.pillActive, pressed && styles.pressed]}
+      >
+        <Text style={[styles.pillText, { color: color ?? colors.ink }]}>{label}</Text>
+      </Pressable>
+    </Animated.View>
   );
 }
 
@@ -119,6 +127,18 @@ export function RatingBadge({
       ]}
     >
       <Text style={[styles.ratingText, { fontSize: size * 0.45 }]}>{value}</Text>
+    </View>
+  );
+}
+
+/** A scouted rating: exact badge when known, a soft range pill when not. */
+export function RangeBadge({ range, size = 34 }: { range: [number, number]; size?: number }) {
+  if (range[0] === range[1]) return <RatingBadge value={range[0]} size={size} />;
+  return (
+    <View style={[styles.range, { height: size, borderRadius: size / 2 }]}>
+      <Text style={[styles.rangeText, { fontSize: size * 0.36 }]}>
+        {range[0]}–{range[1]}
+      </Text>
     </View>
   );
 }
@@ -232,9 +252,16 @@ export function Row({
 }
 
 export function Bar({ value, color = colors.green }: { value: number; color?: string }) {
+  const target = Math.max(0, Math.min(100, value));
+  const [w] = useState(() => new Animated.Value(target));
+  useEffect(() => {
+    // Width can't use the native driver.
+    Animated.timing(w, { toValue: target, duration: 400, easing: Easing.out(Easing.cubic), useNativeDriver: false }).start();
+  }, [w, target]);
+  const width = w.interpolate({ inputRange: [0, 100], outputRange: ['0%', '100%'] });
   return (
     <View style={styles.bar}>
-      <View style={[styles.barFill, { width: `${Math.max(0, Math.min(100, value))}%`, backgroundColor: color }]} />
+      <Animated.View style={[styles.barFill, { width, backgroundColor: color }]} />
     </View>
   );
 }
@@ -253,11 +280,18 @@ export function Sheet({
   footer?: ReactNode;
 }) {
   const insets = useSafeAreaInsets();
+  const [rise] = useState(() => new Animated.Value(0));
+  useEffect(() => {
+    if (!visible) return;
+    rise.setValue(0);
+    Animated.spring(rise, { toValue: 1, useNativeDriver: NATIVE, speed: 14, bounciness: 4 }).start();
+  }, [visible, rise]);
+  const translateY = rise.interpolate({ inputRange: [0, 1], outputRange: [500, 0] });
   return (
-    <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
+    <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
       <View style={styles.backdrop}>
         <Pressable style={StyleSheet.absoluteFill} onPress={onClose} accessibilityLabel="Close" />
-        <View style={[styles.sheet, { paddingBottom: insets.bottom + 16 }]}>
+        <Animated.View style={[styles.sheet, { paddingBottom: insets.bottom + 16, transform: [{ translateY }] }]}>
           <View style={styles.sheetHeader}>
             <Text style={styles.sheetTitle} numberOfLines={1}>
               {title}
@@ -270,7 +304,7 @@ export function Sheet({
             {children}
           </ScrollView>
           {footer}
-        </View>
+        </Animated.View>
       </View>
     </Modal>
   );
@@ -291,12 +325,12 @@ export const styles = StyleSheet.create({
     borderWidth: 2,
     borderBottomWidth: 5,
     paddingVertical: 14,
-    paddingHorizontal: 18,
+    paddingHorizontal: 12,
     alignItems: 'center',
     justifyContent: 'center',
   },
   buttonSmall: { paddingVertical: 8, paddingHorizontal: 14, borderRadius: 14, borderBottomWidth: 4 },
-  buttonText: { fontSize: 18, fontWeight: '900', letterSpacing: 0.3 },
+  buttonText: { fontSize: 17, fontWeight: '900', letterSpacing: 0.3, textAlign: 'center' },
   buttonTextSmall: { fontSize: 14, fontWeight: '800' },
   pressed: { transform: [{ translateY: 2 }], opacity: 0.92 },
   disabled: { opacity: 0.4 },
@@ -322,6 +356,16 @@ export const styles = StyleSheet.create({
     borderColor: '#FFFFFF',
   },
   ratingText: { color: '#FFFFFF', fontWeight: '900' },
+  range: {
+    paddingHorizontal: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#FFF3D6',
+    borderWidth: 2,
+    borderColor: colors.gold,
+    borderStyle: 'dashed',
+  },
+  rangeText: { color: '#A2700F', fontWeight: '900' },
   tags: { flexDirection: 'row', gap: 6 },
   tag: { fontWeight: '800' },
   crest: { overflow: 'hidden', borderColor: '#141414', alignItems: 'center', justifyContent: 'center' },

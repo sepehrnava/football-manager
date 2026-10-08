@@ -4,6 +4,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ECONOMY } from '../game/constants';
 import { useCareer, useGame } from '../state/GameContext';
 import { Button, Card, Row, SectionTitle } from '../ui/components';
+import { FadeIn } from '../ui/motion';
 import { colors, formatFans, formatMoney, ordinal, seasonLabel } from '../ui/theme';
 
 export function SeasonEndScreen() {
@@ -20,12 +21,18 @@ export function SeasonEndScreen() {
       style={{ backgroundColor: colors.bg }}
       contentContainerStyle={[s.content, { paddingTop: insets.top + 20, paddingBottom: insets.bottom + 24 }]}
     >
-      <Text style={s.kicker}>SEASON {seasonLabel(sum.season)} COMPLETE</Text>
-      <Text style={s.place}>{champion ? '🏆' : ordinal(sum.position)}</Text>
-      <Text style={s.headline}>
-        {champion ? 'Champions!' : `You finished ${ordinal(sum.position)}`}
-      </Text>
-      {!champion ? <Text style={s.sub}>Champions: {sum.championName}</Text> : null}
+      <FadeIn>
+        <Text style={s.kicker}>SEASON {seasonLabel(sum.season)} COMPLETE</Text>
+      </FadeIn>
+      <FadeIn from="scale" delay={150} duration={420}>
+        <Text style={s.place}>{champion ? '🏆' : ordinal(sum.position)}</Text>
+      </FadeIn>
+      <FadeIn delay={300}>
+        <Text style={s.headline}>
+          {champion ? 'Champions!' : `You finished ${ordinal(sum.position)}`}
+        </Text>
+        {!champion ? <Text style={s.sub}>Champions: {sum.championName}</Text> : null}
+      </FadeIn>
 
       {sacked ? (
         <Card style={s.sacked}>
@@ -37,6 +44,7 @@ export function SeasonEndScreen() {
         </Card>
       ) : null}
 
+      <FadeIn delay={450}>
       <SectionTitle>FINANCES</SectionTitle>
       <Card>
         <Row label="Prize money" value={`+${formatMoney(sum.prize)}`} color={colors.green} />
@@ -57,9 +65,10 @@ export function SeasonEndScreen() {
         <Row label="Money" value={`${formatMoney(sum.moneyBefore)} → ${formatMoney(sum.moneyAfter)}`} bold />
         <Row label="Fans" value={`${formatFans(sum.fansBefore)} → ${formatFans(sum.fansAfter)}`} />
       </Card>
+      </FadeIn>
 
       {!sacked ? (
-        <>
+        <FadeIn delay={600}>
           <SectionTitle>PLAYER DEVELOPMENT</SectionTitle>
           <Card>
             {sum.changes.length === 0 ? <Text style={s.muted}>No rating changes.</Text> : null}
@@ -76,10 +85,13 @@ export function SeasonEndScreen() {
             ) : null}
           </Card>
 
-          {sum.retired.length || sum.academy.length ? (
+          {sum.retired.length || sum.academy.length || sum.expired.length ? (
             <>
               <SectionTitle>SQUAD CHANGES</SectionTitle>
               <Card>
+                {sum.expired.map((n) => (
+                  <Row key={`x${n}`} label={n} value="Left on a free" color={colors.red} />
+                ))}
                 {sum.retired.map((n) => (
                   <Row key={n} label={n} value="Retired" color={colors.muted} />
                 ))}
@@ -89,7 +101,7 @@ export function SeasonEndScreen() {
               </Card>
             </>
           ) : null}
-        </>
+        </FadeIn>
       ) : null}
 
       <View style={s.action}>

@@ -18,6 +18,9 @@ export type FormationId = '4-4-2' | '4-3-3' | '4-2-3-1' | '3-5-2' | '5-3-2' | '3
 
 export type Tactic = 'defensive' | 'balanced' | 'attacking';
 
+/** How an AI club plays. Each style is beaten by one of the user's tactics. */
+export type Style = 'attack' | 'bus' | 'possession';
+
 export type CrestPattern = 'solid' | 'stripes' | 'half' | 'band';
 
 export interface Crest {
@@ -26,8 +29,17 @@ export interface Crest {
   pattern: CrestPattern;
 }
 
+export interface Contract {
+  /** Fixed yearly wage in dollars. */
+  wage: number;
+  /** Seasons left, including the current one. */
+  years: number;
+}
+
 export interface Player {
   id: string;
+  /** Owning club id, or null for a free agent. */
+  clubId: string | null;
   name: string;
   flag: string;
   age: number;
@@ -36,6 +48,11 @@ export interface Player {
   potential: number;
   seasonsAtClub: number;
   goals: number;
+  contract: Contract;
+  /** 0–1: where the true rating sits inside a scouting range. */
+  scoutBias: number;
+  /** Wage demand multiplier: how greedy the player is (0.9–1.4). */
+  greed: number;
 }
 
 export interface Club {
@@ -43,9 +60,12 @@ export interface Club {
   name: string;
   short: string;
   crest: Crest;
-  /** AI clubs only; the user's strength comes from the lineup. */
+  /** AI clubs: derived from their best XI. The user's comes from the lineup. */
   attack: number;
   defense: number;
+  style: Style;
+  /** Typical rating of the club's starters; guides who it signs. */
+  level: number;
 }
 
 export interface MatchResult {
@@ -70,6 +90,21 @@ export interface PlayerChange {
   to: number;
 }
 
+/** An AI club's bid for one of the user's players. */
+export interface Offer {
+  id: string;
+  playerId: string;
+  clubId: string;
+  fee: number;
+}
+
+/** The state of the user's talks with a selling club this window. */
+export interface Talk {
+  attempts: number;
+  counter: number | null;
+  last: 'accepted' | 'countered' | 'rejected' | 'broken' | null;
+}
+
 export interface SeasonSummary {
   season: number;
   position: number;
@@ -88,10 +123,12 @@ export interface SeasonSummary {
   changes: PlayerChange[];
   retired: string[];
   academy: string[];
+  /** Players who left because their contract ran out. */
+  expired: string[];
 }
 
 export interface GameState {
-  version: 1;
+  version: 2;
   seed: number;
   season: number;
   phase: Phase;
@@ -108,7 +145,18 @@ export interface GameState {
   fixtures: Fixture[];
   money: number;
   fans: number;
-  market: Player[];
+  /** Every player not in the user's squad: AI squads and free agents. */
+  world: Player[];
+  /** Player ids from the last search. */
+  search: string[];
+  /** Scouting level per player id: 0 rough, 1 good, 2 exact. */
+  scouting: Record<string, number>;
+  talks: Record<string, Talk>;
+  offers: Offer[];
+  /** AI clubs whose style the user has seen. */
+  knownStyles: string[];
+  /** Tactic planned for a round (by round index); falls back to `tactic`. */
+  plans: Record<number, Tactic>;
   nextId: number;
   summary: SeasonSummary | null;
   history: { season: number; position: number }[];

@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
-import { FORMATION_IDS, FORMATIONS, LINE_OF, TACTICS } from '../game/constants';
+import { BENCH_SIZE, FORMATION_IDS, FORMATIONS, SQUAD_MIN, TACTICS } from '../game/constants';
 import { userClub } from '../game/game';
 import { lineOf, ratingAt, surname } from '../game/players';
-import { starters, userStrength } from '../game/team';
-import type { Player, Tactic } from '../game/types';
+import { benchFor, starters, userStrength } from '../game/team';
+import type { Player, Position, Tactic } from '../game/types';
 import { useCareer } from '../state/GameContext';
 import {
   Button,
@@ -15,30 +15,73 @@ import {
   PosTags,
   RatingBadge,
   SectionTitle,
-  Sheet,
   Stat,
 } from '../ui/components';
+import { animateNextLayout, FadeIn } from '../ui/motion';
 import { colors, lineColors } from '../ui/theme';
 import { PlayerSheet } from './PlayerSheet';
 
 const LINE_ORDER = { GK: 0, DF: 1, MD: 2, AT: 3 };
 
+/** What the user tapped first: a position on the pitch or a player in a list. */
+type Selection = { kind: 'slot'; index: number } | { kind: 'player'; id: string } | null;
+
+function fitColor(drop: number) {
+  return drop <= 0 ? colors.green : penaltyTone(drop) === 'red' ? colors.red : colors.orange;
+}
+
 export function SquadScreen() {
   const { state, dispatch } = useCareer();
-  const [slot, setSlot] = useState<number | null>(null);
+  const [sel, setSel] = useState<Selection>(null);
   const [detail, setDetail] = useState<string | null>(null);
 
   const strength = userStrength(state);
   const xi = starters(state.squad, state.lineup);
+  const bench = benchFor(state.squad, state.lineup, BENCH_SIZE);
   const reserves = state.squad
-    .filter((p) => !state.lineup.includes(p.id))
+    .filter((p) => !state.lineup.includes(p.id) && !bench.includes(p))
     .sort((a, b) => LINE_ORDER[lineOf(a)] - LINE_ORDER[lineOf(b)] || b.rating - a.rating);
   const formation = FORMATIONS[state.formation];
   const kit = userClub(state).crest;
 
+  const assign = (slot: number, playerId: string) => {
+    animateNextLayout();
+    dispatch({ type: 'assign', slot, playerId });
+    setSel(null);
+  };
+
+  // Pitch: first tap selects; a second tap on another position swaps them,
+  // and a tap after picking a substitute brings that player on.
+  const tapSlot = (i: number) => {
+    if (sel?.kind === 'player') return assign(i, sel.id);
+    if (sel?.kind === 'slot') {
+      if (sel.index === i) return setSel(null);
+      const from = state.lineup[sel.index];
+      const to = state.lineup[i];
+      if (from) return assign(i, from);
+      if (to) return assign(sel.index, to);
+      return setSel({ kind: 'slot', index: i });
+    }
+    setSel({ kind: 'slot', index: i });
+  };
+
+  const tapPlayer = (id: string) => {
+    if (sel?.kind === 'slot') return assign(sel.index, id);
+    setSel(sel?.kind === 'player' && sel.id === id ? null : { kind: 'player', id });
+  };
+
+  const targetPos: Position | undefined = sel?.kind === 'slot' ? formation.slots[sel.index].pos : undefined;
+  const selectedSlot = sel?.kind === 'slot' ? sel.index : null;
+  const selectedPlayer =
+    sel?.kind === 'player'
+      ? state.squad.find((p) => p.id === sel.id)
+      : sel?.kind === 'slot'
+        ? xi[sel.index]
+        : null;
+
   return (
-    <>
-      <ScrollView contentContainerStyle={s.content}>
+    <View style={s.screen}>
+      <ScrollView contentContainerStyle={[s.content, sel && s.contentWithBar]}>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.pills}>
           {FORMATION_IDS.map((id) => (
             <Pill
@@ -84,8 +127,12 @@ export function SquadScreen() {
             return (
               <Pressable
                 key={i}
-                onPress={() => setSlot(i)}
-                accessibilityLabel={p ? `${sl.pos}: ${p.name}, ${r}` : `Empty ${sl.pos} slot`}
+                onPress={() => tapSlot(i)}
+                accessibilityLabel={
+                  p
+                    ? `${sl.pos}: ${p.name}, ${r}${p.rating > r ? `, out of position −${p.rating - r}` : ', natural position'}`
+                    : `Empty ${sl.pos} slot`
+                }
                 style={[s.token, { left: `${sl.x * 100}%`, top: `${sl.y * 100}%` }]}
               >
                 {p ? (
@@ -97,7 +144,7 @@ export function SquadScreen() {
                           backgroundColor: kit.primary,
                           borderColor: kit.secondary,
                         },
-                        slot === i && s.selected,
+                        selectedSlot === i && s.selected,
                       ]}
                     >
                       <Text style={s.shirtPos}>{sl.pos}</Text>
@@ -106,16 +153,24 @@ export function SquadScreen() {
                       <RatingBadge value={r} size={24} tone={penaltyTone(p.rating - r)} />
                     </View>
                     {state.captainId === p.id ? <Text style={s.captain}>C</Text> : null}
+                    <View
+                      style={[
+                        s.fit,
+                        { backgroundColor: fitColor(p.rating - r) },
+                      ]}
+                    >
+                      <Text style={s.fitText}>{p.rating > r ? `−${p.rating - r}` : '✓'}</Text>
+                    </View>
                     <Text style={s.tokenName} numberOfLines={1}>
                       {surname(p.name)}
                     </Text>
                   </>
                 ) : (
                   <>
-                    <View style={[s.empty, slot === i && s.selected]}>
+                    <View style={[s.empty, selectedSlot === i && s.selected]}>
                       <Text style={s.emptyPos}>{sl.pos}</Text>
                     </View>
-                    <Text style={s.tokenName}>Tap to pick</Text>
+                    <Text style={s.tokenName}>Empty</Text>
                   </>
                 )}
               </Pressable>
@@ -123,43 +178,69 @@ export function SquadScreen() {
           })}
         </View>
         <Text style={s.legend}>
-          Tap a position to pick a player. Orange or red rating = playing out of position.
+          Tap a player, then another position or a substitute below to swap. ✓ = natural position; −N =
+          rating lost out of position.
         </Text>
 
         <Button label="AUTO-PICK BEST XI" variant="light" onPress={() => dispatch({ type: 'autoPick' })} />
 
-        <SectionTitle>{`RESERVES · ${reserves.length}`}</SectionTitle>
+        <SectionTitle>{`SUBSTITUTES · ${bench.length}/${BENCH_SIZE}`}</SectionTitle>
         <Card style={s.list}>
-          {reserves.length === 0 ? <Text style={s.emptyList}>No reserves. Buy players in Transfers.</Text> : null}
-          {reserves.map((p, i) => (
-            <PlayerRow key={p.id} player={p} last={i === reserves.length - 1} onPress={() => setDetail(p.id)} />
+          {bench.map((p, i) => (
+            <PlayerRow
+              key={p.id}
+              player={p}
+              last={i === bench.length - 1}
+              target={targetPos}
+              selected={sel?.kind === 'player' && sel.id === p.id}
+              onPress={() => tapPlayer(p.id)}
+            />
           ))}
         </Card>
+        <Text style={s.legend}>
+          {`Your squad needs at least ${SQUAD_MIN} players (11 starters + ${BENCH_SIZE} subs), with 2 goalkeepers, 5 defenders, 5 midfielders and 3 attackers.`}
+        </Text>
 
-        <SectionTitle>STARTING XI</SectionTitle>
-        <Card style={s.list}>
-          {xi.map((p, i) =>
-            p ? (
-              <PlayerRow
-                key={p.id}
-                player={p}
-                captain={state.captainId === p.id}
-                slotPos={formation.slots[i].pos}
-                last={i === xi.length - 1}
-                onPress={() => setDetail(p.id)}
-              />
-            ) : null,
-          )}
-        </Card>
+        {reserves.length ? (
+          <>
+            <SectionTitle>{`OUTSIDE MATCHDAY SQUAD · ${reserves.length}`}</SectionTitle>
+            <Card style={s.list}>
+              {reserves.map((p, i) => (
+                <PlayerRow
+                  key={p.id}
+                  player={p}
+                  last={i === reserves.length - 1}
+                  target={targetPos}
+                  selected={sel?.kind === 'player' && sel.id === p.id}
+                  onPress={() => tapPlayer(p.id)}
+                />
+              ))}
+            </Card>
+          </>
+        ) : null}
+
       </ScrollView>
 
-      <SlotPicker slot={slot} onClose={() => setSlot(null)} />
-      <PlayerSheet
-        player={state.squad.find((p) => p.id === detail) ?? null}
-        mode="squad"
-        onClose={() => setDetail(null)}
-      />
-    </>
+      {sel ? (
+        <FadeIn key={sel.kind === 'slot' ? `s${sel.index}` : sel.id} style={s.bar} distance={20} duration={180}>
+          <Text style={s.barText} numberOfLines={2}>
+            {sel.kind === 'player'
+              ? `Bring on ${surname(selectedPlayer?.name ?? '')}: tap a position on the pitch`
+              : selectedPlayer
+                ? `Swap ${surname(selectedPlayer.name)} (${targetPos}): tap a substitute or another position`
+                : `Fill ${targetPos}: tap a substitute below`}
+          </Text>
+          <View style={s.barButtons}>
+            {selectedPlayer ? (
+              <Button label="DETAILS" variant="light" small onPress={() => setDetail(selectedPlayer.id)} />
+            ) : null}
+            <Button label="CANCEL" variant="light" small onPress={() => setSel(null)} />
+          </View>
+        </FadeIn>
+      ) : null}
+
+      <PlayerSheet playerId={detail} mode="squad" onClose={() => setDetail(null)} />
+    </View>
   );
 }
 
@@ -167,94 +248,69 @@ function PlayerRow({
   player,
   onPress,
   last,
-  captain,
-  slotPos,
+  target,
+  selected,
 }: {
   player: Player;
   onPress: () => void;
   last?: boolean;
-  captain?: boolean;
-  slotPos?: Player['positions'][number];
+  /** When a pitch position is selected, preview the rating there. */
+  target?: Position;
+  selected?: boolean;
 }) {
-  const r = slotPos ? ratingAt(player, slotPos) : player.rating;
+  const r = target ? ratingAt(player, target) : player.rating;
+  const drop = player.rating - r;
   return (
-    <Pressable onPress={onPress} style={({ pressed }) => [s.row, !last && s.rowBorder, pressed && s.rowPressed]}>
-      {slotPos ? (
-        <Text style={[s.rowSlot, { color: lineColors[LINE_OF[slotPos]] }]}>{slotPos}</Text>
-      ) : null}
+    <Pressable
+      onPress={onPress}
+      accessibilityRole="button"
+      accessibilityLabel={`Squad player ${player.name}`}
+      accessibilityState={{ selected: !!selected }}
+      style={({ pressed }) => [s.row, !last && s.rowBorder, selected && s.rowSelected, pressed && s.rowPressed]}
+    >
       <View style={s.rowMain}>
         <Text style={s.rowName} numberOfLines={1}>
           {player.flag} {player.name}
-          {captain ? '  Ⓒ' : ''}
         </Text>
         <View style={s.rowMeta}>
           <PosTags positions={player.positions} size={12} />
           <Text style={s.rowAge}>Age {player.age}</Text>
+          {player.contract.years === 1 ? <Text style={s.expiring}>LAST YEAR</Text> : null}
         </View>
       </View>
-      <RatingBadge value={r} size={34} tone={penaltyTone(player.rating - r)} />
+      {target ? (
+        <View style={[s.rowFit, { backgroundColor: fitColor(drop) }]}>
+          <Text style={s.fitText}>{drop > 0 ? `−${drop}` : '✓'}</Text>
+        </View>
+      ) : null}
+      <RatingBadge value={r} size={34} tone={target ? penaltyTone(drop) : 'gold'} />
     </Pressable>
-  );
-}
-
-function SlotPicker({ slot, onClose }: { slot: number | null; onClose: () => void }) {
-  const { state, dispatch } = useCareer();
-  if (slot === null) return null;
-  const pos = FORMATIONS[state.formation].slots[slot].pos;
-  const current = state.lineup[slot];
-  const options = [...state.squad].sort((a, b) => ratingAt(b, pos) - ratingAt(a, pos));
-  const slotOf = (id: string) => state.lineup.indexOf(id);
-  const assign = (playerId: string | null) => {
-    dispatch({ type: 'assign', slot, playerId });
-    onClose();
-  };
-
-  return (
-    <Sheet
-      visible
-      title={`Pick a player for ${pos}`}
-      onClose={onClose}
-      footer={
-        current ? (
-          <Button label="REMOVE FROM XI" variant="light" small onPress={() => assign(null)} />
-        ) : undefined
-      }
-    >
-      {options.map((p) => {
-        const r = ratingAt(p, pos);
-        const at = slotOf(p.id);
-        const isHere = p.id === current;
-        const where =
-          at >= 0 ? `In XI as ${FORMATIONS[state.formation].slots[at].pos}` : 'Reserve';
-        return (
-          <Pressable
-            key={p.id}
-            disabled={isHere}
-            onPress={() => assign(p.id)}
-            style={({ pressed }) => [s.option, isHere && s.optionHere, pressed && s.rowPressed]}
-          >
-            <View style={s.rowMain}>
-              <Text style={s.rowName} numberOfLines={1}>
-                {p.name}
-              </Text>
-              <View style={s.rowMeta}>
-                <PosTags positions={p.positions} size={12} />
-                <Text style={s.rowAge}>{isHere ? 'Playing here' : where}</Text>
-              </View>
-            </View>
-            {p.rating !== r ? <Text style={s.drop}>−{p.rating - r}</Text> : null}
-            <RatingBadge value={r} size={34} tone={penaltyTone(p.rating - r)} />
-          </Pressable>
-        );
-      })}
-    </Sheet>
   );
 }
 
 const TOKEN_W = 76;
 
 const s = StyleSheet.create({
+  screen: { flex: 1 },
   content: { padding: 16, paddingBottom: 40, gap: 12 },
+  contentWithBar: { paddingBottom: 140 },
+  bar: {
+    position: 'absolute',
+    left: 12,
+    right: 12,
+    bottom: 12,
+    backgroundColor: colors.ink,
+    borderRadius: 20,
+    padding: 14,
+    gap: 10,
+    shadowColor: '#000',
+    shadowOpacity: 0.25,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 8,
+  },
+  barText: { color: '#FFFFFF', fontWeight: '800', fontSize: 15 },
+  barButtons: { flexDirection: 'row', gap: 10, justifyContent: 'flex-end' },
   pills: { gap: 8, paddingRight: 8 },
   tactics: {
     flexDirection: 'row',
@@ -348,6 +404,20 @@ const s = StyleSheet.create({
     borderRadius: 10,
     overflow: 'hidden',
   },
+  fit: {
+    position: 'absolute',
+    top: 28,
+    left: 6,
+    minWidth: 22,
+    height: 18,
+    paddingHorizontal: 4,
+    borderRadius: 9,
+    borderWidth: 1.5,
+    borderColor: '#FFFFFF',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  fitText: { color: '#FFFFFF', fontWeight: '900', fontSize: 10 },
   tokenName: {
     color: '#FFFFFF',
     fontWeight: '800',
@@ -374,26 +444,24 @@ const s = StyleSheet.create({
   row: { flexDirection: 'row', alignItems: 'center', paddingVertical: 10, gap: 10 },
   rowBorder: { borderBottomWidth: 1.5, borderBottomColor: colors.faint },
   rowPressed: { opacity: 0.6 },
-  rowSlot: { width: 38, fontWeight: '900', fontSize: 13 },
+  rowSelected: {
+    backgroundColor: '#FFF3D6',
+    borderRadius: 12,
+    marginHorizontal: -8,
+    paddingHorizontal: 8,
+  },
+  rowFit: {
+    minWidth: 26,
+    height: 20,
+    paddingHorizontal: 5,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   rowMain: { flex: 1, gap: 3 },
   rowName: { fontSize: 16, fontWeight: '800', color: colors.ink },
   rowMeta: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   rowAge: { fontSize: 12, color: colors.muted, fontWeight: '700' },
-  option: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-    backgroundColor: colors.card,
-    borderRadius: 16,
-    borderWidth: 2,
-    borderColor: colors.border,
-    borderBottomWidth: 4,
-    borderBottomColor: colors.borderDark,
-    paddingVertical: 10,
-    paddingHorizontal: 14,
-    marginBottom: 8,
-  },
-  optionHere: { borderColor: colors.gold, borderBottomColor: colors.gold, backgroundColor: '#FFF8E6' },
-  drop: { color: colors.red, fontWeight: '900', fontSize: 13 },
+  expiring: { fontSize: 11, color: colors.red, fontWeight: '900' },
 });
 

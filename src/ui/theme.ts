@@ -18,6 +18,7 @@ export const colors = {
   orange: '#F08C1B',
   blue: '#3D7BE0',
   greenSoft: '#E6F6EC',
+  draw: '#9A9A94',
 };
 
 export const lineColors: Record<Line, string> = {

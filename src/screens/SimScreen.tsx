@@ -1,42 +1,65 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { MID_WINDOW_ROUND, ROUNDS } from '../game/constants';
 import { clubById, USER_ID } from '../game/game';
+import { keyMoment, userFixture } from '../game/insights';
 import { leagueTable } from '../game/league';
 import { surname } from '../game/players';
 import type { Fixture } from '../game/types';
 import { useCareer } from '../state/GameContext';
 import { Bar, Button, Card, ClubCrest } from '../ui/components';
+import { animateNextLayout, FadeIn } from '../ui/motion';
 import { colors } from '../ui/theme';
+import { MatchPreview } from './MatchSheet';
 
 const SPEEDS = { normal: 900, fast: 300 };
 
 /**
- * Plays rounds on a timer until the next stop (transfer window or season end).
- * Pause at any time to go match by match.
+ * Plays rounds on a timer until the next stop (transfer window or season end),
+ * or until `until` rounds have been played. Without a target it also pauses
+ * before key matches so the user can react. Pause any time to go match by match.
  */
-export function SimScreen({ mode, onClose }: { mode: 'fast' | 'step'; onClose: () => void }) {
+export function SimScreen({ until: initialUntil, onClose }: { until?: number; onClose: () => void }) {
   const { state, dispatch } = useCareer();
   const insets = useSafeAreaInsets();
-  const [running, setRunning] = useState(mode === 'fast');
+  const [running, setRunning] = useState(true);
   const [speed, setSpeed] = useState<keyof typeof SPEEDS>('normal');
-  const stepped = useRef(false);
+  const [until, setUntil] = useState(initialUntil);
+  const [startRound] = useState(state.round);
+  // The round whose key moment the user already saw (or started from).
+  const [ackRound, setAckRound] = useState(state.round);
   const inSeason = state.phase === 'season';
-
-  // "Next match" plays exactly one round when opened (guarded against double effects).
-  useEffect(() => {
-    if (mode !== 'step' || stepped.current) return;
-    stepped.current = true;
-    dispatch({ type: 'playRound' });
-  }, [mode, dispatch]);
+  const reached = until !== undefined && state.round >= until;
+  // Key moments only interrupt open-ended runs, never an explicit "play to here".
+  const moment =
+    inSeason && until === undefined && state.round !== ackRound ? keyMoment(state) : null;
+  const active = running && inSeason && !reached && !moment;
 
   useEffect(() => {
-    if (!running || !inSeason) return;
-    const t = setTimeout(() => dispatch({ type: 'playRound' }), SPEEDS[speed]);
+    if (!active) return;
+    // The first match of a run starts quickly; later ones follow the speed.
+    const delay = state.round === startRound ? 250 : SPEEDS[speed];
+    const t = setTimeout(() => {
+      animateNextLayout();
+      dispatch({ type: 'playRound' });
+    }, delay);
     return () => clearTimeout(t);
-  }, [running, inSeason, speed, state.round, dispatch]);
+  }, [active, speed, state.round, startRound, dispatch]);
+
+  const playOn = () => {
+    setAckRound(state.round);
+    setUntil(undefined);
+    setRunning(true);
+  };
+  const nextMatch = () => {
+    setAckRound(state.round);
+    setRunning(false);
+    animateNextLayout();
+    dispatch({ type: 'playRound' });
+  };
+  const nextFixture = userFixture(state, state.round);
 
   const played = state.round;
   const lastRound = played - 1;
@@ -77,14 +100,33 @@ export function SimScreen({ mode, onClose }: { mode: 'fast' | 'step'; onClose: (
         </View>
 
         <ScrollView contentContainerStyle={s.content}>
-          {mine ? <MyMatch fixture={mine} /> : <Text style={s.wait}>Get ready…</Text>}
+          {moment && nextFixture && inSeason ? (
+            <FadeIn key={`m${state.round}`} from="scale">
+              <View style={s.moment}>
+                <Text style={s.momentKicker}>KEY MATCH · MATCHDAY {state.round + 1}</Text>
+                <Text style={s.momentTitle}>{moment.title}</Text>
+                <Text style={s.momentText}>{moment.text}</Text>
+              </View>
+              <MatchPreview fixture={nextFixture} />
+            </FadeIn>
+          ) : null}
 
-          {others.length ? (
-            <Card style={s.others}>
-              {others.map((f, i) => (
-                <ResultLine key={i} fixture={f} />
-              ))}
-            </Card>
+          {mine ? (
+            <FadeIn key={`r${lastRound}`} from="scale" duration={220}>
+              <MyMatch fixture={mine} />
+            </FadeIn>
+          ) : !moment ? (
+            <Text style={s.wait}>Kick-off…</Text>
+          ) : null}
+
+          {others.length && !moment ? (
+            <FadeIn key={`o${lastRound}`} delay={80}>
+              <Card style={s.others}>
+                {others.map((f, i) => (
+                  <ResultLine key={i} fixture={f} />
+                ))}
+              </Card>
+            </FadeIn>
           ) : null}
 
           <Card style={s.table}>
@@ -112,21 +154,27 @@ export function SimScreen({ mode, onClose }: { mode: 'fast' | 'step'; onClose: (
               <Text style={s.stop}>{stopText}</Text>
               <Button label="CONTINUE" variant="green" onPress={onClose} />
             </>
-          ) : running ? (
+          ) : active ? (
             <Button label="⏸  PAUSE" variant="light" onPress={() => setRunning(false)} />
+          ) : reached ? (
+            <View style={s.row}>
+              <Button label="▶ PLAY ON" variant="light" style={s.flex} onPress={playOn} />
+              <Button label="DONE" variant="green" style={s.flex} onPress={onClose} />
+            </View>
           ) : (
             <View style={s.row}>
-              <Button
-                label="NEXT MATCH"
-                variant="light"
-                style={s.flex}
-                onPress={() => dispatch({ type: 'playRound' })}
-              />
-              <Button label="▶ PLAY ON" style={s.flex} onPress={() => setRunning(true)} />
+              <Button label={moment ? 'PLAY MATCH' : 'NEXT MATCH'} variant="light" style={s.flex} onPress={nextMatch} />
+              <Button label="▶ PLAY ON" style={s.flex} onPress={playOn} />
             </View>
           )}
           {!stopText ? (
-            <Pressable onPress={() => dispatch({ type: 'simToStop' })} style={s.skip}>
+            <Pressable
+              onPress={() => {
+                animateNextLayout();
+                dispatch({ type: 'simToStop' });
+              }}
+              style={s.skip}
+            >
               <Text style={s.skipText}>
                 Skip to {state.round < MID_WINDOW_ROUND ? 'transfer window' : 'end of season'} ⏭
               </Text>
@@ -146,7 +194,7 @@ function MyMatch({ fixture }: { fixture: Fixture }) {
   const us = fixture.homeId === USER_ID ? r.home : r.away;
   const them = fixture.homeId === USER_ID ? r.away : r.home;
   const verdict = us > them ? 'WIN' : us < them ? 'LOSS' : 'DRAW';
-  const color = us > them ? colors.green : us < them ? colors.red : '#8A8A84';
+  const color = us > them ? colors.green : us < them ? colors.red : colors.draw;
   return (
     <Card style={s.myMatch}>
       <View style={[s.verdict, { backgroundColor: color }]}>
@@ -213,6 +261,16 @@ const s = StyleSheet.create({
   speedOn: { backgroundColor: colors.ink, borderColor: colors.ink },
   closeText: { fontSize: 15, fontWeight: '900', color: colors.muted },
   content: { gap: 12, paddingBottom: 12 },
+  moment: {
+    backgroundColor: colors.ink,
+    borderRadius: 20,
+    padding: 16,
+    gap: 4,
+    marginBottom: 12,
+  },
+  momentKicker: { color: colors.gold, fontWeight: '900', fontSize: 12, letterSpacing: 1.5 },
+  momentTitle: { color: '#FFFFFF', fontWeight: '900', fontSize: 24 },
+  momentText: { color: '#CFCFC8', fontWeight: '600', fontSize: 14 },
   wait: { textAlign: 'center', fontSize: 18, fontWeight: '800', color: colors.muted, marginVertical: 40 },
   myMatch: { alignItems: 'center', gap: 10 },
   verdict: { paddingHorizontal: 14, paddingVertical: 4, borderRadius: 10 },

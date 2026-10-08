@@ -86,9 +86,10 @@ export function NewClubScreen() {
       <Card style={s.info}>
         <Text style={s.infoTitle}>Your situation</Text>
         <Text style={s.infoText}>
-          You take over a mid-table squad with {formatMoney(ECONOMY.startMoney)} in the bank. Fixed
-          costs and the stakeholder cashout mean the club loses money unless you finish higher.
-          Prize money depends on your final position.
+          You take over an ageing mid-table squad with {formatMoney(ECONOMY.startMoney)} in the bank.
+          Contracts run out, stars ask for raises and rivals bid for your best players. Buy smart,
+          sell at the right time, and keep the club out of debt: the board sacks you below{' '}
+          {formatMoney(ECONOMY.sackedBelow)}.
         </Text>
       </Card>
 

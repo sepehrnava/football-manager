@@ -1,5 +1,5 @@
 import { FORMATIONS, SLOT_WEIGHTS, TACTICS } from './constants';
-import { chemistry, clamp, playerWage, ratingAt } from './players';
+import { chemistry, clamp, ratingAt } from './players';
 import type { FormationId, GameState, Player, Tactic } from './types';
 
 export interface TeamStrength {
@@ -127,6 +127,19 @@ export function remapLineup(
   return result;
 }
 
+/**
+ * The 7 substitutes: a backup goalkeeper first, then the best remaining
+ * reserves. Everyone else is outside the matchday squad.
+ */
+export function benchFor(squad: Player[], lineup: (string | null)[], size: number): Player[] {
+  const reserves = squad
+    .filter((p) => !lineup.includes(p.id))
+    .sort((a, b) => b.rating - a.rating);
+  const gk = reserves.find((p) => p.positions[0] === 'GK');
+  const rest = reserves.filter((p) => p !== gk);
+  return (gk ? [gk, ...rest] : rest).slice(0, size);
+}
+
 export function wageBill(squad: Player[]) {
-  return squad.reduce((sum, p) => sum + playerWage(p), 0);
+  return squad.reduce((sum, p) => sum + p.contract.wage, 0);
 }

@@ -12,7 +12,8 @@ import {
 import { reducer, type Action } from '../game/game';
 import type { GameState } from '../game/types';
 
-const SAVE_KEY = 'pocket-manager/save-v1';
+// v2 changed the save format (contracts, market); v1 saves start a new career.
+const SAVE_KEY = 'pocket-manager/save-v2';
 
 interface GameContextValue {
   state: GameState | null;
@@ -31,7 +32,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
     AsyncStorage.getItem(SAVE_KEY)
       .then((raw) => {
         const saved = raw ? (JSON.parse(raw) as GameState) : null;
-        if (saved?.version === 1) dispatch({ type: 'load', state: saved });
+        if (saved?.version === 2) dispatch({ type: 'load', state: saved });
       })
       .catch(() => {})
       .finally(() => setLoaded(true));
