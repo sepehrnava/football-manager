@@ -202,6 +202,7 @@ export function develop(rng: Rng, p: Player, youthBoost = 0): Player {
     potential: Math.max(p.potential, rating),
     seasonsAtClub: p.seasonsAtClub + 1,
     goals: 0,
+    assists: 0,
   };
 }
 

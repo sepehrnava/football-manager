@@ -252,6 +252,25 @@ export const SLOT_WEIGHTS: Record<Position, { attack: number; defense: number }>
 };
 
 /** Relative chance of scoring from each slot. */
+/** Share of goals that have an assist. */
+export const ASSIST_CHANCE = 0.75;
+
+/** Relative chance of making the assist from each position. */
+export const ASSIST_WEIGHT: Record<Position, number> = {
+  GK: 0.1,
+  CB: 0.5,
+  LB: 2,
+  RB: 2,
+  CDM: 1.5,
+  CM: 3,
+  LM: 3,
+  RM: 3,
+  CAM: 5,
+  LW: 4,
+  RW: 4,
+  ST: 2.5,
+};
+
 export const SCORING_WEIGHT: Record<Position, number> = {
   GK: 0,
   CB: 0.4,

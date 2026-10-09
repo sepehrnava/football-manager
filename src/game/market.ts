@@ -210,6 +210,7 @@ function sign(state: GameState, p: Player, fee: number, years: number): GameStat
     clubId: USER_ID,
     seasonsAtClub: 0,
     goals: 0,
+    assists: 0,
     contract: { wage: wageDemand(p), years },
   };
   const next: GameState = {
@@ -316,6 +317,7 @@ function leave(state: GameState, rng: Rng, p: Player, clubId: string | null, fee
     clubId,
     seasonsAtClub: 0,
     goals: 0,
+    assists: 0,
     contract: { wage: wageDemand(p), years: clubId ? 3 : 0 },
   };
   const remaining = state.squad.filter((m) => m.id !== p.id);

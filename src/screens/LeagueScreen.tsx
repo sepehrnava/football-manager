@@ -1,12 +1,13 @@
 import { useState } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { clubById, compTable, USER_ID, userComp } from '../game/game';
 import { compKey, compName, COMPS, divisionsIn, flagOf, PROMOTION_SPOTS, zoneOf, type Comp } from '../game/leagues';
 import { leagueStats } from '../game/stats';
-import type { Club, Fixture } from '../game/types';
+import type { Club, Fixture, Player } from '../game/types';
 import { useCareer } from '../state/GameContext';
-import { Card, ClubCrest, Pill, SectionTitle } from '../ui/components';
+import { Button, Card, ClubCrest, Pill, SectionTitle } from '../ui/components';
+import { FadeIn } from '../ui/motion';
 import { CupCard } from './CupCard';
 import { colors, seasonLabel } from '../ui/theme';
 
@@ -14,6 +15,7 @@ export function LeagueScreen() {
   const { state } = useCareer();
   const myComp = userComp(state);
   const [comp, setComp] = useState<Comp>(myComp);
+  const [view, setView] = useState<'table' | 'stats'>('table');
   const table = compTable(state, comp);
   const isMine = compKey(comp) === compKey(myComp);
   const deepest = divisionsIn(comp.country);
@@ -46,137 +48,256 @@ export function LeagueScreen() {
           : 'prize money is paid by final position'}
       </Text>
 
-      <Card style={s.table}>
-        <View style={[s.tr, s.th]}>
-          <Text style={[s.pos, s.head]}>#</Text>
-          <Text style={[s.club, s.head]}>CLUB</Text>
-          {['P', 'W', 'D', 'L', 'GD'].map((h) => (
-            <Text key={h} style={[s.num, s.head]}>
-              {h}
-            </Text>
-          ))}
-          <Text style={[s.pts, s.head]}>PTS</Text>
-        </View>
-        {table.map((r, i) => {
-          const c = clubById(state, r.clubId);
-          const me = r.clubId === USER_ID;
-          return (
-            <View key={r.clubId} style={[s.tr, me && s.me, i < table.length - 1 && !me && s.border]}>
-              <View
-                style={[
-                  s.zone,
-                  zoneOf(i, table.length, comp) === 'up' && { backgroundColor: colors.green },
-                  zoneOf(i, table.length, comp) === 'down' && { backgroundColor: colors.red },
-                ]}
-              />
-              <Text style={[s.pos, i === 0 && { color: colors.gold }]}>{i + 1}</Text>
-              <View style={s.club}>
-                <ClubCrest club={c} size={20} />
-                <Text style={[s.name, me && s.bold]} numberOfLines={1}>
-                  {c.name}
-                </Text>
-              </View>
-              <Text style={s.num}>{r.played}</Text>
-              <Text style={s.num}>{r.won}</Text>
-              <Text style={s.num}>{r.drawn}</Text>
-              <Text style={s.num}>{r.lost}</Text>
-              <Text style={s.num}>{r.gf - r.ga}</Text>
-              <Text style={s.pts}>{r.points}</Text>
-            </View>
-          );
-        })}
-      </Card>
+      <View style={s.switch}>
+        {(['table', 'stats'] as const).map((v) => (
+          <Pressable
+            key={v}
+            onPress={() => setView(v)}
+            style={[s.switchItem, view === v && s.switchOn]}
+            accessibilityRole="button"
+            accessibilityState={{ selected: view === v }}
+          >
+            <Text style={[s.switchText, view === v && s.switchTextOn]}>{v === 'table' ? 'Table' : 'Stats'}</Text>
+          </Pressable>
+        ))}
+      </View>
 
-      {isMine ? <LeagueStats /> : null}
-
-      {isMine ? (
-        <>
-          <SectionTitle>YOUR MATCHES</SectionTitle>
-          <Card style={s.list}>
-            {mine.map((f, i) => (
-              <FixtureRow key={i} fixture={f} next={f.round === state.round && state.phase !== 'summary'} />
-            ))}
+      {view === 'stats' ? (
+        isMine ? (
+          <LeagueStats />
+        ) : (
+          <Card style={s.notMine}>
+            <Text style={s.statsEmpty}>Player stats are kept for your own league.</Text>
+            <Button label={`SHOW ${compName(myComp).toUpperCase()}`} variant="light" small onPress={() => setComp(myComp)} />
           </Card>
-        </>
-      ) : null}
+        )
+      ) : (
+          <>
+          <Card style={s.table}>
+            <View style={[s.tr, s.th]}>
+              <Text style={[s.pos, s.head]}>#</Text>
+              <Text style={[s.club, s.head]}>CLUB</Text>
+              {['P', 'W', 'D', 'L', 'GD'].map((h) => (
+                <Text key={h} style={[s.num, s.head]}>
+                  {h}
+                </Text>
+              ))}
+              <Text style={[s.pts, s.head]}>PTS</Text>
+            </View>
+            {table.map((r, i) => {
+              const c = clubById(state, r.clubId);
+              const me = r.clubId === USER_ID;
+              return (
+                <View key={r.clubId} style={[s.tr, me && s.me, i < table.length - 1 && !me && s.border]}>
+                  <View
+                    style={[
+                      s.zone,
+                      zoneOf(i, table.length, comp) === 'up' && { backgroundColor: colors.green },
+                      zoneOf(i, table.length, comp) === 'down' && { backgroundColor: colors.red },
+                    ]}
+                  />
+                  <Text style={[s.pos, i === 0 && { color: colors.gold }]}>{i + 1}</Text>
+                  <View style={s.club}>
+                    <ClubCrest club={c} size={20} />
+                    <Text style={[s.name, me && s.bold]} numberOfLines={1}>
+                      {c.name}
+                    </Text>
+                  </View>
+                  <Text style={s.num}>{r.played}</Text>
+                  <Text style={s.num}>{r.won}</Text>
+                  <Text style={s.num}>{r.drawn}</Text>
+                  <Text style={s.num}>{r.lost}</Text>
+                  <Text style={s.num}>{r.gf - r.ga}</Text>
+                  <Text style={s.pts}>{r.points}</Text>
+                </View>
+              );
+            })}
+          </Card>
 
-      {state.cups?.length ? (
-        <>
-          <SectionTitle>EUROPEAN CUPS</SectionTitle>
-          {state.cups.map((cup) => (
-            <CupCard key={cup.id} cup={cup} />
-          ))}
-        </>
-      ) : null}
+          {isMine ? (
+            <>
+              <SectionTitle>YOUR MATCHES</SectionTitle>
+              <Card style={s.list}>
+                {mine.map((f, i) => (
+                  <FixtureRow key={i} fixture={f} next={f.round === state.round && state.phase !== 'summary'} />
+                ))}
+              </Card>
+            </>
+          ) : null}
+
+          {state.cups?.length ? (
+            <>
+              <SectionTitle>EUROPEAN CUPS</SectionTitle>
+              {state.cups.map((cup) => (
+                <CupCard key={cup.id} cup={cup} />
+              ))}
+            </>
+          ) : null}
+          </>
+      )}
 
     </ScrollView>
   );
 }
 
-/** Top scorers across the league and the season's team records. */
+type StatTab = 'goals' | 'assists' | 'both' | 'teams';
+
+const STAT_TABS: { id: StatTab; label: string }[] = [
+  { id: 'goals', label: 'Scorers' },
+  { id: 'assists', label: 'Assists' },
+  { id: 'both', label: 'Goals + assists' },
+  { id: 'teams', label: 'Teams' },
+];
+
+/** The season's stats for the user's league: player leaders and team records. */
 function LeagueStats() {
   const { state } = useCareer();
+  const [tab, setTab] = useState<StatTab>('goals');
   const st = leagueStats(state);
   if (!st.scorers.length && !st.attack) {
-    return (
-      <>
-        <SectionTitle>LEAGUE STATS</SectionTitle>
-        <Text style={s.statsEmpty}>Stats appear once the season starts.</Text>
-      </>
-    );
+    return <Text style={s.statsEmpty}>Stats appear once the season starts.</Text>;
   }
   return (
     <>
-      <SectionTitle>LEAGUE STATS</SectionTitle>
-      <View style={s.records}>
-        {st.attack ? <Record label="BEST ATTACK" club={st.attack.club} value={`${st.attack.value} goals`} /> : null}
-        {st.defence ? (
-          <Record label="BEST DEFENCE" club={st.defence.club} value={`${st.defence.value} conceded`} />
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.divisions}>
+        {STAT_TABS.map((x) => (
+          <Pill key={x.id} label={x.label} active={tab === x.id} onPress={() => setTab(x.id)} />
+        ))}
+      </ScrollView>
+      <FadeIn key={tab} distance={10} duration={180} style={s.statsBody}>
+        {tab === 'goals' ? <PlayerTable title="TOP SCORERS" rows={st.scorers} value={(p) => p.goals} unit="G" /> : null}
+        {tab === 'assists' ? (
+          <PlayerTable title="TOP ASSISTS" rows={st.assists} value={(p) => p.assists ?? 0} unit="A" />
         ) : null}
-        {st.wins ? <Record label="MOST WINS" club={st.wins.club} value={`${st.wins.value} wins`} /> : null}
-      </View>
-      {st.biggest ? (
-        <Card style={s.biggest}>
-          <Text style={s.recordLabel}>BIGGEST WIN</Text>
-          <View style={s.biggestRow}>
-            <ClubCrest club={st.biggest.home} size={22} />
-            <Text style={s.biggestName} numberOfLines={1}>
-              {st.biggest.home.name}
-            </Text>
-            <Text style={s.biggestScore}>{st.biggest.score}</Text>
-            <Text style={[s.biggestName, s.right]} numberOfLines={1}>
-              {st.biggest.away.name}
-            </Text>
-            <ClubCrest club={st.biggest.away} size={22} />
-          </View>
-          <Text style={s.statsEmpty}>{st.goalsPerGame.toFixed(1)} goals per game this season</Text>
-        </Card>
-      ) : null}
-      {st.scorers.length ? (
-        <>
-          <SectionTitle>TOP SCORERS</SectionTitle>
-          <Card style={s.list}>
-            {st.scorers.map(({ player, club }, i) => {
-              const ours = club.id === USER_ID;
-              return (
-                <View key={player.id} style={[s.fixture, ours && s.ours]}>
-                  <Text style={s.rank}>{i + 1}</Text>
-                  <ClubCrest club={club} size={20} />
-                  <View style={s.flexText}>
-                    <Text style={[s.fname, ours && s.bold]} numberOfLines={1}>
-                      {player.flag} {player.name}
-                    </Text>
-                    <Text style={s.scorerClub} numberOfLines={1}>
-                      {club.name}
-                    </Text>
-                  </View>
-                  <Text style={s.goals}>{player.goals}</Text>
+        {tab === 'both' ? (
+          <PlayerTable
+            title="GOALS + ASSISTS"
+            rows={st.contributions}
+            value={(p) => p.goals + (p.assists ?? 0)}
+            unit=""
+            detail={(p) => `${p.goals} G · ${p.assists ?? 0} A`}
+          />
+        ) : null}
+        {tab === 'teams' ? (
+          <>
+            <View style={s.records}>
+              {st.attack ? <Record label="BEST ATTACK" club={st.attack.club} value={`${st.attack.value} goals`} /> : null}
+              {st.defence ? (
+                <Record label="BEST DEFENCE" club={st.defence.club} value={`${st.defence.value} conceded`} />
+              ) : null}
+              {st.wins ? <Record label="MOST WINS" club={st.wins.club} value={`${st.wins.value} wins`} /> : null}
+            </View>
+            {st.biggest ? (
+              <Card style={s.biggest}>
+                <Text style={s.recordLabel}>BIGGEST WIN</Text>
+                <View style={s.biggestRow}>
+                  <ClubCrest club={st.biggest.home} size={22} />
+                  <Text style={s.biggestName} numberOfLines={1}>
+                    {st.biggest.home.name}
+                  </Text>
+                  <Text style={s.biggestScore}>{st.biggest.score}</Text>
+                  <Text style={[s.biggestName, s.right]} numberOfLines={1}>
+                    {st.biggest.away.name}
+                  </Text>
+                  <ClubCrest club={st.biggest.away} size={22} />
                 </View>
-              );
-            })}
-          </Card>
-        </>
-      ) : null}
+                <Text style={s.statsEmpty}>{st.goalsPerGame.toFixed(1)} goals per game this season</Text>
+              </Card>
+            ) : null}
+            <ClubTable title="BEST FORM · LAST 5" rows={st.form} unit="pts" last />
+            <ClubTable title="CLEAN SHEETS" rows={st.cleanSheets} unit="" />
+          </>
+        ) : null}
+      </FadeIn>
+    </>
+  );
+}
+
+const RESULT_COLOR: Record<number, string> = { 3: colors.green, 1: '#9A9A94', 0: colors.red };
+
+/** A top-5 list of clubs, optionally with their last five results. */
+function ClubTable({
+  title,
+  rows,
+  unit,
+  last,
+}: {
+  title: string;
+  rows: { club: Club; value: number; last?: number[] }[];
+  unit: string;
+  last?: boolean;
+}) {
+  if (!rows.length) return null;
+  return (
+    <>
+      <SectionTitle>{title}</SectionTitle>
+      <Card style={s.list}>
+        {rows.map((r, i) => (
+          <View key={r.club.id} style={[s.fixture, r.club.id === USER_ID && s.ours]}>
+            <Text style={s.rank}>{i + 1}</Text>
+            <ClubCrest club={r.club} size={20} />
+            <Text style={[s.fname, r.club.id === USER_ID && s.bold]} numberOfLines={1}>
+              {r.club.name}
+            </Text>
+            {last && r.last ? (
+              <View style={s.formDots}>
+                {r.last.map((x, j) => (
+                  <View key={j} style={[s.formDot, { backgroundColor: RESULT_COLOR[x] }]}>
+                    <Text style={s.formText}>{x === 3 ? 'W' : x === 1 ? 'D' : 'L'}</Text>
+                  </View>
+                ))}
+              </View>
+            ) : null}
+            <Text style={s.goals}>{r.value}</Text>
+            {unit ? <Text style={s.unitWide}>{unit}</Text> : null}
+          </View>
+        ))}
+      </Card>
+    </>
+  );
+}
+
+/** A top-10 list of players for one stat. */
+function PlayerTable({
+  title,
+  rows,
+  value,
+  unit,
+  detail,
+}: {
+  title: string;
+  rows: { player: Player; club: Club }[];
+  value: (p: Player) => number;
+  unit: string;
+  /** Extra text under the club name, e.g. the goals and assists behind a total. */
+  detail?: (p: Player) => string;
+}) {
+  if (!rows.length) return <Text style={s.statsEmpty}>Nobody yet.</Text>;
+  return (
+    <>
+      <SectionTitle>{title}</SectionTitle>
+      <Card style={s.list}>
+        {rows.map(({ player, club }, i) => {
+          const ours = club.id === USER_ID;
+          return (
+            <View key={player.id} style={[s.fixture, ours && s.ours]}>
+              <Text style={s.rank}>{i + 1}</Text>
+              <ClubCrest club={club} size={20} />
+              <View style={s.flexText}>
+                <Text style={[s.fname, ours && s.bold]} numberOfLines={1}>
+                  {player.flag} {player.name}
+                </Text>
+                <Text style={s.scorerClub} numberOfLines={1}>
+                  {club.name}
+                  {detail ? ` · ${detail(player)}` : ''}
+                </Text>
+              </View>
+              <Text style={s.goals}>{value(player)}</Text>
+              {unit ? <Text style={s.unit}>{unit}</Text> : null}
+            </View>
+          );
+        })}
+      </Card>
     </>
   );
 }
@@ -259,6 +380,18 @@ const s = StyleSheet.create({
   tagSpace: { width: 26 },
   tagText: { color: '#FFFFFF', fontWeight: '900', fontSize: 11 },
   goals: { fontWeight: '900', color: colors.ink, fontSize: 18, minWidth: 24, textAlign: 'right' },
+  unitWide: { fontSize: 11, fontWeight: '900', color: colors.muted, width: 22 },
+  formDots: { flexDirection: 'row', gap: 3 },
+  formDot: { width: 18, height: 18, borderRadius: 5, alignItems: 'center', justifyContent: 'center' },
+  formText: { color: '#FFFFFF', fontSize: 10, fontWeight: '900' },
+  statsBody: { gap: 12 },
+  notMine: { gap: 10 },
+  switch: { flexDirection: 'row', backgroundColor: colors.faint, borderRadius: 16, padding: 4, borderWidth: 2, borderColor: colors.border },
+  switchItem: { flex: 1, paddingVertical: 9, borderRadius: 12, alignItems: 'center' },
+  switchOn: { backgroundColor: colors.ink },
+  switchText: { fontWeight: '800', color: colors.muted },
+  switchTextOn: { color: '#FFFFFF' },
+  unit: { fontSize: 11, fontWeight: '900', color: colors.muted, width: 12 },
   rank: { width: 20, fontSize: 14, fontWeight: '900', color: colors.muted },
   flexText: { flex: 1, minWidth: 0 },
   scorerClub: { fontSize: 12, fontWeight: '600', color: colors.muted },

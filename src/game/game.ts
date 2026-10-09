@@ -3,6 +3,9 @@ import {
   ECONOMY,
   FIRST_SEASON,
   SCORING_WEIGHT,
+  ASSIST_CHANCE,
+  ASSIST_WEIGHT,
+  FORMATIONS,
   STYLES,
 } from './constants';
 import { CUP_RULES, cupProgress, drawCups, playCupStages } from './cups';
@@ -442,6 +445,27 @@ function clubScorers(rng: Rng, players: Player[], goals: number): Player[] {
   return result;
 }
 
+/** Who set up each goal, if anyone: creative players most often, never the scorer. */
+function pickAssists(rng: Rng, candidates: { p: Player; pos: Position }[], scorers: Player[]): Player[] {
+  const result: Player[] = [];
+  for (const scorer of scorers) {
+    if (!rng.chance(ASSIST_CHANCE)) continue;
+    const pool = candidates
+      .filter((c) => c.p.id !== scorer.id)
+      .map((c) => ({ p: c.p, w: ASSIST_WEIGHT[c.pos] * Math.exp((c.p.rating - 70) / 12) }));
+    const total = pool.reduce((sum, x) => sum + x.w, 0);
+    let roll = rng.next() * total;
+    for (const x of pool) {
+      roll -= x.w;
+      if (roll <= 0) {
+        result.push(x.p);
+        break;
+      }
+    }
+  }
+  return result;
+}
+
 function playRound(state: GameState, rng: Rng): GameState {
   if (state.phase !== 'season' || state.round >= seasonRounds(state)) return state;
   const s = ensureLineup(state);
@@ -466,6 +490,8 @@ function playRound(state: GameState, rng: Rng): GameState {
   );
   for (const p of s.world) if (p.clubId) leagueSquads.get(p.clubId)?.push(p);
   const worldGoals = new Map<string, number>();
+  const assists = new Map<string, number>();
+  const credit = (players: Player[]) => players.forEach((p) => assists.set(p.id, (assists.get(p.id) ?? 0) + 1));
   const fixtures = s.fixtures.map((f) => {
     if (f.result || !playsNow(f)) return f;
     const home = clubById(s, f.homeId);
@@ -481,9 +507,11 @@ function playRound(state: GameState, rng: Rng): GameState {
           [f.homeId, score.home],
           [f.awayId, score.away],
         ] as const) {
-          for (const p of clubScorers(rng, leagueSquads.get(clubId) ?? [], n)) {
-            worldGoals.set(p.id, (worldGoals.get(p.id) ?? 0) + 1);
-          }
+          const players = leagueSquads.get(clubId) ?? [];
+          const scored = clubScorers(rng, players, n);
+          for (const p of scored) worldGoals.set(p.id, (worldGoals.get(p.id) ?? 0) + 1);
+          const regulars = [...players].sort((a, b) => b.rating - a.rating).slice(0, 14);
+          credit(pickAssists(rng, regulars.map((p) => ({ p, pos: p.positions[0] })), scored));
         }
       }
       return { ...f, result: score };
@@ -493,14 +521,19 @@ function playRound(state: GameState, rng: Rng): GameState {
     const own = userHome ? score.home : score.away;
     const scorers = pickScorers(rng, s.squad, s.lineup, s.formation, own);
     scorers.forEach((p) => goals.set(p.id, (goals.get(p.id) ?? 0) + 1));
+    const slots = FORMATIONS[s.formation].slots;
+    const xi = s.lineup
+      .map((id, i) => ({ p: s.squad.find((m) => m.id === id), pos: slots[i].pos }))
+      .filter((c): c is { p: Player; pos: Position } => !!c.p);
+    credit(pickAssists(rng, xi, scorers));
     return { ...f, result: { ...score, scorers: scorers.map((p) => p.name) } };
   });
-  const squad = goals.size
-    ? s.squad.map((p) => (goals.has(p.id) ? { ...p, goals: p.goals + goals.get(p.id)! } : p))
-    : s.squad;
-  const world = worldGoals.size
-    ? s.world.map((p) => (worldGoals.has(p.id) ? { ...p, goals: p.goals + worldGoals.get(p.id)! } : p))
-    : s.world;
+  const tally = (p: Player, g: Map<string, number>) =>
+    g.has(p.id) || assists.has(p.id)
+      ? { ...p, goals: p.goals + (g.get(p.id) ?? 0), assists: (p.assists ?? 0) + (assists.get(p.id) ?? 0) }
+      : p;
+  const squad = goals.size || assists.size ? s.squad.map((p) => tally(p, goals)) : s.squad;
+  const world = worldGoals.size || assists.size ? s.world.map((p) => tally(p, worldGoals)) : s.world;
   const round = s.round + 1;
   let next: GameState = { ...s, fixtures, squad, world, round, knownStyles };
   if (next.cups?.length) {

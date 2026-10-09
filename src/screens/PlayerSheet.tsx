@@ -290,6 +290,7 @@ function SquadView({ player: p, onClose }: { player: Player; onClose: () => void
         <Row label="Wage" value={`${formatMoney(p.contract.wage)} per season`} />
         <Row label="Value" value={formatMoney(playerValue(p))} />
         <Row label="Goals this season" value={String(p.goals)} />
+        <Row label="Assists this season" value={String(p.assists ?? 0)} />
         <Text style={s.hint}>
           Contracts renew automatically. The new wage follows the player&apos;s rating: up when they improve,
           down as they age.

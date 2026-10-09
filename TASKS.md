@@ -31,7 +31,7 @@ Keep current work and a short completed baseline; avoid session logs.
 | T024: FIFA-style chemistry links | S011-AC01–AC04 | Done | tsc, lint, web screenshots, headless balance vs previous rule; Android pending |
 | T025: Easier swaps with a bench on the pitch | S012-AC01–AC03 | Done | tsc, lint, web swap flows; Android pending |
 | T026: New club builds its squad from empty | S013-AC01–AC03 | Done | tsc, lint, web flow, headless market balance; Android pending |
-| T027: League stats and top scorers | S014-AC01, AC02 | Done | tsc, lint, web screenshot, headless season; Android pending |
+| T027: League stats: scorers, assists, team records | S014-AC01, AC02 | Done | tsc, lint, web screenshots, headless season; Android pending |
 
 New implementation tasks reference one spec, relevant acceptance IDs, and a concrete check.
 Split work by observable behavior. Candidate ideas do not become authorized tasks automatically.

@@ -48,6 +48,8 @@ export interface Player {
   potential: number;
   seasonsAtClub: number;
   goals: number;
+  /** Assists this season (older saves may not have it). */
+  assists?: number;
   contract: Contract;
   /** 0–1: where the true rating sits inside a scouting range. */
   scoutBias: number;

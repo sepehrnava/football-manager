@@ -27,7 +27,7 @@ Updated: 2026-10-09. Replace outdated entries; keep this as a snapshot.
 - FIFA-style chemistry links between neighbouring players, shown as coloured lines on the
   pitch, with an explanation sheet and per-player links (S011).
 - A new club starts empty and builds its squad from a budget in the normal screens (S013);
-  league stats with top scorers on the League tab (S014); swaps via a bench strip (S012).
+  league stats (scorers, assists, team records) on the League tab (S014); swaps via a bench strip (S012).
 - Game rules in src/game (pure TypeScript); screens in src/screens; theme in src/ui.
 - npm lockfile, lint configuration, and setup instructions in README.md.
 - Spec-driven documentation and selective context-reading workflow.
