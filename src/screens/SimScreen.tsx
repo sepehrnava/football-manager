@@ -2,8 +2,7 @@ import { useEffect, useState } from 'react';
 import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { ROUNDS } from '../game/constants';
-import { clubById, USER_ID } from '../game/game';
+import { clubById, seasonRounds, USER_ID } from '../game/game';
 import { leagueTable } from '../game/league';
 import { playerValue, surname } from '../game/players';
 import type { Fixture } from '../game/types';
@@ -54,6 +53,7 @@ export function SimScreen({ until: initialUntil, onClose }: { until?: number; on
   };
 
   const played = state.round;
+  const rounds = seasonRounds(state);
   const lastRound = played - 1;
   const roundFixtures = state.fixtures.filter((f) => f.round === lastRound);
   const mine = roundFixtures.find((f) => f.homeId === USER_ID || f.awayId === USER_ID);
@@ -78,9 +78,9 @@ export function SimScreen({ until: initialUntil, onClose }: { until?: number; on
           </Pressable>
           <View style={s.headerMid}>
             <Text style={s.md}>
-              {played === 0 ? 'Kick-off' : `Matchday ${played} / ${ROUNDS}`}
+              {played === 0 ? 'Kick-off' : `Matchday ${played} / ${rounds}`}
             </Text>
-            <Bar value={(played / ROUNDS) * 100} color={colors.ink} />
+            <Bar value={(played / rounds) * 100} color={colors.ink} />
           </View>
           {stopText ? (
             <View style={s.close} />

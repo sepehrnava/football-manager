@@ -1,7 +1,7 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
-import { MID_WINDOW_ROUND, STYLES, TACTICS } from '../game/constants';
-import { clubById, USER_ID, userClub } from '../game/game';
+import { STYLES, TACTICS } from '../game/constants';
+import { clubById, midWindowRound, USER_ID, userClub } from '../game/game';
 import { matchInsight, percent, userFixture } from '../game/insights';
 import { surname } from '../game/players';
 import { teamStrength } from '../game/team';
@@ -27,13 +27,14 @@ export function MatchSheet({
   const played = !!fixture.result;
   const count = round - state.round + 1;
   // A transfer window in between stops the simulation there.
-  const crossesWindow = state.round < MID_WINDOW_ROUND && round >= MID_WINDOW_ROUND && state.phase === 'season';
+  const mid = midWindowRound(state);
+  const crossesWindow = state.round < mid && round >= mid && state.phase === 'season';
   const kickoff = state.phase === 'window';
 
   const footer = played ? undefined : (
     <View style={s.footer}>
       {crossesWindow ? (
-        <Text style={s.note}>The simulation stops at the transfer window after matchday {MID_WINDOW_ROUND}.</Text>
+        <Text style={s.note}>The simulation stops at the transfer window after matchday {mid}.</Text>
       ) : null}
       <Button
         label={

@@ -4,7 +4,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ECONOMY } from '../game/constants';
 import { clubCrest, clubEconomy } from '../game/game';
-import { AI_CLUBS } from '../game/names';
+import { DISCLAIMER, LEAGUE } from '../game/leagues';
 import type { CrestPattern } from '../game/types';
 import { useGame } from '../state/GameContext';
 import { Button, Card, Crest, Pill, SectionTitle } from '../ui/components';
@@ -73,7 +73,7 @@ export function NewClubScreen() {
           <ModeCard
             icon="🏟️"
             title="Manage a club"
-            text="Take over one of the league's 10 clubs, from title favourites to underdogs."
+            text={`Take over one of the ${LEAGUE.clubs.length} clubs in the ${LEAGUE.name}, from title favourites to underdogs.`}
             onPress={() => setMode('manage')}
           />
         </View>
@@ -86,9 +86,9 @@ export function NewClubScreen() {
       {mode === 'manage' ? (
         <>
           <SectionTitle>CHOOSE YOUR CLUB</SectionTitle>
-          {AI_CLUBS.map((c, i) => {
+          {LEAGUE.clubs.map((c, i) => {
             const eco = clubEconomy(c.level);
-            const tier = clubTier(c.level);
+            const tier = clubTier(i);
             return (
               <Pressable
                 key={c.short}
@@ -118,7 +118,7 @@ export function NewClubScreen() {
             the bills. Underdogs are cheap and poor.
           </Text>
           <Button
-            label={picked === null ? 'PICK A CLUB' : `MANAGE ${AI_CLUBS[picked].name.toUpperCase()}`}
+            label={picked === null ? 'PICK A CLUB' : `MANAGE ${LEAGUE.clubs[picked].name.toUpperCase()}`}
             disabled={picked === null}
             onPress={() =>
               dispatch({ type: 'new', name: '', short: '', crest, seed: seed(), takeOver: picked })
@@ -185,6 +185,8 @@ export function NewClubScreen() {
       />
       </>
       ) : null}
+
+      {DISCLAIMER ? <Text style={s.disclaimer}>{DISCLAIMER}</Text> : null}
     </ScrollView>
   );
 }
@@ -202,12 +204,17 @@ function ModeCard({ icon, title, text, onPress }: { icon: string; title: string;
   );
 }
 
-/** How strong a club is, in words a player understands at a glance. */
-function clubTier(level: number) {
-  const stars = Math.max(1, Math.min(5, Math.round((level - 58) / 4)));
-  if (level >= 75) return { stars, label: 'Title favourites', difficulty: 'Easy', color: colors.green };
-  if (level >= 71) return { stars, label: 'Contenders', difficulty: 'Normal', color: colors.ink };
-  if (level >= 66) return { stars, label: 'Mid-table', difficulty: 'Normal', color: colors.ink };
+/** How strong a club is compared with the rest of the league, at a glance. */
+function clubTier(index: number) {
+  const levels = LEAGUE.clubs.map((c) => c.level);
+  const min = Math.min(...levels);
+  const max = Math.max(...levels);
+  const level = LEAGUE.clubs[index].level;
+  const stars = max === min ? 3 : 1 + Math.round(((level - min) / (max - min)) * 4);
+  const rank = index / LEAGUE.clubs.length; // clubs are sorted strongest first
+  if (rank < 0.2) return { stars, label: 'Title favourites', difficulty: 'Easy', color: colors.green };
+  if (rank < 0.5) return { stars, label: 'Contenders', difficulty: 'Normal', color: colors.ink };
+  if (rank < 0.8) return { stars, label: 'Mid-table', difficulty: 'Normal', color: colors.ink };
   return { stars, label: 'Underdogs', difficulty: 'Hard', color: colors.red };
 }
 
@@ -266,6 +273,7 @@ const s = StyleSheet.create({
   clubRight: { alignItems: 'flex-end' },
   clubBudget: { fontSize: 15, fontWeight: '900', color: colors.ink },
   clubDifficulty: { fontSize: 12, fontWeight: '900' },
+  disclaimer: { fontSize: 11, fontWeight: '600', color: colors.muted, lineHeight: 15, marginTop: 28, textAlign: 'center' },
   hint: { fontSize: 13, fontWeight: '600', color: colors.muted, marginVertical: 12, lineHeight: 18 },
   content: { paddingHorizontal: 20, maxWidth: 560, width: '100%', alignSelf: 'center' },
   logo: {

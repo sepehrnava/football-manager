@@ -1,9 +1,5 @@
 import type { FormationId, Line, Position, Style, Tactic } from './types';
 
-export const LEAGUE_SIZE = 10;
-export const ROUNDS = (LEAGUE_SIZE - 1) * 2;
-/** The mid-season window opens after this many rounds. */
-export const MID_WINDOW_ROUND = LEAGUE_SIZE - 1;
 export const FIRST_SEASON = 2026;
 
 /** A full matchday squad: 11 starters plus a 7-player bench. */
@@ -37,12 +33,23 @@ export const ECONOMY = {
    * Sponsors pay bigger clubs more: scale × e^(0.14 × (size − 60)) − offset,
    * never below zero. A size-64 club (a new club) gets nothing.
    */
-  sponsorScale: 1_300_000,
+  sponsorScale: 1_000_000,
   sponsorOffset: 3_500_000,
-  /** The size of a brand-new user club (its typical starter rating). */
+  /** Reference size for budgets and sponsors (a typical new club). */
   newClubSize: 64,
-  /** Prize money by final position, 1st first. */
+  /** A new user club starts this far below the league's weakest club. */
+  newClubBelowWeakest: 1,
+  /** A new club's founding investment, as a multiple of the weakest club's budget. */
+  newClubInvestment: 1.5,
+  /** Prize money by final position, 1st first (fallback for a 10-club league). */
   prize: [20, 15, 12, 10, 9, 8, 7, 6, 5, 4].map((m) => m * 1_000_000),
+  /** Prize money curve: champion and last place for a league of reference strength. */
+  prizeFirst: 16_000_000,
+  prizeLast: 3_000_000,
+  /** Higher = more of the money goes to the top; mid-table roughly breaks even. */
+  prizeCurve: 2.5,
+  /** Average club level at which prize money is exactly prizeFirst..prizeLast. */
+  prizeReferenceLevel: 68.5,
   /** Share of the wage bill paid as bonuses for a top-3 finish. */
   topFinishBonus: [0.15, 0.1, 0.05],
   /** Ending a season below this earns a final warning; twice in a row is the sack. */

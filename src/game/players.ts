@@ -1,4 +1,5 @@
 import { LINE_OF, MARKET, PENALTY, RELATED, RETIRE_ALWAYS_AT, RETIRE_CHANCE } from './constants';
+import { econRating } from './leagues';
 import { NATIONS } from './names';
 import type { Rng } from './rng';
 import type { Line, Player, Position } from './types';
@@ -18,13 +19,13 @@ function ageFactor(age: number) {
 /** Transfer value in dollars. */
 export function playerValue(p: Pick<Player, 'rating' | 'age' | 'potential'>) {
   const growth = Math.max(0, p.potential - p.rating);
-  const base = 500_000 * Math.exp(0.16 * (p.rating - 60)) * ageFactor(p.age);
+  const base = 500_000 * Math.exp(0.16 * (econRating(p.rating) - 60)) * ageFactor(p.age);
   return roundMoney(base * (1 + growth / 40));
 }
 
 /** The going yearly wage for a player of this rating, before personal demands. */
 export function marketWage(p: Pick<Player, 'rating'>) {
-  return roundMoney(100_000 * Math.exp(0.14 * (p.rating - 60)));
+  return roundMoney(100_000 * Math.exp(0.14 * (econRating(p.rating) - 60)));
 }
 
 /** What the player asks for to sign or renew. Winning clubs pay more. */
@@ -136,11 +137,6 @@ export function potentialRange(
 
 export function rangeLabel([lo, hi]: [number, number]) {
   return lo === hi ? String(lo) : `${lo}–${hi}`;
-}
-
-/** Rating that makes a player of this age worth roughly `value`. */
-export function ratingForValue(value: number, age: number) {
-  return 60 + Math.log(value / (500_000 * ageFactor(age))) / 0.16;
 }
 
 export const ALL_POSITIONS: Position[] = [

@@ -9,6 +9,7 @@ import {
   roundMoney,
   wageDemand,
 } from './players';
+import { packPlayersFor, type PackPlayer } from './leagues';
 import type { Rng } from './rng';
 import { autoPick, teamStrength } from './team';
 import type { Club, GameState, Line, Offer, Player, Position, Style } from './types';
@@ -47,13 +48,69 @@ export function makeClubSquad(rng: Rng, clubId: string, level: number, nextId: (
   );
 }
 
+/** A player from the league data file, with generated contract and hidden traits. */
+function fromPack(rng: Rng, id: string, pp: PackPlayer, clubId: string): Player {
+  const base = makePlayer(rng, id, {
+    position: pp.positions[0],
+    rating: pp.rating,
+    age: pp.age,
+    seasonsAtClub: rng.int(0, 4),
+    clubId,
+  });
+  return {
+    ...base,
+    name: pp.name,
+    flag: pp.flag,
+    positions: pp.positions,
+    potential: pp.potential ?? base.potential,
+  };
+}
+
+/**
+ * A club's squad: its real players from the league data, topped up to `size`
+ * with generated players that fill whichever lines are short.
+ */
+export function clubSquad(
+  rng: Rng,
+  clubId: string,
+  short: string,
+  level: number,
+  nextId: () => string,
+  size = AI_SQUAD,
+): Player[] {
+  const real = packPlayersFor(short).map((pp) => fromPack(rng, nextId(), pp, clubId));
+  if (real.length >= size) return real;
+  // Fill gaps as squad players when the real XI is already there.
+  const fillLevel = real.length >= 11 ? level - 6 : level;
+  const target: Record<Line, number> = { GK: 2, DF: 6, MD: 7, AT: 5 };
+  const have = (line: Line) => real.filter((p) => LINE_OF[p.positions[0]] === line).length;
+  const fillers: Player[] = [];
+  const add = (position: Position) =>
+    fillers.push(
+      makePlayer(rng, nextId(), {
+        position,
+        rating: fillLevel + rng.int(-4, 3),
+        age: rng.int(19, 32),
+        seasonsAtClub: rng.int(0, 4),
+        clubId,
+      }),
+    );
+  for (const line of Object.keys(target) as Line[]) {
+    for (let i = have(line); i < target[line] && real.length + fillers.length < size; i++) {
+      add(rng.pick(positionsForLine(line)));
+    }
+  }
+  while (real.length + fillers.length < size) add(rng.pick(positionsForLine('ALL')));
+  return [...real, ...fillers];
+}
+
 /** A squad for every AI club. Every player in the world belongs to a club. */
 export function buildWorld(rng: Rng, clubs: Club[], startId: number) {
   let nextId = startId;
   const id = () => `p${nextId++}`;
   const world: Player[] = [];
   for (const c of clubs) {
-    if (c.id !== USER_ID) world.push(...makeClubSquad(rng, c.id, c.level, id));
+    if (c.id !== USER_ID) world.push(...clubSquad(rng, c.id, c.short, c.level, id));
   }
   return { world, nextId };
 }

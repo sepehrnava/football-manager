@@ -47,3 +47,11 @@ Accepted for S005. Running costs scale with fans (floor 250K fans) and owners ta
 profit only, so a cheap squad can break even anywhere in the table and debt always traces back
 to the player's spending. Selling is never blocked; academy call-ups keep the squad legal.
 Revisit if real league finances replace the generated economy.
+
+## D008: Real names as data, never as assets
+
+Accepted for S007 at the user's request, following the approach of comparable apps: real club
+and player names appear as plain text only, with a non-affiliation disclaimer. No badges, logos,
+photos or real league names; ratings are the game's own. All names live in editable data files,
+so the game can return to fictional data quickly if a rights holder objects. Not legal advice:
+an IP-lawyer review is required before publishing (T014).

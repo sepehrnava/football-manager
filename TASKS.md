@@ -15,7 +15,10 @@ Keep current work and a short completed baseline; avoid session logs.
 | T008: Season roadmap, smart sim, motion | S003-AC01–AC05 | Done | tsc, lint, web flow screenshots; 60 headless seasons |
 | T009: Transfer market, contracts, counters | S004-AC01–AC08, AC10 | Done |
 | T010: Simplify play and make money fair | S005-AC01–AC07, AC09–AC14 | Done |
-| T011: Club choice, transfer list, simpler home | S006-AC01–AC04 | Done | tsc, lint, web flows; per-club headless careers | tsc, lint, web flow; 6 strategies × 30 careers | tsc, lint, web flows; 3 strategies × 30 careers × 5 seasons |
+| T011: Club choice, transfer list, simpler home | S006-AC01–AC04 | Done | tsc, lint, web flows; per-club headless careers |
+| T012: Real-name league from editable data | S007-AC01–AC05 | Done | Converter validation, web English league, headless economy |
+| T013: Fill English player data | S007-AC06 | Done | 400 players added; user to verify recent transfers and ratings |
+| T014: Legal check before publishing | D008 | Todo (user) | Short IP-lawyer review; no real names in store assets | tsc, lint, web flow; 6 strategies × 30 careers | tsc, lint, web flows; 3 strategies × 30 careers × 5 seasons |
 
 New implementation tasks reference one spec, relevant acceptance IDs, and a concrete check.
 Split work by observable behavior. Candidate ideas do not become authorized tasks automatically.

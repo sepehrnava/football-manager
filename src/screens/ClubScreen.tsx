@@ -1,8 +1,7 @@
 import { useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 
-import { ROUNDS } from '../game/constants';
-import { clubById, MONEY_STATUS_TEXT, moneyStatus, USER_ID, userClub } from '../game/game';
+import { clubById, MONEY_STATUS_TEXT, moneyStatus, seasonRounds, USER_ID, userClub } from '../game/game';
 import { matchInsight, percent, userFixture } from '../game/insights';
 import { leagueTable } from '../game/league';
 import { useCareer } from '../state/GameContext';
@@ -83,7 +82,7 @@ export function ClubScreen({
           <View style={s.roadHead}>
             <Text style={s.roadTitle}>Season roadmap</Text>
             <Text style={s.roadMeta}>
-              {Math.min(state.round, ROUNDS)}/{ROUNDS} played
+              {Math.min(state.round, seasonRounds(state))}/{seasonRounds(state)} played
             </Text>
           </View>
           <Roadmap onRound={setSheetRound} onWindow={onOpenTransfers} onFinish={onOpenLeague} />

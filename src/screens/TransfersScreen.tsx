@@ -1,8 +1,15 @@
 import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
-import { MID_WINDOW_ROUND } from '../game/constants';
-import { canTrade, clubById, defaultSearchBudget, MONEY_STATUS_TEXT, moneyStatus, SEARCH_BUDGETS } from '../game/game';
+import {
+  canTrade,
+  clubById,
+  defaultSearchBudget,
+  midWindowRound,
+  MONEY_STATUS_TEXT,
+  moneyStatus,
+  SEARCH_BUDGETS,
+} from '../game/game';
 import { askingPrice } from '../game/market';
 import { playerValue, ratingRange, trend, wageDemand } from '../game/players';
 import type { Line, Player } from '../game/types';
@@ -55,7 +62,7 @@ export function TransfersScreen() {
             {open
               ? 'Buy and sell now. The window closes when you kick off.'
               : `You can look around, but deals wait until ${
-                  state.round < MID_WINDOW_ROUND ? `after matchday ${MID_WINDOW_ROUND}` : 'the season ends'
+                  state.round < midWindowRound(state) ? `after matchday ${midWindowRound(state)}` : 'the season ends'
                 }.`}
           </Text>
         </Card>

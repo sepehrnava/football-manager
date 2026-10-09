@@ -1,0 +1,27 @@
+# Clubs for the English league pack. One row per club; the league needs an even number of clubs.
+# short: 3-letter code shown on crests. primary/secondary: kit colours as hex.
+# pattern: solid, stripes, half or band (a simple crest shape, never a real badge).
+# strength: typical rating of the club's starters (55-90). Used for generated players
+#   and the club's budget until you add real players for it in players.csv.
+# Clubs below are the 2025/26 season. Check promotions/relegations before publishing.
+short,name,primary,secondary,pattern,strength
+ARS,Arsenal,#EF0107,#FFFFFF,band,82
+AVL,Aston Villa,#670E36,#95BFE5,half,77
+BOU,Bournemouth,#DA291C,#000000,stripes,73
+BRE,Brentford,#E30613,#FFFFFF,stripes,72
+BHA,Brighton & Hove Albion,#0057B8,#FFFFFF,stripes,74
+BUR,Burnley,#6C1D45,#99D6EA,half,68
+CHE,Chelsea,#034694,#FFFFFF,solid,79
+CRY,Crystal Palace,#1B458F,#C4122E,stripes,73
+EVE,Everton,#003399,#FFFFFF,solid,72
+FUL,Fulham,#FFFFFF,#000000,band,72
+LEE,Leeds United,#FFFFFF,#1D428A,band,70
+LIV,Liverpool,#C8102E,#FFFFFF,solid,82
+MCI,Manchester City,#6CABDD,#FFFFFF,solid,81
+MUN,Manchester United,#DA291C,#FBE122,solid,76
+NEW,Newcastle United,#241F20,#FFFFFF,stripes,77
+NFO,Nottingham Forest,#DD0000,#FFFFFF,solid,74
+SUN,Sunderland,#EB172B,#FFFFFF,stripes,69
+TOT,Tottenham Hotspur,#FFFFFF,#132257,band,76
+WHU,West Ham United,#7A263A,#1BB1E7,half,72
+WOL,Wolverhampton Wanderers,#FDB913,#231F20,solid,70

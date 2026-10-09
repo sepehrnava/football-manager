@@ -2,8 +2,6 @@ import {
   COUNTER_BONUS,
   ECONOMY,
   FIRST_SEASON,
-  MID_WINDOW_ROUND,
-  ROUNDS,
   STYLES,
 } from './constants';
 import { leagueTable, makeFixtures, pickScorers, playMatch } from './league';
@@ -11,7 +9,7 @@ import {
   acceptOffer,
   advanceWorld,
   buildWorld,
-  makeClubSquad,
+  clubSquad,
   canTrade,
   academyFill,
   makeOffers,
@@ -27,7 +25,7 @@ import {
   topUpClubs,
   USER_ID,
 } from './market';
-import { AI_CLUBS } from './names';
+import { econRating, LEAGUE } from './leagues';
 import { develop, makePlayer, markRetirements } from './players';
 import { createRng, type Rng } from './rng';
 import { autoPick, remapLineup, teamStrength, userStrength, wageBill } from './team';
@@ -98,23 +96,31 @@ const STARTING_SQUAD: [Position, number, number][] = [
   ['CM', 57, 34],
 ];
 
-const PATTERNS = ['solid', 'stripes', 'half', 'band'] as const;
-
 /** Each league club always has the same crest, so pickers can show it. */
 export function clubCrest(index: number): Crest {
-  const c = AI_CLUBS[index];
-  return { primary: c.primary, secondary: c.secondary, pattern: PATTERNS[index % PATTERNS.length] };
+  const c = LEAGUE.clubs[index];
+  return { primary: c.primary, secondary: c.secondary, pattern: c.pattern };
+}
+
+/** Matchdays in a season: everyone plays everyone home and away. */
+export function seasonRounds(state: Pick<GameState, 'clubs'>) {
+  return (state.clubs.length - 1) * 2;
+}
+
+/** The mid-season window opens once the first half of the fixtures is played. */
+export function midWindowRound(state: Pick<GameState, 'clubs'>) {
+  return state.clubs.length - 1;
 }
 
 /** Sponsor income per season for a club of this size. */
 export function sponsorFor(size: number) {
-  const raw = ECONOMY.sponsorScale * Math.exp(0.14 * (size - 60)) - ECONOMY.sponsorOffset;
+  const raw = ECONOMY.sponsorScale * Math.exp(0.14 * (econRating(size) - 60)) - ECONOMY.sponsorOffset;
   return Math.max(0, Math.round(raw / 50_000) * 50_000);
 }
 
 /** Starting budget, fan base and sponsor income for a club of this size. */
 export function clubEconomy(size: number) {
-  const d = size - ECONOMY.newClubSize;
+  const d = econRating(size) - ECONOMY.newClubSize;
   return {
     money: Math.round((ECONOMY.startMoney * Math.exp(0.06 * d)) / 500_000) * 500_000,
     fans: Math.round((ECONOMY.startFans * Math.exp(0.06 * d)) / 1000) * 1000,
@@ -131,7 +137,7 @@ export function createGame(action: Extract<Action, { type: 'new' }>): GameState 
   const rng = createRng(action.seed);
   let nextId = 1;
   const nextPlayerId = () => `p${nextId++}`;
-  const league: Club[] = AI_CLUBS.map((c, i) => ({
+  const league: Club[] = LEAGUE.clubs.map((c, i) => ({
     id: `ai${i}`,
     name: c.name,
     short: c.short,
@@ -148,10 +154,13 @@ export function createGame(action: Extract<Action, { type: 'new' }>): GameState 
   let ai: Club[];
   if (takeOver !== null && league[takeOver]) {
     const chosen = league[takeOver];
-    user = { ...chosen, id: USER_ID, size: AI_CLUBS[takeOver].level };
-    squad = makeClubSquad(rng, USER_ID, chosen.level, nextPlayerId);
+    user = { ...chosen, id: USER_ID, size: LEAGUE.clubs[takeOver].level };
+    squad = clubSquad(rng, USER_ID, chosen.short, chosen.level, nextPlayerId);
     ai = league.filter((_, i) => i !== takeOver);
   } else {
+    // A new club starts just below the weakest club in the league.
+    const size = Math.min(...LEAGUE.clubs.map((c) => c.level)) - ECONOMY.newClubBelowWeakest;
+    const shift = size - ECONOMY.newClubSize;
     user = {
       id: USER_ID,
       name: action.name.trim() || 'My Club',
@@ -160,15 +169,26 @@ export function createGame(action: Extract<Action, { type: 'new' }>): GameState 
       attack: 0,
       defense: 0,
       style: 'possession',
-      level: ECONOMY.newClubSize,
-      size: ECONOMY.newClubSize,
+      level: size,
+      size,
     };
     squad = STARTING_SQUAD.map(([position, rating, age]) =>
-      makePlayer(rng, nextPlayerId(), { position, rating, age, seasonsAtClub: rng.int(0, 4), clubId: USER_ID }),
+      makePlayer(rng, nextPlayerId(), {
+        position,
+        rating: rating + shift,
+        age,
+        seasonsAtClub: rng.int(0, 4),
+        clubId: USER_ID,
+      }),
     );
     ai = league.slice(0, league.length - 1);
   }
   const economy = clubEconomy(user.size ?? ECONOMY.newClubSize);
+  if (takeOver === null) {
+    // Founding investment: enough to compete with the clubs around you.
+    const weakest = Math.min(...LEAGUE.clubs.map((c) => c.level));
+    economy.money = Math.round((clubEconomy(weakest).money * ECONOMY.newClubInvestment) / 500_000) * 500_000;
+  }
   const clubs = [user, ...ai];
   const built = buildWorld(rng, clubs, nextId);
   const formation: FormationId = '4-4-2';
@@ -248,7 +268,7 @@ export function userSideFor(state: GameState, round: number, opponent: Club) {
 }
 
 function playRound(state: GameState, rng: Rng): GameState {
-  if (state.phase !== 'season' || state.round >= ROUNDS) return state;
+  if (state.phase !== 'season' || state.round >= seasonRounds(state)) return state;
   const s = ensureLineup(state);
   const goals = new Map<string, number>();
   let knownStyles = s.knownStyles;
@@ -274,8 +294,8 @@ function playRound(state: GameState, rng: Rng): GameState {
     : s.squad;
   const round = s.round + 1;
   let next: GameState = { ...s, fixtures, squad, round, knownStyles };
-  if (round === MID_WINDOW_ROUND) next = openWindow({ ...next, window: 'mid' }, rng);
-  else if (round === ROUNDS) next = endSeason(next, rng);
+  if (round === midWindowRound(next)) next = openWindow({ ...next, window: 'mid' }, rng);
+  else if (round === seasonRounds(next)) next = endSeason(next, rng);
   return next;
 }
 
@@ -324,8 +344,22 @@ export function boardVerdict(state: GameState, moneyAfter: number): BoardStatus 
   return state.warning != null ? 'sacked' : 'warning';
 }
 
-export function seasonIncome(position: number, fans: number, sponsor = 0) {
-  const prize = ECONOMY.prize[position - 1] ?? 0;
+/**
+ * Prize money by final position: from the champion's share down to last place,
+ * scaled to the league's size and to how strong (and so how rich) it is.
+ */
+export function prizeFor(position: number, clubs: Pick<Club, 'level' | 'size' | 'id'>[]) {
+  const n = clubs.length;
+  const levels = clubs.map((c) => (c.id === USER_ID ? (c.size ?? c.level) : c.level));
+  const avg = levels.reduce((a, b) => a + b, 0) / n;
+  const wealth = Math.exp(0.14 * (econRating(avg) - ECONOMY.prizeReferenceLevel));
+  const share = Math.pow((n - position) / (n - 1), ECONOMY.prizeCurve);
+  const prize = (ECONOMY.prizeLast + (ECONOMY.prizeFirst - ECONOMY.prizeLast) * share) * wealth;
+  return Math.round(prize / 50_000) * 50_000;
+}
+
+export function seasonIncome(position: number, fans: number, sponsor = 0, clubs?: Pick<Club, 'level' | 'size' | 'id'>[]) {
+  const prize = clubs ? prizeFor(position, clubs) : (ECONOMY.prize[position - 1] ?? 0);
   const fanIncome = Math.round(fans * ECONOMY.revenuePerFan);
   return { prize, fanIncome, sponsor, total: prize + fanIncome + sponsor };
 }
@@ -335,7 +369,12 @@ function endSeason(state: GameState, rng: Rng): GameState {
   const position = table.findIndex((r) => r.clubId === USER_ID) + 1;
   const champion = state.clubs.find((c) => c.id === table[0].clubId)!;
   const costs = seasonCosts(state);
-  const income = seasonIncome(position, state.fans, sponsorFor(userClub(state).size ?? ECONOMY.newClubSize));
+  const income = seasonIncome(
+    position,
+    state.fans,
+    sponsorFor(userClub(state).size ?? ECONOMY.newClubSize),
+    state.clubs,
+  );
   const bonuses = Math.round(costs.wages * (ECONOMY.topFinishBonus[position - 1] ?? 0));
   const profit = income.total - costs.total - bonuses;
   const stakeholder = stakeholderShare(profit);

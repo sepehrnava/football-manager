@@ -24,7 +24,8 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
-    "lint": "expo lint"
+    "lint": "expo lint",
+    "build:league": "node scripts/build-league.mjs"
   },
   "private": true
 }

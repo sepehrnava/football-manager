@@ -1,8 +1,7 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { Animated, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
-import { MID_WINDOW_ROUND, ROUNDS } from '../game/constants';
-import { clubById, projectedPosition, USER_ID } from '../game/game';
+import { clubById, midWindowRound, projectedPosition, seasonRounds, USER_ID } from '../game/game';
 import { userFixture } from '../game/insights';
 import { leagueTable } from '../game/league';
 import { useCareer } from '../state/GameContext';
@@ -15,16 +14,16 @@ type Stop =
   | { kind: 'round'; round: number }
   | { kind: 'finish' };
 
-const STOPS: Stop[] = [
-  { kind: 'window', which: 'pre' },
-  ...Array.from({ length: MID_WINDOW_ROUND }, (_, round) => ({ kind: 'round' as const, round })),
-  { kind: 'window', which: 'mid' },
-  ...Array.from({ length: ROUNDS - MID_WINDOW_ROUND }, (_, i) => ({
-    kind: 'round' as const,
-    round: MID_WINDOW_ROUND + i,
-  })),
-  { kind: 'finish' },
-];
+/** Start window, first half, mid-season window, second half, finish. */
+function makeStops(rounds: number, mid: number): Stop[] {
+  return [
+    { kind: 'window', which: 'pre' },
+    ...Array.from({ length: mid }, (_, round) => ({ kind: 'round' as const, round })),
+    { kind: 'window', which: 'mid' },
+    ...Array.from({ length: rounds - mid }, (_, i) => ({ kind: 'round' as const, round: mid + i })),
+    { kind: 'finish' },
+  ];
+}
 
 const ITEM_W = 62;
 
@@ -39,6 +38,8 @@ export function Roadmap({
   onFinish: () => void;
 }) {
   const { state } = useCareer();
+  const mid = midWindowRound(state);
+  const STOPS = makeStops(seasonRounds(state), mid);
   const scroll = useRef<ScrollView>(null);
   const [width, setWidth] = useState(0);
   const [contentWidth, setContentWidth] = useState(0);
@@ -83,7 +84,7 @@ export function Roadmap({
           const open = state.phase === 'window' && state.window === stop.which;
           return (
             <Item key={`w${stop.which}`} label={stop.which === 'pre' ? 'START' : 'WINDOW'} lineIn={lineIn} lineOut={lineOut}
-              caption={open ? 'Open' : reached ? 'Closed' : `After MD${MID_WINDOW_ROUND}`}
+              caption={open ? 'Open' : reached ? 'Closed' : `After MD${mid}`}
               onPress={open ? onWindow : undefined}
             >
               <View style={[s.window, open && s.windowOpen, !reached && s.future]}>

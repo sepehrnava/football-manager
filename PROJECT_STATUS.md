@@ -12,6 +12,9 @@ Updated: 2026-10-08. Replace outdated entries; keep this as a snapshot.
   sacked, academy cover on sales, running costs that grow with fans (S005).
 - Start by creating a club or managing one of 10 existing clubs; transfer list;
   simplified Club page and bottom bar; settings sheet (S006).
+- English league (20 clubs, 400 real players, no badges) from editable CSV data with a
+  validating converter and a disclaimer (S007). Economy is priced relative to the league.
+  Squads reflect 2025/26 knowledge; recent transfers need checking before publishing.
 - Game rules in src/game (pure TypeScript); screens in src/screens; theme in src/ui.
 - npm lockfile, lint configuration, and setup instructions in README.md.
 - Spec-driven documentation and selective context-reading workflow.

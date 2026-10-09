@@ -3,6 +3,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { userClub } from '../game/game';
+import { DISCLAIMER } from '../game/leagues';
 import { useCareer, useGame } from '../state/GameContext';
 import { Button, ClubCrest, Sheet } from '../ui/components';
 import { FadeIn } from '../ui/motion';
@@ -128,6 +129,7 @@ function SettingsSheet({ visible, onClose }: { visible: boolean; onClose: () => 
         variant={confirm ? 'red' : 'light'}
         onPress={() => (confirm ? resetCareer() : setConfirm(true))}
       />
+      {DISCLAIMER ? <Text style={s.disclaimer}>{DISCLAIMER}</Text> : null}
     </Sheet>
   );
 }
@@ -191,6 +193,7 @@ const s = StyleSheet.create({
   },
   playIcon: { color: '#FFFFFF', fontSize: 18, fontWeight: '900' },
   playText: { color: '#FFFFFF', fontSize: 10, fontWeight: '900', letterSpacing: 0.5 },
+  disclaimer: { fontSize: 11, fontWeight: '600', color: colors.muted, lineHeight: 15, marginTop: 20 },
   settingsText: { fontSize: 14, fontWeight: '600', color: colors.muted, marginBottom: 14, lineHeight: 20 },
   tabs: {
     flexDirection: 'row',

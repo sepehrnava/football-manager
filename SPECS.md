@@ -24,6 +24,7 @@ or hosting. These are not approved features.
 | S004 | [Transfer market and contracts](specs/004-transfer-market-contracts.md) | Implemented; partly revised by S005 |
 | S005 | [Simple and fair](specs/005-simple-and-fair.md) | Implemented; device observation pending |
 | S006 | [Club choice and transfer list](specs/006-club-choice-and-transfer-list.md) | Implemented; device observation pending |
+| S007 | [Real league data](specs/007-real-league-data.md) | Implemented; player data pending |
 
 Use [the template](specs/_template.md) for the next feature. Number specs sequentially.
 Keep IDs stable; criteria use S002-AC01 style IDs referenced by tasks and evidence.
