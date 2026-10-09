@@ -157,7 +157,7 @@ export function econRating(rating: number) {
 export const DISCLAIMER =
   LEAGUE.id === 'fictional'
     ? null
-    : 'Pocket Manager is an independent game. Club and player names are used only to identify real ' +
+    : 'Top Squad is an independent game. Club and player names are used only to identify real ' +
       'clubs and players and belong to their respective owners. It is not licensed by, affiliated with, ' +
       'or endorsed by any club, league, players\' association or player. Crests are original simple ' +
       'designs, and all ratings, values and game data are created by the game, not taken from any real ' +

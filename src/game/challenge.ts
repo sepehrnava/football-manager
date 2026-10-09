@@ -20,6 +20,7 @@ function hash(text: string) {
  * already played, and a goal that fits where it stands at the mid-season window.
  */
 export function createChallenge(day = todayKey()): GameState {
+  // The old app name stays in the seed so each day's challenge never changes.
   const seed = hash(`pocket-manager:${day}`);
   const takeOver = seed % LEAGUE.clubs.length;
   let s = createGame({ type: 'new', name: '', short: '', crest: { primary: '#000', secondary: '#fff', pattern: 'solid' }, seed, takeOver });

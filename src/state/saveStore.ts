@@ -10,6 +10,7 @@ export type Slot = 'career' | 'challenge';
 // fails on single values around 2 MB. So a save is written as small chunks plus
 // a manifest saying how many there are.
 const KEYS: Record<Slot, string> = {
+  // Keys keep the app's first name (Pocket Manager): changing them would lose saves.
   career: 'pocket-manager/save-v3',
   challenge: 'pocket-manager/challenge-v1',
 };

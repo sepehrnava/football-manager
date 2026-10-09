@@ -62,7 +62,7 @@ A new QR code is shown in the terminal; after a network change, do not use the o
 1. Install Expo Go from https://expo.dev/go or Google Play.
 2. Connect the phone and the computer to the same Wi-Fi network.
 3. In Expo Go, tap Scan QR code and scan the QR code in the terminal.
-4. The app should open on the "Pocket Manager" club creation screen.
+4. The app should open on the "Top Squad" start screen.
 
 Android Studio is not needed for this project or for running Expo Go on a phone. For an emulator and local native builds you will need the Android SDK tools. Android Studio, the SDK, adb and Java were not found during the initial check. Firmware virtualization is enabled and a hypervisor is available, but running an emulator has not been tested yet. System installation was not done with Administrator access.
 

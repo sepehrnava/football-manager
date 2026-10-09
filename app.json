@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "Pocket Manager",
+    "name": "Top Squad",
     "slug": "first-expo-app",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -19,6 +19,7 @@
       "predictiveBackGestureEnabled": false
     },
     "web": {
+      "name": "Top Squad: Football Manager",
       "favicon": "./assets/favicon.png"
     }
   }

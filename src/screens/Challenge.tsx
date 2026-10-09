@@ -83,7 +83,7 @@ export function ChallengeEndScreen() {
 
   const share = () => {
     const line = `${result.success ? '✅' : '❌'} ${club.name}: ${c.title.toLowerCase()} (${ordinal(c.startPosition)} → ${ordinal(result.position)})`;
-    Share.share({ message: `Pocket Manager · Daily ${c.day}\n${line}\n${result.score} pts · 🔥 ${streak}` }).catch(() => {});
+    Share.share({ message: `Top Squad · Daily ${c.day}\n${line}\n${result.score} pts · 🔥 ${streak}` }).catch(() => {});
   };
 
   return (

@@ -1,7 +1,7 @@
 # Product scope and spec index
 
-Repository: sepehrnava/football-manager. Current product: Pocket Manager, a simple
-football manager mockup with generated data (S002).
+Repository: sepehrnava/football-manager. Current product: Top Squad: Football Manager (formerly Pocket
+Manager), a simple football manager game (S002 onward).
 
 ## Confirmed scope
 
@@ -32,6 +32,7 @@ or hosting. These are not approved features.
 | S012 | [Easier swaps](specs/012-easier-swaps.md) | Implemented; device observation pending |
 | S013 | [Build your squad (new club)](specs/013-build-your-squad.md) | Implemented; device observation pending |
 | S014 | [League stats](specs/014-league-stats.md) | Implemented; device observation pending |
+| S015 | [Simple start screen and random club](specs/015-start-screen.md) | Implemented; device observation pending |
 
 Use [the template](specs/_template.md) for the next feature. Number specs sequentially.
 Keep IDs stable; criteria use S002-AC01 style IDs referenced by tasks and evidence.
@@ -44,5 +45,7 @@ Superseded specs name their replacement. Status labels alone are not evidence.
 
 Product direction (user, 2026-10-08/09): the challenge is managing squad and money, not
 match play. Keep it very simple to play: no fatigue, no level grinding, no energy bar.
-Next: a full UI/UX pass over every screen. Monetization later (rewarded ads, remove-ads,
+Next: a full UI/UX pass over every screen (start screen done, S015). Visual direction
+(user, 2026-10-09): simple everywhere; plain rows over boxed cards, no tags/chips or
+explaining subtitles, little text; small animated badges are welcome. Monetization later (rewarded ads, remove-ads,
 cosmetics), which needs a development build.

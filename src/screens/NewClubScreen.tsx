@@ -17,8 +17,11 @@ import {
 } from '../game/leagues';
 import type { CrestPattern } from '../game/types';
 import { useGame } from '../state/GameContext';
-import { DailyCard } from './Challenge';
+import { clubTier, PickedClub, SpinSheet, Stars } from './ClubPick';
+import { HonoursSheet } from './Honours';
+import { ClubCycle, CyclingCrest, DailyRow, Hero, MenuRow, StartLinks } from './StartHome';
 import { Button, Card, Crest, Pill, SectionTitle, Sheet } from '../ui/components';
+import { FadeIn } from '../ui/motion';
 import { colors, CREST_COLORS, formatMoney } from '../ui/theme';
 
 const PATTERNS: { id: CrestPattern; label: string }[] = [
@@ -63,6 +66,8 @@ export function NewClubScreen() {
   const [comp, setComp] = useState<Comp | null>(COMPS.length === 1 ? COMPS[0] : null);
   // Country a new club starts in (its lowest division).
   const [country, setCountry] = useState(DEFAULT_COUNTRY);
+  const [spinning, setSpinning] = useState(false);
+  const [honours, setHonours] = useState(false);
   const seed = () => Date.now() % 2147483647;
 
   const shortCode = shortEdited ? short : makeShort(name);
@@ -74,30 +79,23 @@ export function NewClubScreen() {
       contentContainerStyle={[s.content, { paddingTop: insets.top + 16, paddingBottom: insets.bottom + 24 }]}
       keyboardShouldPersistTaps="handled"
     >
-      {mode === null ? (
-        <>
-          <Text style={s.logo}>POCKET{'\n'}MANAGER</Text>
-          <Text style={s.tagline}>Build your XI. Trade smart. Keep the board happy.</Text>
-        </>
-      ) : (
-        <Text style={s.logoSmall}>POCKET MANAGER</Text>
-      )}
+      {mode === null ? null : <Text style={s.logoSmall}>TOP SQUAD</Text>}
 
       {mode === null ? (
-        <View style={s.choices}>
-          <ModeCard
-            icon="🏗️"
-            title="Create your club"
-            text="Pick a name and crest. Start small with a modest squad and build a legend."
-            onPress={() => setMode('create')}
+        <View style={s.start}>
+          <Hero />
+          <FadeIn delay={60} style={s.menu}>
+            <MenuRow icon={<CyclingCrest />} title="Create your club" onPress={() => setMode('create')} />
+            <MenuRow icon={<ClubCycle />} title="Manage a club" onPress={() => setMode('manage')} />
+            <DailyRow last />
+          </FadeIn>
+          <StartLinks onSpin={() => setSpinning(true)} onHonours={() => setHonours(true)} />
+          <SpinSheet
+            visible={spinning}
+            onClose={() => setSpinning(false)}
+            onManage={(i) => dispatch({ type: 'new', name: '', short: '', crest: clubCrest(i), seed: seed(), takeOver: i })}
           />
-          <ModeCard
-            icon="🏟️"
-            title="Manage a club"
-            text={`Take over one of ${LEAGUE.clubs.length} clubs in ${COMPS.length} leagues, from title favourites to underdogs.`}
-            onPress={() => setMode('manage')}
-          />
-          <DailyCard />
+          <HonoursSheet visible={honours} onClose={() => setHonours(false)} />
         </View>
       ) : (
         <Text
@@ -186,10 +184,7 @@ export function NewClubScreen() {
                     <Text style={s.clubName} numberOfLines={1}>
                       {c.name}
                     </Text>
-                    <Text style={s.clubMeta}>
-                      {'★'.repeat(tier.stars)}
-                      <Text style={s.starsOff}>{'★'.repeat(5 - tier.stars)}</Text>
-                    </Text>
+                    <Stars count={tier.stars} />
                     <Text style={s.clubTier}>{tier.label}</Text>
                   </View>
                   <View style={s.clubRight}>
@@ -290,79 +285,9 @@ export function NewClubScreen() {
       </>
       ) : null}
 
-      {DISCLAIMER ? <Text style={s.disclaimer}>{DISCLAIMER}</Text> : null}
+      {DISCLAIMER ? <Text style={[s.disclaimer, mode === null && s.disclaimerEnd]}>{DISCLAIMER}</Text> : null}
     </ScrollView>
   );
-}
-
-function ModeCard({ icon, title, text, onPress }: { icon: string; title: string; text: string; onPress: () => void }) {
-  return (
-    <Pressable onPress={onPress} accessibilityRole="button" style={({ pressed }) => [s.mode, pressed && { opacity: 0.85 }]}>
-      <Text style={s.modeIcon}>{icon}</Text>
-      <View style={s.clubMain}>
-        <Text style={s.modeTitle}>{title}</Text>
-        <Text style={s.modeText}>{text}</Text>
-      </View>
-      <Text style={s.modeArrow}>›</Text>
-    </Pressable>
-  );
-}
-
-/** What taking over a club means: budget, expectations and difficulty. */
-function PickedClub({ index }: { index: number }) {
-  const c = LEAGUE.clubs[index];
-  const eco = clubEconomy(c.level);
-  const tier = clubTier(index);
-  const comp = { country: c.country, division: c.division };
-  return (
-    <View style={s.picked}>
-      <Crest crest={clubCrest(index)} short={c.short} size={72} />
-      <Text style={s.pickedMeta}>
-        {flagOf(c.country)} {compName(comp)}
-      </Text>
-      <Text style={s.clubMeta}>
-        {'★'.repeat(tier.stars)}
-        <Text style={s.starsOff}>{'★'.repeat(5 - tier.stars)}</Text>
-      </Text>
-      <View style={s.pickedStats}>
-        <PickedStat label="BUDGET" value={formatMoney(eco.money)} />
-        <PickedStat label="EXPECTED" value={tier.label} />
-        <PickedStat label="DIFFICULTY" value={tier.difficulty} color={tier.color} />
-      </View>
-    </View>
-  );
-}
-
-function PickedStat({ label, value, color }: { label: string; value: string; color?: string }) {
-  return (
-    <View style={s.pickedStat}>
-      <Text style={[s.pickedValue, color ? { color } : null]}>{value}</Text>
-      <Text style={s.pickedLabel}>{label}</Text>
-    </View>
-  );
-}
-
-/** How strong a club is compared with the rest of its division, at a glance. */
-function clubTier(index: number) {
-  const club = LEAGUE.clubs[index];
-  const peers = LEAGUE.clubs.filter((c) => c.country === club.country && c.division === club.division);
-  const levels = peers.map((c) => c.level);
-  const min = Math.min(...levels);
-  const max = Math.max(...levels);
-  const stars = max === min ? 3 : 1 + Math.round(((club.level - min) / (max - min)) * 4);
-  const rank = peers.indexOf(club) / peers.length; // clubs are sorted strongest first
-  const top = club.division === 1;
-  if (rank < 0.2)
-    return { stars, label: top ? 'Title favourites' : 'Promotion favourites', difficulty: 'Easy', color: colors.green };
-  if (rank < 0.5)
-    return { stars, label: top ? 'Contenders' : 'Promotion hopefuls', difficulty: 'Normal', color: colors.ink };
-  if (rank < 0.8) return { stars, label: 'Mid-table', difficulty: 'Normal', color: colors.ink };
-  return {
-    stars,
-    label: top && divisionsIn(club.country) > 1 ? 'Relegation fight' : 'Underdogs',
-    difficulty: 'Hard',
-    color: colors.red,
-  };
 }
 
 function Swatches({ value, onChange }: { value: string; onChange: (c: string) => void }) {
@@ -381,22 +306,8 @@ function Swatches({ value, onChange }: { value: string; onChange: (c: string) =>
 }
 
 const s = StyleSheet.create({
-  choices: { gap: 12, marginTop: 8 },
-  mode: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 14,
-    backgroundColor: colors.card,
-    borderRadius: 22,
-    borderWidth: 2,
-    borderColor: colors.border,
-    borderBottomWidth: 5,
-    borderBottomColor: colors.borderDark,
-    padding: 18,
-  },
-  modeIcon: { fontSize: 40 },
-  modeTitle: { fontSize: 20, fontWeight: '900', color: colors.ink },
-  modeText: { fontSize: 14, fontWeight: '600', color: colors.muted, marginTop: 2 },
+  start: { flex: 1 },
+  menu: { marginTop: 4 },
   modeArrow: { fontSize: 32, fontWeight: '900', color: colors.muted },
   back: { fontSize: 16, fontWeight: '800', color: colors.muted, paddingVertical: 8 },
   league: {
@@ -441,8 +352,6 @@ const s = StyleSheet.create({
   clubRowOn: { borderColor: colors.ink, borderBottomColor: colors.ink, backgroundColor: '#FFF8E6' },
   clubMain: { flex: 1 },
   clubName: { fontSize: 16, fontWeight: '900', color: colors.ink },
-  clubMeta: { fontSize: 13, fontWeight: '800', color: colors.gold, marginTop: 2 },
-  starsOff: { color: colors.border },
   clubTier: { fontSize: 12, fontWeight: '800', color: colors.muted, marginTop: 1 },
   logoSmall: {
     fontSize: 16,
@@ -452,38 +361,14 @@ const s = StyleSheet.create({
     color: colors.ink,
     letterSpacing: 2,
   },
-  picked: { alignItems: 'center', gap: 6, marginBottom: 18 },
-  pickedMeta: { fontSize: 15, fontWeight: '800', color: colors.muted, marginTop: 4 },
-  pickedStats: { flexDirection: 'row', gap: 8, marginTop: 10, alignSelf: 'stretch' },
-  pickedStat: {
-    flex: 1,
-    alignItems: 'center',
-    backgroundColor: colors.card,
-    borderRadius: 16,
-    borderWidth: 2,
-    borderColor: colors.border,
-    paddingVertical: 10,
-    paddingHorizontal: 4,
-    gap: 2,
-  },
-  pickedValue: { fontSize: 15, fontWeight: '900', color: colors.ink, textAlign: 'center' },
-  pickedLabel: { fontSize: 9, fontWeight: '900', color: colors.muted, letterSpacing: 1 },
   clubRight: { alignItems: 'flex-end' },
   clubBudget: { fontSize: 15, fontWeight: '900', color: colors.ink },
   clubDifficulty: { fontSize: 12, fontWeight: '900' },
   disclaimer: { fontSize: 11, fontWeight: '600', color: colors.muted, lineHeight: 15, marginTop: 28, textAlign: 'center' },
+  // On the start view the pitch takes the free space; the note follows the menu.
+  disclaimerEnd: { marginTop: 16 },
   hint: { fontSize: 13, fontWeight: '600', color: colors.muted, marginVertical: 12, lineHeight: 18 },
-  content: { paddingHorizontal: 20, maxWidth: 560, width: '100%', alignSelf: 'center' },
-  logo: {
-    fontSize: 40,
-    lineHeight: 42,
-    fontWeight: '900',
-    fontStyle: 'italic',
-    textAlign: 'center',
-    color: colors.ink,
-    letterSpacing: 1,
-  },
-  tagline: { textAlign: 'center', color: colors.muted, fontWeight: '700', marginTop: 8 },
+  content: { flexGrow: 1, paddingHorizontal: 20, maxWidth: 560, width: '100%', alignSelf: 'center' },
   preview: { alignItems: 'center', marginTop: 24, gap: 12 },
   previewName: { fontSize: 22, fontWeight: '900', color: colors.ink },
   input: {
