@@ -1,14 +1,14 @@
 import { useEffect, useState, type ReactNode } from 'react';
-import { Animated, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Animated, Easing, Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { todayKey } from '../game/challenge';
 import { clubCrest } from '../game/game';
-import { COUNTRIES, LEAGUE } from '../game/leagues';
+import { LEAGUE } from '../game/leagues';
 import { currentStreak } from '../game/meta';
-import type { Crest as CrestData, CrestPattern, CrestShape } from '../game/types';
+import type { Crest as CrestData } from '../game/types';
 import { useGame } from '../state/GameContext';
 import { Crest } from '../ui/components';
-import { FadeIn, NATIVE, usePulse } from '../ui/motion';
+import { NATIVE, usePulse } from '../ui/motion';
 import { colors, CREST_COLORS } from '../ui/theme';
 
 /** One side's 4-3-3 as [depth from its own goal line, across], both in % of the pitch. */
@@ -83,11 +83,43 @@ const OUTLINE: [number, number][] = [
   [-2, 4], [0, 4], [2, 4], [-2, 5], [0, 5], [2, 5],
 ];
 
+/** The logo slams in (big to normal with a bounce and a small tilt), then the label pops up. */
 function Logo() {
   const text = `TOP\nSQUAD`;
+  const [slam] = useState(() => new Animated.Value(0));
+  const [label] = useState(() => new Animated.Value(0));
+  useEffect(() => {
+    Animated.parallel([
+      Animated.sequence([
+        Animated.delay(150),
+        Animated.spring(slam, { toValue: 1, speed: 9, bounciness: 12, useNativeDriver: NATIVE }),
+      ]),
+      Animated.timing(label, {
+        toValue: 1,
+        delay: 520,
+        duration: 380,
+        easing: Easing.out(Easing.back(2)),
+        useNativeDriver: NATIVE,
+      }),
+    ]).start();
+  }, [slam, label]);
+  const logoStyle = {
+    opacity: slam.interpolate({ inputRange: [0, 0.35, 1], outputRange: [0, 1, 1], extrapolate: 'clamp' as const }),
+    transform: [
+      { scale: slam.interpolate({ inputRange: [0, 1], outputRange: [2.4, 1] }) },
+      { rotate: slam.interpolate({ inputRange: [0, 1], outputRange: ['-10deg', '0deg'] }) },
+    ],
+  };
+  const labelStyle = {
+    opacity: label,
+    transform: [
+      { translateY: label.interpolate({ inputRange: [0, 1], outputRange: [18, 0] }) },
+      { scale: label.interpolate({ inputRange: [0, 1], outputRange: [0.7, 1] }) },
+    ],
+  };
   return (
     <View style={s.logoWrap}>
-      <View>
+      <Animated.View style={logoStyle}>
         {OUTLINE.map(([dx, dy]) => (
           <Text
             key={`${dx},${dy}`}
@@ -98,70 +130,24 @@ function Logo() {
           </Text>
         ))}
         <Text style={s.logo}>{text}</Text>
-      </View>
-      <Text style={s.logoSub}>FOOTBALL MANAGER</Text>
+      </Animated.View>
+      <Animated.Text style={[s.logoSub, labelStyle]}>FOOTBALL MANAGER</Animated.Text>
     </View>
   );
 }
 
-/** Steps a counter on a timer, for the little changing badges. */
-function useTicker(period: number, offset = 0) {
-  const [n, setN] = useState(0);
-  useEffect(() => {
-    let id: ReturnType<typeof setInterval> | undefined;
-    const start = setTimeout(() => {
-      id = setInterval(() => setN((x) => x + 1), period);
-    }, offset);
-    return () => {
-      clearTimeout(start);
-      if (id) clearInterval(id);
-    };
-  }, [period, offset]);
-  return n;
+/** "This could be your club": a fixed sample crest for Create your club. */
+const YOU_CREST: CrestData = { primary: CREST_COLORS[3], secondary: '#FFFFFF', pattern: 'stripes', shape: 'shield' };
+
+export function YouCrest() {
+  return <Crest crest={YOU_CREST} short="YOU" size={34} />;
 }
 
-/** The three menu icons change in turn, one beat apart. */
-const BEAT = 2700;
-const SWAP = 450;
+/** The first league's top club, as the face of Manage a club. */
+const FEATURED = LEAGUE.clubs.findIndex((c) => c.division === 1);
 
-const PATTERNS: CrestPattern[] = ['stripes', 'half', 'band', 'solid'];
-const CREST_SHAPES: CrestShape[] = ['shield', 'round', 'square', 'oval', 'shield'];
-
-/** A made-up crest that keeps redesigning itself: "this could be your club". */
-export function CyclingCrest() {
-  const n = useTicker(BEAT);
-  const crest: CrestData = {
-    primary: CREST_COLORS[(n * 3) % CREST_COLORS.length],
-    secondary: CREST_COLORS[(n * 7 + 9) % CREST_COLORS.length],
-    pattern: PATTERNS[n % PATTERNS.length],
-    shape: CREST_SHAPES[n % CREST_SHAPES.length],
-  };
-  if (crest.primary === crest.secondary) crest.secondary = '#FFFFFF';
-  return (
-    <FadeIn key={n} from="scale" duration={SWAP}>
-      <Crest crest={crest} short="YOU" size={34} />
-    </FadeIn>
-  );
-}
-
-/** The top two clubs of every top division, taking turns. */
-const SHOWCASE = COUNTRIES.flatMap((c) =>
-  LEAGUE.clubs
-    .map((x, i) => ({ x, i }))
-    .filter(({ x }) => x.country === c.id && x.division === 1)
-    .slice(0, 2)
-    .map(({ i }) => i),
-);
-
-/** Real club badges taking turns. */
-export function ClubCycle() {
-  const n = useTicker(BEAT, BEAT / 3);
-  const i = SHOWCASE[n % SHOWCASE.length];
-  return (
-    <FadeIn key={n} from="scale" duration={SWAP}>
-      <Crest crest={clubCrest(i)} short={LEAGUE.clubs[i].short} size={34} />
-    </FadeIn>
-  );
+export function FeaturedCrest() {
+  return <Crest crest={clubCrest(FEATURED)} short={LEAGUE.clubs[FEATURED].short} size={34} />;
 }
 
 /** One start option: a small icon, a title, an optional note and a value on the right. */
@@ -201,23 +187,14 @@ export function MenuRow({
   );
 }
 
-/** A drawn target that gets hit on every beat: it jolts, tilts and settles. */
-function DartHit() {
-  const n = useTicker(BEAT, (BEAT * 2) / 3);
-  const [hit] = useState(() => new Animated.Value(1));
-  useEffect(() => {
-    if (n === 0) return;
-    hit.setValue(0);
-    Animated.spring(hit, { toValue: 1, useNativeDriver: NATIVE, speed: 6, bounciness: 14 }).start();
-  }, [n, hit]);
-  const scale = hit.interpolate({ inputRange: [0, 1], outputRange: [1.25, 1] });
-  const rotate = hit.interpolate({ inputRange: [0, 1], outputRange: ['-14deg', '0deg'] });
+/** A drawn target for the Daily challenge. */
+function Target() {
   return (
-    <Animated.View style={[s.target, { transform: [{ scale }, { rotate }] }]}>
+    <View style={s.target}>
       <View style={s.targetRing}>
         <View style={s.targetEye} />
       </View>
-    </Animated.View>
+    </View>
   );
 }
 
@@ -235,7 +212,7 @@ export function DailyRow({ last, compact }: { last?: boolean; compact?: boolean 
   };
   return (
     <MenuRow
-      icon={<DartHit />}
+      icon={<Target />}
       title="Daily challenge"
       note={busy ? 'Preparing…' : undefined}
       value={streak > 0 ? `Streak ${streak}` : undefined}

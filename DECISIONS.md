@@ -48,6 +48,14 @@ profit only, so a cheap squad can break even anywhere in the table and debt alwa
 to the player's spending. Selling is never blocked; academy call-ups keep the squad legal.
 Revisit if real league finances replace the generated economy.
 
+## D014: Ads with AdMob, rewards that never sell power
+
+Accepted for S019 (2026-10-10): monetization in stages, ads first. react-native-google-mobile-ads
+with Google's UMP consent; rewarded ads give small conveniences only (a sponsor bonus of 2% of
+the wage bill once per window, free scouting); one capped interstitial at the season break. The
+library is loaded only in native builds (adsLib.ts / adsLib.web.ts); development falls back to a
+simulated ad. RevenueCat (remove ads, Pro) comes later.
+
 ## D013: Over-the-air updates with EAS Update
 
 Accepted 2026-10-10 at the user's request (update apps without a store release). expo-updates

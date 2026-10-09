@@ -2,6 +2,8 @@ import { useMemo, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 
 import {
+  adBonusAmount,
+  canTakeAdBonus,
   canTrade,
   clubById,
   midWindowRound,
@@ -13,6 +15,7 @@ import { DEFAULT_FINDER, findPlayers, type Finder, type FinderTab } from '../gam
 import { COUNTRIES } from '../game/leagues';
 import { playerValue, ratingRange, trend, wageDemand } from '../game/players';
 import type { Player, Position } from '../game/types';
+import { useAds } from '../ads/AdsContext';
 import { useCareer } from '../state/GameContext';
 import {
   Button,
@@ -58,6 +61,7 @@ type Picker = 'tab' | 'position' | 'country' | 'fee' | null;
 
 export function TransfersScreen() {
   const { state, dispatch } = useCareer();
+  const ads = useAds();
   const [finder, setFinder] = useState<Finder>(DEFAULT_FINDER);
   const [shown, setShown] = useState(PAGE);
   const [picker, setPicker] = useState<Picker>(null);
@@ -92,6 +96,21 @@ export function TransfersScreen() {
           ) : null}
           {status !== 'ok' ? <Text style={[s.line, { color: colors.red }]}>{MONEY_STATUS_TEXT[status]}</Text> : null}
         </View>
+
+        {ads.available && canTakeAdBonus(state) ? (
+          <Pressable
+            onPress={async () => {
+              if (await ads.showRewarded()) dispatch({ type: 'adBonus' });
+            }}
+            accessibilityRole="button"
+            style={({ pressed }) => [s.bonus, pressed && s.pressed]}
+          >
+            <Text style={s.bonusText}>
+              Sponsor bonus: watch a short ad for <Text style={s.bonusAmount}>+{formatMoney(adBonusAmount(state))}</Text>
+            </Text>
+            <Text style={s.bonusArrow}>›</Text>
+          </Pressable>
+        ) : null}
 
         {state.offers.length ? (
           <FadeIn>
@@ -273,6 +292,18 @@ const s = StyleSheet.create({
   content: { padding: 16, paddingBottom: 40, gap: 12 },
   line: { fontSize: 14, fontWeight: '700', color: colors.muted, paddingVertical: 2 },
   lineStrong: { fontWeight: '900', color: colors.ink },
+  bonus: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    backgroundColor: colors.greenSoft,
+    borderRadius: 14,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+  },
+  bonusText: { flex: 1, fontSize: 14, fontWeight: '800', color: colors.ink },
+  bonusAmount: { color: colors.green, fontWeight: '900' },
+  bonusArrow: { fontSize: 22, fontWeight: '900', color: colors.green },
   offer: { gap: 10, paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: colors.border },
   offerTop: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   offerButtons: { flexDirection: 'row', gap: 10 },

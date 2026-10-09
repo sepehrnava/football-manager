@@ -3,6 +3,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ECONOMY } from '../game/constants';
 import { compName, DEFAULT_COUNTRY } from '../game/leagues';
+import { useAds } from '../ads/AdsContext';
 import { useCareer, useGame } from '../state/GameContext';
 import { Button, Card, Row, SectionTitle } from '../ui/components';
 import { FadeIn } from '../ui/motion';
@@ -10,6 +11,7 @@ import { colors, formatFans, formatMoney, ordinal, seasonLabel } from '../ui/the
 
 export function SeasonEndScreen() {
   const { state, dispatch } = useCareer();
+  const { maybeInterstitial } = useAds();
   const { resetCareer } = useGame();
   const insets = useSafeAreaInsets();
   const sum = state.summary;
@@ -129,7 +131,11 @@ export function SeasonEndScreen() {
           <Button
             label={`START ${seasonLabel(sum.season + 1)}`}
             variant="green"
-            onPress={() => dispatch({ type: 'nextSeason' })}
+            onPress={async () => {
+              // One occasional full-screen ad, never after the very first season.
+              if (state.history.length >= 2) await maybeInterstitial();
+              dispatch({ type: 'nextSeason' });
+            }}
           />
         )}
       </View>

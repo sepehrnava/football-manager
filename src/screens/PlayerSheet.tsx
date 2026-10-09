@@ -15,6 +15,7 @@ import {
   wageDemand,
 } from '../game/players';
 import type { Player } from '../game/types';
+import { useAds } from '../ads/AdsContext';
 import { useCareer } from '../state/GameContext';
 import { Button, ClubCrest, PosTags, RangeBadge, RatingBadge, Row, Sheet, TrendTag } from '../ui/components';
 import { FadeIn } from '../ui/motion';
@@ -68,6 +69,7 @@ const OFFERS = [
 
 function MarketView({ player: p, onClose }: { player: Player; onClose: () => void }) {
   const { state, dispatch } = useCareer();
+  const ads = useAds();
   const asking = askingPrice(state, p);
   const scouted = (state.scouting[p.id] ?? 0) >= 1;
   const talk = state.talks[p.id];
@@ -150,6 +152,16 @@ function MarketView({ player: p, onClose }: { player: Player; onClose: () => voi
         ) : (
           <View style={s.scoutRow}>
             <Text style={[s.hint, s.flex]}>Rating is a guess.</Text>
+            {ads.available ? (
+              <Button
+                label="FREE WITH AD"
+                variant="light"
+                small
+                onPress={async () => {
+                  if (await ads.showRewarded()) dispatch({ type: 'scoutPlayer', playerId: p.id, free: true });
+                }}
+              />
+            ) : null}
             <Button
               label={`SCOUT ${formatMoney(scoutCost(state))}`}
               variant="light"

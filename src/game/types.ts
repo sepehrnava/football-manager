@@ -231,6 +231,8 @@ export interface GameState {
   season: number;
   phase: Phase;
   window: 'pre' | 'mid';
+  /** The transfer window ("season-window") in which the ad sponsor bonus was last taken. */
+  adBonusAt?: string;
   /** Index of the next round to play, 0-based. */
   round: number;
   userClubId: string;

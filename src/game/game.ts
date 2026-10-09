@@ -33,7 +33,7 @@ import {
 import { roundNews, withNews } from './news';
 import { hireStaff, staffMarket, staffWages, startingStaff, youthBoostChance } from './staff';
 import { compKey, compName, DEFAULT_COUNTRY, divisionsIn, econRating, LEAGUE, PROMOTION_SPOTS, type Comp } from './leagues';
-import { develop, makePlayer, markRetirements, playerValue } from './players';
+import { develop, makePlayer, markRetirements, playerValue, roundMoney } from './players';
 import { createRng, type Rng } from './rng';
 import { autoPick, remapLineup, userStrength, userTeam, wageBill } from './team';
 import type {
@@ -83,7 +83,8 @@ export type Action =
   | { type: 'captain'; playerId: string }
   | { type: 'watch'; playerId: string }
   | { type: 'hireStaff'; staffId: string }
-  | { type: 'scoutPlayer'; playerId: string }
+  | { type: 'scoutPlayer'; playerId: string; free?: boolean }
+  | { type: 'adBonus' }
   | { type: 'bid'; playerId: string; fee: number; years: number }
   | { type: 'acceptOffer'; offerId: string }
   | { type: 'rejectOffer'; offerId: string }
@@ -269,6 +270,18 @@ function cupResults(cups: Cup[]) {
 export function sponsorFor(size: number) {
   const raw = ECONOMY.sponsorScale * Math.exp(0.14 * (econRating(size) - 60)) - ECONOMY.sponsorOffset;
   return Math.max(0, Math.round(raw / 50_000) * 50_000);
+}
+
+const windowKey = (state: GameState) => `${state.season}-${state.window}`;
+
+/** The ad sponsor bonus: small on purpose, 2% of the season's wage bill (at least $25K). */
+export function adBonusAmount(state: GameState) {
+  return Math.max(25_000, roundMoney(wageBill(state.squad) * 0.02));
+}
+
+/** Once per transfer window, while it is open, outside the Daily Challenge. */
+export function canTakeAdBonus(state: GameState) {
+  return state.phase === 'window' && !state.challenge && state.adBonusAt !== windowKey(state);
 }
 
 /** Starting budget, fan base and sponsor income for a club of this size. */
@@ -874,7 +887,11 @@ function step(state: GameState | null, action: Action): GameState | null {
       };
     }
     case 'scoutPlayer':
-      return scoutPlayer(state, action.playerId);
+      return scoutPlayer(state, action.playerId, action.free);
+    case 'adBonus':
+      return canTakeAdBonus(state)
+        ? { ...state, money: state.money + adBonusAmount(state), adBonusAt: windowKey(state) }
+        : state;
     case 'bid':
       return placeBid(state, action.playerId, action.fee, action.years);
     case 'acceptOffer':

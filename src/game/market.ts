@@ -192,8 +192,9 @@ export function renewalDemand(state: GameState, p: Player) {
 // ---------------------------------------------------------------- searching
 
 
-export function scoutPlayer(state: GameState, playerId: string): GameState {
-  const cost = scoutCost(state);
+/** Scouts a market player; `free` is the ad-funded report, which costs nothing. */
+export function scoutPlayer(state: GameState, playerId: string, free = false): GameState {
+  const cost = free ? 0 : scoutCost(state);
   if ((state.scouting[playerId] ?? 0) >= 1 || cost > state.money) return state;
   return {
     ...state,

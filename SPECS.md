@@ -11,7 +11,7 @@ Manager), a simple football manager game (S002 onward).
 - Reproducible source/dependencies in the specified GitHub repository.
 - Develop subsequent behavior from specs and observable acceptance criteria.
 
-Not yet in scope: real player database, payments, release builds, or hosting. Accounts and
+Not yet in scope: real player database, in-app purchases (RevenueCat later), or hosting. Accounts and
 a backend are approved only for optional sign-in and cloud save (S018, Firebase).
 
 ## Feature specs
@@ -35,7 +35,8 @@ a backend are approved only for optional sign-in and cloud save (S018, Firebase)
 | S015 | [Simple start screen and random club](specs/015-start-screen.md) | Implemented; device observation pending |
 | S016 | [Simple in-career screens](specs/016-simple-career-screens.md) | Implemented; Android partly observed |
 | S017 | [Crest shapes](specs/017-crest-shapes.md) | Implemented; Android observed |
-| S018 | [Sign in and cloud save](specs/018-accounts-cloud-save.md) | Implemented; needs the user's Firebase setup to verify |
+| S018 | [Sign in and cloud save](specs/018-accounts-cloud-save.md) | Implemented; Firebase set up, device test pending |
+| S019 | [Ads (AdMob)](specs/019-ads.md) | Implemented; test ads on device and AdMob account pending |
 
 Use [the template](specs/_template.md) for the next feature. Number specs sequentially.
 Keep IDs stable; criteria use S002-AC01 style IDs referenced by tasks and evidence.

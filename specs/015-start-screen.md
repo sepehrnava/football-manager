@@ -14,6 +14,9 @@ Create text was stale (a new club starts empty since S013). Undecided players ha
 
 ## Scope and exclusions
 
+- 2026-10-10 (user): menu icons are still (sample "YOU" crest, the first league's top club,
+  a target); the screen opens with an intro: pitch fades in, the logo slams in with a bounce,
+  "FOOTBALL MANAGER" pops up, then the rows slide in one by one and the links fade in.
 - Upright green pitch, inset from the screen edges, filling the free space above the menu:
   lines, penalty boxes, two faint 4-3-3 teams drifting slowly (one per half), and the logo
   on the centre circle with a black outline and drop (sticker 3D). Markings are placed in

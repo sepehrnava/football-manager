@@ -38,6 +38,8 @@ Updated: 2026-10-09. Replace outdated entries; keep this as a snapshot.
   Firestore (free plan), restore and account deletion (S018, D012). Firebase project
   top-squad-fm-97218 is fully set up, Google and Apple sign-in enabled; untested on a device.
 - Remote updates with EAS Update (Expo project @sepehrnava/top-squad, channels per build) (D013).
+- Ads (S019, D014): rewarded sponsor bonus (2% of wages, once per window) and free scouting, one
+  capped interstitial at the season break; simulated in development, Google test ads in builds.
 - Game rules in src/game (pure TypeScript); screens in src/screens; theme in src/ui.
 - npm lockfile, lint configuration, and setup instructions in README.md.
 - Spec-driven documentation and selective context-reading workflow.
@@ -62,7 +64,7 @@ Updated: 2026-10-09. Replace outdated entries; keep this as a snapshot.
 
 ## Limits and next step
 
-- Next: an Android development build (EAS) to verify S018 sign-in and backup; play a full season on Android (T007, S016-AC05); then gameplay ideas (board goals,
+- Next: an Android development build (EAS) to verify S018 sign-in and S019 test ads; play a full season on Android (T007, S016-AC05); then gameplay ideas (board goals,
   rival club, quick decision moments) if the user wants them.
 - Developed on macOS; README setup steps still describe the original Windows setup.
 - Initial npm audit: 23 warnings (7 moderate, 16 high). Historical result, not a fresh audit.

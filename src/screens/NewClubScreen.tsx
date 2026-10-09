@@ -20,7 +20,7 @@ import { clubTier, PickedClub, SpinSheet, Stars } from './ClubPick';
 import { useAccount } from '../cloud/AccountContext';
 import { AccountSheet } from './AccountSheet';
 import { HonoursSheet } from './Honours';
-import { ClubCycle, CyclingCrest, DailyRow, Hero, MenuRow, StartLinks } from './StartHome';
+import { DailyRow, FeaturedCrest, Hero, MenuRow, StartLinks, YouCrest } from './StartHome';
 import { Button, Crest, Pill, SectionTitle, Sheet } from '../ui/components';
 import { FadeIn } from '../ui/motion';
 import { colors, CREST_COLORS, formatMoney } from '../ui/theme';
@@ -101,17 +101,28 @@ export function NewClubScreen() {
 
       {mode === null ? (
         <View style={s.start}>
-          <Hero />
-          <FadeIn delay={60} style={s.menu}>
-            <MenuRow icon={<CyclingCrest />} title="Create your club" onPress={() => setMode('create')} />
-            <MenuRow icon={<ClubCycle />} title="Manage a club" onPress={() => setMode('manage')} />
-            <DailyRow last />
+          <FadeIn from="scale" duration={320} style={s.start}>
+            <Hero />
           </FadeIn>
-          <StartLinks
+          {/* After the logo lands, the menu rows slide in one by one, then the links. */}
+          <View style={s.menu}>
+            <FadeIn delay={650} from="right" distance={48} duration={340}>
+              <MenuRow icon={<YouCrest />} title="Create your club" onPress={() => setMode('create')} />
+            </FadeIn>
+            <FadeIn delay={740} from="right" distance={48} duration={340}>
+              <MenuRow icon={<FeaturedCrest />} title="Manage a club" onPress={() => setMode('manage')} />
+            </FadeIn>
+            <FadeIn delay={830} from="right" distance={48} duration={340}>
+              <DailyRow last />
+            </FadeIn>
+          </View>
+          <FadeIn delay={960} duration={300}>
+            <StartLinks
             onSpin={() => setSpinning(true)}
             onHonours={() => setHonours(true)}
             onAccount={provider ? () => setAccountOpen(true) : undefined}
-          />
+            />
+          </FadeIn>
           <AccountSheet visible={accountOpen} onClose={() => setAccountOpen(false)} />
           <SpinSheet
             visible={spinning}

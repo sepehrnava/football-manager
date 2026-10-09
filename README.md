@@ -95,6 +95,20 @@ Deploy rule changes with `npx firebase-tools deploy --only firestore:rules`.
 Google sign-in needs a development build (`eas build --profile development`, or
 `npx expo run:android`); Expo Go runs the game without the Android account option.
 
+## Ads (AdMob)
+
+S019: a small sponsor bonus and free scouting for rewarded ads, plus one interstitial when a new
+season starts (at most every 10 minutes, never after the first season or in the challenge).
+- **Now (no account needed):** development uses a simulated ad in Expo Go and on web, and
+  Google's test ads in a development build (`eas build --profile development`).
+- **Real ads:** create an AdMob account (admob.google.com), add an Android and an iOS app, and
+  create one *Rewarded* and one *Interstitial* ad unit per platform. Put the IDs into the
+  `EXPO_PUBLIC_ADMOB_*` values (`.env.local` and EAS environment variables, see `.env.example`),
+  set up the EU consent message (Privacy & messaging) and the iOS ATT message, then make a new
+  build. Link each AdMob app to its store listing after release. AdMob pays out, not the stores.
+- Stores: mark "Contains ads" (Play), and declare advertising data in Play Data safety and the
+  App Store privacy answers.
+
 ## Remote updates (EAS Update)
 
 Expo project `@sepehrnava/top-squad`. Builds made with EAS get a channel (`development`,
