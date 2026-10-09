@@ -34,6 +34,10 @@ Updated: 2026-10-09. Replace outdated entries; keep this as a snapshot.
   rows (formation, tactic, finder, league), Staff on the Club tab, one squad list (S016).
 - Crest shapes (shield, round, square, oval) (S017); chemistry links now include each slot's
   nearest player ahead, so centre-backs link to midfield (S011, D010).
+- Optional sign-in (Apple on iOS, Google on Android build) with gzip cloud backup in Firebase
+  Firestore (free plan), restore and account deletion (S018, D012). Firebase project
+  top-squad-fm-97218 is fully set up, Google and Apple sign-in enabled; untested on a device.
+- Remote updates with EAS Update (Expo project @sepehrnava/top-squad, channels per build) (D013).
 - Game rules in src/game (pure TypeScript); screens in src/screens; theme in src/ui.
 - npm lockfile, lint configuration, and setup instructions in README.md.
 - Spec-driven documentation and selective context-reading workflow.
@@ -58,7 +62,7 @@ Updated: 2026-10-09. Replace outdated entries; keep this as a snapshot.
 
 ## Limits and next step
 
-- Next: play a full season on Android (T007, S016-AC05); then gameplay ideas (board goals,
+- Next: an Android development build (EAS) to verify S018 sign-in and backup; play a full season on Android (T007, S016-AC05); then gameplay ideas (board goals,
   rival club, quick decision moments) if the user wants them.
 - Developed on macOS; README setup steps still describe the original Windows setup.
 - Initial npm audit: 23 warnings (7 moderate, 16 high). Historical result, not a fresh audit.

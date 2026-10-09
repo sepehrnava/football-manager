@@ -9,6 +9,8 @@ import { DISCLAIMER } from '../game/leagues';
 import { useCareer, useGame } from '../state/GameContext';
 import { Button, ClubCrest, Sheet } from '../ui/components';
 import { CoinIcon, CrestIcon, PlayIcon, ShirtIcon, TrophyIcon } from '../ui/icons';
+import { useAccount } from '../cloud/AccountContext';
+import { AccountSheet } from './AccountSheet';
 import { FadeIn } from '../ui/motion';
 import { colors, formatMoney, seasonLabel } from '../ui/theme';
 import { ChallengeEndScreen } from './Challenge';
@@ -45,6 +47,7 @@ export function MainScreen() {
   };
   const [sim, setSim] = useState<{ until?: number } | null>(null);
   const [settings, setSettings] = useState(false);
+  const [accountOpen, setAccountOpen] = useState(false);
   const [honours, setHonours] = useState(false);
 
   if (!sim && (state.phase === 'summary' || state.phase === 'gameover')) {
@@ -128,15 +131,25 @@ export function MainScreen() {
       </View>
 
       {sim ? <SimScreen until={sim.until} onClose={() => setSim(null)} /> : null}
-      <SettingsSheet visible={settings} onClose={() => setSettings(false)} />
+      <SettingsSheet visible={settings} onClose={() => setSettings(false)} onAccount={() => setAccountOpen(true)} />
+      <AccountSheet visible={accountOpen} onClose={() => setAccountOpen(false)} />
       <HonoursSheet visible={honours} onClose={() => setHonours(false)} />
     </View>
   );
 }
 
 /** Rarely used options, kept out of the way. */
-function SettingsSheet({ visible, onClose }: { visible: boolean; onClose: () => void }) {
+function SettingsSheet({
+  visible,
+  onClose,
+  onAccount,
+}: {
+  visible: boolean;
+  onClose: () => void;
+  onAccount: () => void;
+}) {
   const { resetCareer, slot, leaveChallenge } = useGame();
+  const { provider } = useAccount();
   const [confirm, setConfirm] = useState(false);
   if (!visible) return null;
   const close = () => {
@@ -156,6 +169,18 @@ function SettingsSheet({ visible, onClose }: { visible: boolean; onClose: () => 
   }
   return (
     <Sheet visible title="Settings" onClose={close}>
+      {provider ? (
+        <View style={s.account}>
+          <Button
+            label="ACCOUNT AND BACKUP"
+            variant="light"
+            onPress={() => {
+              close();
+              onAccount();
+            }}
+          />
+        </View>
+      ) : null}
       <Text style={s.settingsText}>
         Starting a new career deletes this one. You can create a new club or manage another one.
       </Text>
@@ -217,6 +242,7 @@ const s = StyleSheet.create({
   menu: { flexDirection: 'row', gap: 3, alignItems: 'center', justifyContent: 'center', height: 36, paddingLeft: 12 },
   menuDot: { width: 5, height: 5, borderRadius: 2.5, backgroundColor: colors.ink },
   disclaimer: { fontSize: 11, fontWeight: '600', color: colors.muted, lineHeight: 15, marginTop: 20 },
+  account: { marginBottom: 18 },
   settingsText: { fontSize: 14, fontWeight: '600', color: colors.muted, marginBottom: 14, lineHeight: 20 },
   tabs: {
     flexDirection: 'row',

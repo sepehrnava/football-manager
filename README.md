@@ -77,6 +77,32 @@ http://YOUR_WIFI_IP:8081/status
 The correct response is: packager-status:running. If this page does not open, send the error text so the VPN, firewall and network device isolation can be checked. Do not turn off the firewall. If Windows asks for Node.js permission, allow it on trusted networks only.
 According to the official Expo documentation, a tunnel connection can also be used on networks that block communication between devices; it must be prepared and tested separately and has not yet been tested in this setup.
 
+## Cloud save (sign in with Apple / Google)
+
+Firebase project: `top-squad-fm-97218` (account contact@d3studio.co, free Spark plan).
+Already set up from the CLI (S018): web, Android and iOS apps; Firestore database (nam5)
+with `firebase/firestore.rules`; `.env.local` (git-ignored) and the same values as EAS
+environment variables; `google-services.json`; the React Native debug-key SHA-1 for local
+Android development builds.
+
+Google and Apple sign-in are enabled in Authentication (2026-10-10), and the Google *Web
+client* ID is in `EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID` (`.env.local` and EAS). Anonymous sign-in is
+also enabled in the console but unused by the app. After the first EAS Android build, add its SHA-1
+(`eas credentials`) and later the Play Console app-signing SHA-1 to the Firebase Android app.
+iOS needs the Apple Developer account; EAS Build sets the Sign in with Apple capability.
+
+Deploy rule changes with `npx firebase-tools deploy --only firestore:rules`.
+Google sign-in needs a development build (`eas build --profile development`, or
+`npx expo run:android`); Expo Go runs the game without the Android account option.
+
+## Remote updates (EAS Update)
+
+Expo project `@sepehrnava/top-squad`. Builds made with EAS get a channel (`development`,
+`preview`, `production`, see eas.json). JavaScript and asset changes reach installed apps with
+`npx eas-cli update --channel production --environment production --message "…"`; they download
+in the background and apply on the next launch. Native changes (new native packages, app.json
+native settings) need a new store build with a higher `version` (runtime policy `appVersion`).
+
 ## Checks performed
 
 - Installed dependencies with npm and created package-lock.json.

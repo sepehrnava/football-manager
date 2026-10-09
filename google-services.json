@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "418321718874",
+    "project_id": "top-squad-fm-97218",
+    "storage_bucket": "top-squad-fm-97218.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:418321718874:android:748ad840e4c26d7a4d8263",
+        "android_client_info": {
+          "package_name": "com.sepehrnava.topsquad"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "418321718874-j961dn23p1dlcd8loi0khklrbgarstli.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.sepehrnava.topsquad",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
+          "client_id": "418321718874-63vogb32pvqv4sia6pcpapdumqtn2jn9.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDld6W-zc69i9UlCdDzwwI7VFD-1-DQpdc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "418321718874-63vogb32pvqv4sia6pcpapdumqtn2jn9.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "418321718874-chp6hkd4gmqfc8ttmnc305clib60p2rp.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.sepehrnava.topsquad"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -48,6 +48,24 @@ profit only, so a cheap squad can break even anywhere in the table and debt alwa
 to the player's spending. Selling is never blocked; academy call-ups keep the squad legal.
 Revisit if real league finances replace the generated economy.
 
+## D013: Over-the-air updates with EAS Update
+
+Accepted 2026-10-10 at the user's request (update apps without a store release). expo-updates
+with EAS Update on channels `development`, `preview`, `production`; runtime version policy
+`appVersion`, so native changes ship as a new store build with a higher version. Firebase
+settings live in `.env.local` and as EAS environment variables so builds and updates get them.
+
+## D012: Optional sign-in with Firebase cloud save
+
+Accepted for S018 (2026-10-09). The Firebase JS SDK (Auth + Storage) keeps Expo Go working;
+Sign in with Apple on iOS (expo-apple-authentication), Google on Android
+(@react-native-google-signin, loaded only outside Expo Go, so it needs a development build).
+The whole state is gzip-compressed (fflate, about 265 KB per career instead of 1.8 MB) into
+one Firestore document per user (`saves/{uid}`), which keeps the project on the free Spark plan;
+Cloud Storage would need billing for new projects. If a backup ever nears Firestore's 1 MB
+limit, split it across documents. Signing in is optional; without Firebase
+settings the feature hides. Revisit for cross-platform accounts (Google on iOS) or save merging.
+
 ## D011: Vector icons with react-native-svg
 
 Accepted for S016 (2026-10-09): icons drawn from Views and borders looked pixelated at tab-bar

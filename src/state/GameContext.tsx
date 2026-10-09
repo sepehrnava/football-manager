@@ -16,6 +16,7 @@ import { createChallenge, todayKey } from '../game/challenge';
 import { reducer, type Action } from '../game/game';
 import { EMPTY_META, recordChallenge, unlock, type Meta } from '../game/meta';
 import type { GameState } from '../game/types';
+import type { Backup } from '../cloud/backup';
 import { clearGame, loadGame, loadMeta, saveGame, saveMeta, type Slot } from './saveStore';
 
 interface App {
@@ -55,6 +56,10 @@ interface GameContextValue {
   resetCareer: () => void;
   openChallenge: () => Promise<void>;
   leaveChallenge: () => Promise<void>;
+  /** Everything to back up: both saves and the meta. */
+  snapshot: () => Promise<Backup>;
+  /** Replaces this device's saves with a backup and opens its career. */
+  restore: (backup: Backup) => Promise<void>;
 }
 
 const GameContext = createContext<GameContextValue | null>(null);
@@ -133,6 +138,24 @@ export function GameProvider({ children }: { children: ReactNode }) {
     dispatch({ type: 'switch', slot: 'career', game: career });
   };
 
+  const snapshot = async (): Promise<Backup> => {
+    await flush();
+    const career = slot === 'career' ? game : await loadGame('career').catch(() => null);
+    const challenge = slot === 'challenge' ? game : await loadGame('challenge').catch(() => null);
+    return { version: 1, savedAt: Date.now(), career, challenge, meta };
+  };
+
+  const restore = async (backup: Backup) => {
+    latest.current = null;
+    if (backup.career) await saveGame('career', backup.career);
+    else await clearGame('career');
+    if (backup.challenge) await saveGame('challenge', backup.challenge);
+    else await clearGame('challenge');
+    saveMeta(backup.meta);
+    dispatch({ type: 'meta', meta: backup.meta });
+    dispatch({ type: 'switch', slot: 'career', game: backup.career });
+  };
+
   return (
     <GameContext.Provider
       value={{
@@ -145,6 +168,8 @@ export function GameProvider({ children }: { children: ReactNode }) {
         openChallenge,
         leaveChallenge,
         seenAchievement,
+        snapshot,
+        restore,
       }}
     >
       {children}

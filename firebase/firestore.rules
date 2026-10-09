@@ -1,0 +1,12 @@
+rules_version = '2';
+// Each player can only read and write their own backup document.
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /saves/{uid} {
+      allow read, delete: if request.auth != null && request.auth.uid == uid;
+      allow create, update: if request.auth != null && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(['savedAt', 'data'])
+        && request.resource.data.savedAt is int;
+    }
+  }
+}

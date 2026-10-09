@@ -5,6 +5,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { AchievementToast } from './src/screens/Honours';
 import { MainScreen } from './src/screens/MainScreen';
 import { NewClubScreen } from './src/screens/NewClubScreen';
+import { AccountProvider } from './src/cloud/AccountContext';
 import { GameProvider, useGame } from './src/state/GameContext';
 import { colors } from './src/ui/theme';
 
@@ -24,11 +25,13 @@ export default function App() {
   return (
     <SafeAreaProvider>
       <GameProvider>
-        <View style={styles.app}>
-          <Root />
-          <AchievementToast />
-        </View>
-        <StatusBar style="dark" />
+        <AccountProvider>
+          <View style={styles.app}>
+            <Root />
+            <AchievementToast />
+          </View>
+          <StatusBar style="dark" />
+        </AccountProvider>
       </GameProvider>
     </SafeAreaProvider>
   );

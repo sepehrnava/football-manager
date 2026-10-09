@@ -17,6 +17,8 @@ import {
 import type { Crest as CrestData, CrestPattern, CrestShape } from '../game/types';
 import { useGame } from '../state/GameContext';
 import { clubTier, PickedClub, SpinSheet, Stars } from './ClubPick';
+import { useAccount } from '../cloud/AccountContext';
+import { AccountSheet } from './AccountSheet';
 import { HonoursSheet } from './Honours';
 import { ClubCycle, CyclingCrest, DailyRow, Hero, MenuRow, StartLinks } from './StartHome';
 import { Button, Crest, Pill, SectionTitle, Sheet } from '../ui/components';
@@ -75,6 +77,8 @@ export function NewClubScreen() {
   const [country, setCountry] = useState(DEFAULT_COUNTRY);
   const [spinning, setSpinning] = useState(false);
   const [honours, setHonours] = useState(false);
+  const [accountOpen, setAccountOpen] = useState(false);
+  const { provider } = useAccount();
   // Building a career takes a moment on phones: show it, then start on the next frame.
   const [starting, setStarting] = useState(false);
   const start = (action: Parameters<typeof dispatch>[0]) => {
@@ -103,7 +107,12 @@ export function NewClubScreen() {
             <MenuRow icon={<ClubCycle />} title="Manage a club" onPress={() => setMode('manage')} />
             <DailyRow last />
           </FadeIn>
-          <StartLinks onSpin={() => setSpinning(true)} onHonours={() => setHonours(true)} />
+          <StartLinks
+            onSpin={() => setSpinning(true)}
+            onHonours={() => setHonours(true)}
+            onAccount={provider ? () => setAccountOpen(true) : undefined}
+          />
+          <AccountSheet visible={accountOpen} onClose={() => setAccountOpen(false)} />
           <SpinSheet
             visible={spinning}
             onClose={() => setSpinning(false)}

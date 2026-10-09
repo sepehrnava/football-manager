@@ -1,13 +1,15 @@
 {
   "expo": {
     "name": "Top Squad",
-    "slug": "first-expo-app",
+    "slug": "top-squad",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "usesAppleSignIn": true,
+      "bundleIdentifier": "com.sepehrnava.topsquad"
     },
     "android": {
       "adaptiveIcon": {
@@ -16,11 +18,28 @@
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "com.sepehrnava.topsquad"
     },
     "web": {
       "name": "Top Squad: Football Manager",
       "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-apple-authentication",
+      "@react-native-google-signin/google-signin"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "e795ce89-57bd-44d3-bbd0-b2358fdd8445"
+      }
+    },
+    "owner": "sepehrnava",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/e795ce89-57bd-44d3-bbd0-b2358fdd8445"
     }
   }
 }

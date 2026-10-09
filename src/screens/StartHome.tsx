@@ -247,7 +247,16 @@ export function DailyRow({ last, compact }: { last?: boolean; compact?: boolean 
 }
 
 /** Quiet text links under the menu. */
-export function StartLinks({ onSpin, onHonours }: { onSpin: () => void; onHonours: () => void }) {
+export function StartLinks({
+  onSpin,
+  onHonours,
+  onAccount,
+}: {
+  onSpin: () => void;
+  onHonours: () => void;
+  /** Shown only where sign-in is available. */
+  onAccount?: () => void;
+}) {
   return (
     <View style={s.links}>
       <Text style={s.link} onPress={onSpin} accessibilityRole="button">
@@ -257,6 +266,14 @@ export function StartLinks({ onSpin, onHonours }: { onSpin: () => void; onHonour
       <Text style={s.link} onPress={onHonours} accessibilityRole="button">
         Honours
       </Text>
+      {onAccount ? (
+        <>
+          <Text style={s.dot}>·</Text>
+          <Text style={s.link} onPress={onAccount} accessibilityRole="button">
+            Account
+          </Text>
+        </>
+      ) : null}
     </View>
   );
 }
