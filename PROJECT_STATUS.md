@@ -39,7 +39,7 @@ Updated: 2026-10-09. Replace outdated entries; keep this as a snapshot.
 - S004 web flows (scout, reject, counter, sign, free agent, renew, offers): no errors.
 - S005 balance, 30 careers × 6 seasons: frugal/rescue never sacked, reckless sacked
   2/30, smart trading climbs to ~4th. Simplified screens checked in Chrome.
-- Android display not yet observed (S001-AC03, S002-AC08, S003-AC06, S004-AC09, S005-AC08, S011-AC05).
+- Android display not yet observed (S001-AC03, S002-AC08, S003-AC06, S004-AC09, S005-AC08, S011-AC05, S012-AC04).
 - Save format v2: careers saved before S004 start over.
 - 2026-10-09 S010: 12 leagues × 3 clubs with staff wages, 0 sacked; 30 daily challenges
   generated in ~70 ms each; web flows for hiring, challenge, toast, honours, news.

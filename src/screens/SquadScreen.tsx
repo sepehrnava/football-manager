@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { useRef, useState, type ReactNode } from 'react';
+import { Animated, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { BENCH_SIZE, FORMATION_IDS, FORMATIONS, SQUAD_MIN, TACTICS } from '../game/constants';
 import { userClub } from '../game/game';
@@ -18,7 +18,7 @@ import {
   Stat,
   TrendTag,
 } from '../ui/components';
-import { animateNextLayout, FadeIn } from '../ui/motion';
+import { animateNextLayout, usePulse } from '../ui/motion';
 import { colors, lineColors } from '../ui/theme';
 import { ChemistrySheet, LinkLines } from './Chemistry';
 import { PlayerSheet } from './PlayerSheet';
@@ -40,6 +40,8 @@ export function SquadScreen() {
   const [staffOpen, setStaffOpen] = useState(false);
   const [chemOpen, setChemOpen] = useState(false);
   const [pitch, setPitch] = useState({ w: 0, h: 0 });
+  const scroller = useRef<ScrollView>(null);
+  const view = useRef<{ y: number; height: number; wrap?: { y: number; height: number } }>({ y: 0, height: 0 });
 
   const strength = userStrength(state);
   const chemBonus = Math.round((strength.chemistry - 50) / 10);
@@ -59,6 +61,16 @@ export function SquadScreen() {
 
   // Pitch: first tap selects; a second tap on another position swaps them,
   // and a tap after picking a substitute brings that player on.
+  const select = (next: Selection) => {
+    setSel(next);
+    // Keep the bench in view after picking someone on the pitch.
+    const { wrap, height, y } = view.current;
+    if (next?.kind === 'slot' && wrap && height) {
+      const bottom = wrap.y + wrap.height + 12;
+      if (bottom > y + height) scroller.current?.scrollTo({ y: bottom - height, animated: true });
+    }
+  };
+
   const tapSlot = (i: number) => {
     if (sel?.kind === 'player') return assign(i, sel.id);
     if (sel?.kind === 'slot') {
@@ -67,9 +79,9 @@ export function SquadScreen() {
       const to = state.lineup[i];
       if (from) return assign(i, from);
       if (to) return assign(sel.index, to);
-      return setSel({ kind: 'slot', index: i });
+      return select({ kind: 'slot', index: i });
     }
-    setSel({ kind: 'slot', index: i });
+    select({ kind: 'slot', index: i });
   };
 
   const tapPlayer = (id: string) => {
@@ -88,7 +100,13 @@ export function SquadScreen() {
 
   return (
     <View style={s.screen}>
-      <ScrollView contentContainerStyle={[s.content, sel && s.contentWithBar]}>
+      <ScrollView
+        ref={scroller}
+        contentContainerStyle={s.content}
+        onLayout={(e) => (view.current.height = e.nativeEvent.layout.height)}
+        onScroll={(e) => (view.current.y = e.nativeEvent.contentOffset.y)}
+        scrollEventThrottle={32}
+      >
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.pills}>
           {FORMATION_IDS.map((id) => (
             <Pill
@@ -137,6 +155,7 @@ export function SquadScreen() {
 
         <StaffCard onPress={() => setStaffOpen(true)} />
 
+        <View style={s.pitchWrap} onLayout={(e) => (view.current.wrap = e.nativeEvent.layout)}>
         <View style={s.pitch} onLayout={(e) => setPitch({ w: e.nativeEvent.layout.width, h: e.nativeEvent.layout.height })}>
           <View style={s.boxTop} />
           <View style={s.halfway} />
@@ -157,6 +176,7 @@ export function SquadScreen() {
                 }
                 style={[s.token, { left: `${sl.x * 100}%`, top: `${sl.y * 100}%` }]}
               >
+                {selectedSlot === i ? <SelectRing /> : null}
                 {p ? (
                   <>
                     <View
@@ -197,9 +217,45 @@ export function SquadScreen() {
             );
           })}
         </View>
+        <BenchStrip
+          players={[...bench, ...reserves]}
+          benchCount={bench.length}
+          target={targetPos}
+          selectedId={sel?.kind === 'player' ? sel.id : null}
+          onPress={tapPlayer}
+          header={
+            sel ? (
+              <View style={s.benchHead}>
+                <Text style={s.benchHint} numberOfLines={2}>
+                  {sel.kind === 'player'
+                    ? `Bring on ${surname(selectedPlayer?.name ?? '')}: tap a position`
+                    : selectedPlayer
+                      ? `Swap ${surname(selectedPlayer.name)} (${targetPos}): tap a bench player or a position`
+                      : `Fill ${targetPos}: tap a bench player`}
+                </Text>
+                {selectedPlayer ? (
+                  <Pressable onPress={() => setDetail(selectedPlayer.id)} style={s.benchBtn} accessibilityRole="button">
+                    <Text style={s.benchBtnText}>Details</Text>
+                  </Pressable>
+                ) : null}
+                <Pressable
+                  onPress={() => setSel(null)}
+                  style={s.benchBtn}
+                  accessibilityRole="button"
+                  accessibilityLabel="Cancel"
+                >
+                  <Text style={s.benchBtnText}>✕</Text>
+                </Pressable>
+              </View>
+            ) : (
+              <Text style={s.benchTitle}>BENCH · TAP A PLAYER TO SWAP</Text>
+            )
+          }
+        />
+        </View>
         <Text style={s.legend}>
-          Tap a player, then another position or a substitute below to swap. −N = rating lost out of
-          position.
+          Tap a player, then another position or a substitute on the bench to swap. −N = rating lost out
+          of position.
         </Text>
 
         <Button label="AUTO-PICK BEST XI" variant="light" onPress={() => dispatch({ type: 'autoPick' })} />
@@ -241,26 +297,77 @@ export function SquadScreen() {
 
       </ScrollView>
 
-      {sel ? (
-        <FadeIn key={sel.kind === 'slot' ? `s${sel.index}` : sel.id} style={s.bar} distance={20} duration={180}>
-          <Text style={s.barText} numberOfLines={2}>
-            {sel.kind === 'player'
-              ? `Bring on ${surname(selectedPlayer?.name ?? '')}: tap a position on the pitch`
-              : selectedPlayer
-                ? `Swap ${surname(selectedPlayer.name)} (${targetPos}): tap a substitute or another position`
-                : `Fill ${targetPos}: tap a substitute below`}
-          </Text>
-          <View style={s.barButtons}>
-            {selectedPlayer ? (
-              <Button label="DETAILS" variant="light" small onPress={() => setDetail(selectedPlayer.id)} />
-            ) : null}
-            <Button label="CANCEL" variant="light" small onPress={() => setSel(null)} />
-          </View>
-        </FadeIn>
-      ) : null}
-
       <PlayerSheet playerId={detail} mode="squad" onClose={() => setDetail(null)} />
       <StaffSheet visible={staffOpen} onClose={() => setStaffOpen(false)} />
+    </View>
+  );
+}
+
+/** A soft gold ring that pulses around the selected player. */
+function SelectRing() {
+  const pulse = usePulse(true, 1200);
+  const scale = pulse.interpolate({ inputRange: [0, 1], outputRange: [1, 1.18] });
+  const opacity = pulse.interpolate({ inputRange: [0, 1], outputRange: [0.9, 0.35] });
+  return <Animated.View pointerEvents="none" style={[s.ring, { opacity, transform: [{ scale }] }]} />;
+}
+
+/** Subs and reserves on a bench under the pitch: tap one to swap with the selected position. */
+function BenchStrip({
+  players,
+  benchCount,
+  target,
+  selectedId,
+  onPress,
+  header,
+}: {
+  header: ReactNode;
+  players: Player[];
+  benchCount: number;
+  target?: Position;
+  selectedId: string | null;
+  onPress: (id: string) => void;
+}) {
+  const { state } = useCareer();
+  const kit = userClub(state).crest;
+  return (
+    <View style={s.bench}>
+      {header}
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.benchRow}>
+        {players.map((p, i) => {
+          const r = target ? ratingAt(p, target) : p.rating;
+          const drop = p.rating - r;
+          const on = selectedId === p.id;
+          return (
+            <View key={p.id} style={s.benchItem}>
+              {i === benchCount ? <View style={s.benchDivider} /> : null}
+              <Pressable
+                onPress={() => onPress(p.id)}
+                accessibilityRole="button"
+                accessibilityLabel={`Bench ${p.name}`}
+                accessibilityState={{ selected: on }}
+                style={[s.benchToken, i >= benchCount && s.reserve]}
+              >
+                {on ? <SelectRing /> : null}
+                <View style={[s.shirt, s.benchShirt, { backgroundColor: kit.primary, borderColor: kit.secondary }, on && s.selected]}>
+                  <Text style={s.shirtPos}>{p.positions[0]}</Text>
+                </View>
+                <View style={s.tokenBadge}>
+                  <RatingBadge value={r} size={22} tone={target ? penaltyTone(drop) : 'gold'} />
+                </View>
+                {drop > 0 ? (
+                  <View style={[s.fit, s.benchFit, { backgroundColor: fitColor(drop) }]}>
+                    <Text style={s.fitText}>−{drop}</Text>
+                  </View>
+                ) : null}
+                <Text style={s.tokenName} numberOfLines={1}>
+                  {surname(p.name)}
+                </Text>
+                {i === benchCount ? <Text style={s.reserveLabel}>RESERVES</Text> : null}
+              </Pressable>
+            </View>
+          );
+        })}
+      </ScrollView>
     </View>
   );
 }
@@ -317,24 +424,6 @@ const s = StyleSheet.create({
   chemHow: { textAlign: 'center', fontSize: 11, fontWeight: '800', color: colors.green, marginTop: 2 },
   screen: { flex: 1 },
   content: { padding: 16, paddingBottom: 40, gap: 12 },
-  contentWithBar: { paddingBottom: 140 },
-  bar: {
-    position: 'absolute',
-    left: 12,
-    right: 12,
-    bottom: 12,
-    backgroundColor: colors.ink,
-    borderRadius: 20,
-    padding: 14,
-    gap: 10,
-    shadowColor: '#000',
-    shadowOpacity: 0.25,
-    shadowRadius: 10,
-    shadowOffset: { width: 0, height: 4 },
-    elevation: 8,
-  },
-  barText: { color: '#FFFFFF', fontWeight: '800', fontSize: 15 },
-  barButtons: { flexDirection: 'row', gap: 10, justifyContent: 'flex-end' },
   pills: { gap: 8, paddingRight: 8 },
   tactics: {
     flexDirection: 'row',
@@ -349,15 +438,39 @@ const s = StyleSheet.create({
   tacticText: { fontWeight: '800', color: colors.muted },
   tacticTextActive: { color: '#FFFFFF' },
   stats: { flexDirection: 'row', paddingVertical: 12, paddingHorizontal: 4 },
+  pitchWrap: { borderRadius: 22, overflow: 'hidden', borderWidth: 3, borderColor: colors.pitchDark },
   pitch: {
     backgroundColor: colors.pitch,
-    borderRadius: 22,
     aspectRatio: 0.8,
     width: '100%',
     overflow: 'hidden',
-    borderWidth: 3,
-    borderColor: colors.pitchDark,
   },
+  ring: {
+    position: 'absolute',
+    top: -6,
+    left: '50%',
+    marginLeft: -28,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    borderWidth: 4,
+    borderColor: colors.gold,
+    backgroundColor: 'rgba(242,181,68,0.25)',
+  },
+  bench: { backgroundColor: colors.pitchDark, paddingTop: 8, paddingBottom: 10 },
+  benchHead: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 12, minHeight: 30 },
+  benchHint: { flex: 1, color: '#FFFFFF', fontSize: 13, fontWeight: '800' },
+  benchBtn: { paddingHorizontal: 10, height: 30, borderRadius: 15, backgroundColor: 'rgba(255,255,255,0.18)', justifyContent: 'center' },
+  benchBtnText: { color: '#FFFFFF', fontSize: 13, fontWeight: '900' },
+  benchTitle: { color: 'rgba(255,255,255,0.75)', fontSize: 11, fontWeight: '900', letterSpacing: 1.2, paddingHorizontal: 12 },
+  benchRow: { paddingHorizontal: 6, paddingTop: 10, gap: 2 },
+  benchItem: { flexDirection: 'row', alignItems: 'stretch' },
+  benchToken: { width: 72, alignItems: 'center' },
+  benchShirt: { width: 40, height: 40, borderRadius: 20 },
+  benchFit: { top: 24, left: 4 },
+  benchDivider: { width: 2, marginHorizontal: 6, marginVertical: 4, backgroundColor: 'rgba(255,255,255,0.3)', borderRadius: 1 },
+  reserve: { opacity: 0.8 },
+  reserveLabel: { position: 'absolute', top: -12, color: 'rgba(255,255,255,0.6)', fontSize: 8, fontWeight: '900', letterSpacing: 1 },
   boxTop: {
     position: 'absolute',
     top: -3,
@@ -411,7 +524,7 @@ const s = StyleSheet.create({
     textShadowRadius: 2,
     textShadowOffset: { width: 0, height: 1 },
   },
-  selected: { borderColor: colors.gold, transform: [{ scale: 1.08 }] },
+  selected: { borderColor: colors.gold, borderWidth: 4, transform: [{ scale: 1.15 }] },
   tokenBadge: { position: 'absolute', top: -6, right: 6 },
   captain: {
     position: 'absolute',
