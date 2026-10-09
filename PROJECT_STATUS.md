@@ -24,6 +24,8 @@ Updated: 2026-10-09. Replace outdated entries; keep this as a snapshot.
 - Staff (head coach, youth coach, chief scout), a Daily Challenge with streak and share,
   a trophy cabinet with 12 achievements, and a short news feed (S010). The challenge and
   the cross-career meta are saved apart from the career.
+- FIFA-style chemistry links between neighbouring players, shown as coloured lines on the
+  pitch, with an explanation sheet and per-player links (S011).
 - Game rules in src/game (pure TypeScript); screens in src/screens; theme in src/ui.
 - npm lockfile, lint configuration, and setup instructions in README.md.
 - Spec-driven documentation and selective context-reading workflow.
@@ -37,7 +39,7 @@ Updated: 2026-10-09. Replace outdated entries; keep this as a snapshot.
 - S004 web flows (scout, reject, counter, sign, free agent, renew, offers): no errors.
 - S005 balance, 30 careers × 6 seasons: frugal/rescue never sacked, reckless sacked
   2/30, smart trading climbs to ~4th. Simplified screens checked in Chrome.
-- Android display not yet observed (S001-AC03, S002-AC08, S003-AC06, S004-AC09, S005-AC08).
+- Android display not yet observed (S001-AC03, S002-AC08, S003-AC06, S004-AC09, S005-AC08, S011-AC05).
 - Save format v2: careers saved before S004 start over.
 - 2026-10-09 S010: 12 leagues × 3 clubs with staff wages, 0 sacked; 30 daily challenges
   generated in ~70 ms each; web flows for hiring, challenge, toast, honours, news.

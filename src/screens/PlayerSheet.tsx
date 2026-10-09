@@ -6,7 +6,6 @@ import { canTrade, clubById } from '../game/game';
 import { scoutCost } from '../game/staff';
 import { askingPrice, needsCover, quickSalePrice, releaseBlocker } from '../game/market';
 import {
-  chemistry,
   playerValue,
   potentialRange,
   rangeLabel,
@@ -17,8 +16,11 @@ import {
 } from '../game/players';
 import type { Player } from '../game/types';
 import { useCareer } from '../state/GameContext';
-import { Bar, Button, ClubCrest, PosTags, RangeBadge, RatingBadge, Row, Sheet, TrendTag } from '../ui/components';
+import { Button, ClubCrest, PosTags, RangeBadge, RatingBadge, Row, Sheet, TrendTag } from '../ui/components';
 import { FadeIn } from '../ui/motion';
+import { PlayerLinks } from './Chemistry';
+import { lineupLinks } from '../game/links';
+import { starters } from '../game/team';
 import { colors, formatMoney } from '../ui/theme';
 
 /** A squad player (contract, renew, sell) or a market target (scout, negotiate). */
@@ -144,6 +146,10 @@ function MarketView({ player: p, onClose }: { player: Player; onClose: () => voi
       <View style={s.box}>
         <Row label="Price" value={formatMoney(asking)} bold />
         <Row label="Wage" value={`${formatMoney(wage)} per season`} />
+        <Text style={s.hint}>
+          Chemistry: a new signing starts with red links to his teammates, unless they share his country. Links
+          grow with each season together.
+        </Text>
         {scouted ? (
           <Text style={s.hint}>✓ Scouted: rating and potential are exact.</Text>
         ) : (
@@ -203,7 +209,9 @@ function SquadView({ player: p, onClose }: { player: Player; onClose: () => void
   const isCaptain = state.captainId === p.id;
   const sale = quickSalePrice(p);
   const sellBlocked = releaseBlocker(state, p);
-  const chem = chemistry(p);
+  const xi = starters(state.squad, state.lineup);
+  const slot = xi.findIndex((x) => x?.id === p.id);
+  const chem = slot >= 0 ? lineupLinks(xi, state.formation).perSlot[slot] : 0;
 
   return (
     <Sheet
@@ -289,11 +297,9 @@ function SquadView({ player: p, onClose }: { player: Player; onClose: () => void
       </View>
 
       <View style={s.box}>
-        <Row label="Chemistry" value={`${chem}`} />
-        <Bar value={chem} color={chem >= 80 ? colors.green : chem >= 60 ? colors.gold : colors.orange} />
-        <Text style={s.hint}>
-          Chemistry grows with every season at the club. A captain in the XI adds +10 to team chemistry.
-        </Text>
+        <Row label="Chemistry links" value={slot >= 0 ? `${chem}` : '–'} />
+        <PlayerLinks player={p} />
+        {isCaptain ? <Text style={s.hint}>As captain in the XI he adds +10 to team chemistry.</Text> : null}
       </View>
     </Sheet>
   );

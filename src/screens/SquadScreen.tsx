@@ -20,6 +20,7 @@ import {
 } from '../ui/components';
 import { animateNextLayout, FadeIn } from '../ui/motion';
 import { colors, lineColors } from '../ui/theme';
+import { ChemistrySheet, LinkLines } from './Chemistry';
 import { PlayerSheet } from './PlayerSheet';
 import { StaffCard, StaffSheet } from './StaffSheet';
 
@@ -37,8 +38,11 @@ export function SquadScreen() {
   const [sel, setSel] = useState<Selection>(null);
   const [detail, setDetail] = useState<string | null>(null);
   const [staffOpen, setStaffOpen] = useState(false);
+  const [chemOpen, setChemOpen] = useState(false);
+  const [pitch, setPitch] = useState({ w: 0, h: 0 });
 
   const strength = userStrength(state);
+  const chemBonus = Math.round((strength.chemistry - 50) / 10);
   const xi = starters(state.squad, state.lineup);
   const bench = benchFor(state.squad, state.lineup, BENCH_SIZE);
   const reserves = state.squad
@@ -116,16 +120,29 @@ export function SquadScreen() {
           <Stat label="POWER" value={strength.power} />
           <Stat label="ATTACK" value={strength.attack} color={lineColors.AT} />
           <Stat label="DEFENSE" value={strength.defense} color={lineColors.DF} />
-          <Stat label="CHEMISTRY" value={strength.chemistry} color={colors.green} />
+          <Pressable
+            onPress={() => setChemOpen(true)}
+            style={({ pressed }) => [s.chemStat, pressed && { opacity: 0.6 }]}
+            accessibilityRole="button"
+            accessibilityLabel="How chemistry works"
+          >
+            <Stat label="CHEMISTRY" value={strength.chemistry} color={colors.green} />
+            <Text style={s.chemHow}>
+              {chemBonus >= 0 ? '+' : ''}
+              {chemBonus} · how? ›
+            </Text>
+          </Pressable>
         </Card>
+        <ChemistrySheet visible={chemOpen} onClose={() => setChemOpen(false)} />
 
         <StaffCard onPress={() => setStaffOpen(true)} />
 
-        <View style={s.pitch}>
+        <View style={s.pitch} onLayout={(e) => setPitch({ w: e.nativeEvent.layout.width, h: e.nativeEvent.layout.height })}>
           <View style={s.boxTop} />
           <View style={s.halfway} />
           <View style={s.circle} />
           <View style={s.boxBottom} />
+          <LinkLines xi={xi} formation={state.formation} width={pitch.w} height={pitch.h} />
           {formation.slots.map((sl, i) => {
             const p = xi[i];
             const r = p ? ratingAt(p, sl.pos) : 0;
@@ -299,6 +316,8 @@ function PlayerRow({
 const TOKEN_W = 76;
 
 const s = StyleSheet.create({
+  chemStat: { flex: 1 },
+  chemHow: { textAlign: 'center', fontSize: 11, fontWeight: '800', color: colors.green, marginTop: 2 },
   screen: { flex: 1 },
   content: { padding: 16, paddingBottom: 40, gap: 12 },
   contentWithBar: { paddingBottom: 140 },

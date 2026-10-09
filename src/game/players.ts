@@ -41,10 +41,6 @@ export function roundMoney(n: number) {
   return Math.round(n / 5_000) * 5_000;
 }
 
-export function chemistry(p: Pick<Player, 'seasonsAtClub'>) {
-  return Math.min(100, 40 + 20 * p.seasonsAtClub);
-}
-
 export function lineOf(p: Pick<Player, 'positions'>): Line {
   return LINE_OF[p.positions[0]];
 }

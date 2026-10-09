@@ -48,6 +48,13 @@ profit only, so a cheap squad can break even anywhere in the table and debt alwa
 to the player's spending. Selling is never blocked; academy call-ups keep the squad legal.
 Revisit if real league finances replace the generated economy.
 
+## D010: Chemistry from links between neighbours
+
+Accepted for S011 at the user's request (FIFA-style). Chemistry comes from links between
+neighbouring positions: time together at the club and shared nationality. Club and league links
+are left out because every squad player shares them. Team chemistry keeps the old range and
+effect, so balance stays close to the previous rule.
+
 ## D009: Chunked saves
 
 The saved world (about 1.6 MB) is written as 400 KB chunks plus a manifest, because Android's

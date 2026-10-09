@@ -1,5 +1,6 @@
 import { FORMATIONS, SLOT_WEIGHTS, TACTICS } from './constants';
-import { chemistry, clamp, ratingAt } from './players';
+import { chemFromLinks, lineupLinks } from './links';
+import { clamp, ratingAt } from './players';
 import { coachBonus } from './staff';
 import type { FormationId, GameState, Player, Position, Tactic } from './types';
 
@@ -30,7 +31,6 @@ export function teamStrength(
   let attW = 0;
   let def = 0;
   let defW = 0;
-  let chem = 0;
   let filled = 0;
   formation.slots.forEach((slot, i) => {
     const p = xi[i];
@@ -40,13 +40,12 @@ export function teamStrength(
     attW += w.attack;
     def += r * w.defense;
     defW += w.defense;
-    if (p) {
-      chem += chemistry(p);
-      filled += 1;
-    }
+    if (p) filled += 1;
   });
   const captainIn = captainId !== null && xi.some((p) => p?.id === captainId);
-  const teamChem = filled ? clamp(Math.round(chem / filled + (captainIn ? 10 : 0)), 0, 100) : 0;
+  // FIFA-style: chemistry comes from the links between neighbouring starters.
+  const linked = lineupLinks(xi, formationId);
+  const teamChem = filled ? clamp(chemFromLinks(linked.average) + (captainIn ? 10 : 0), 0, 100) : 0;
   const chemBonus = (teamChem - 50) / 10;
   const t = TACTICS[tactic];
   const attack = Math.round(att / attW + formation.bias.attack + t.attack + chemBonus);
@@ -203,4 +202,22 @@ export function benchFor(squad: Player[], lineup: (string | null)[], size: numbe
 
 export function wageBill(squad: Player[]) {
   return squad.reduce((sum, p) => sum + p.contract.wage, 0);
+}
+
+/** What makes up the user's team chemistry, for explaining it on screen. */
+export function chemistryBreakdown(state: GameState) {
+  const xi = starters(state.squad, state.lineup);
+  const { links, average, perSlot } = lineupLinks(xi, state.formation);
+  const captainIn = state.captainId !== null && xi.some((p) => p?.id === state.captainId);
+  const team = userTeam(state).chemistry;
+  return {
+    team,
+    fromLinks: chemFromLinks(average),
+    captainIn,
+    /** Added to both attack and defence. */
+    bonus: Math.round((team - 50) / 10),
+    counts: [0, 1, 2, 3].map((n) => links.filter((l) => l.score === n).length),
+    links,
+    perSlot,
+  };
 }

@@ -43,7 +43,7 @@ export function makeClubSquad(rng: Rng, clubId: string, level: number, nextId: (
       position,
       rating: i < 11 ? level + rng.int(-4, 3) : level - 8 + rng.int(-4, 3),
       age: rng.int(19, 33),
-      seasonsAtClub: rng.int(0, 4),
+      seasonsAtClub: rng.int(2, 4),
       clubId,
     }),
   );
@@ -55,7 +55,7 @@ function fromPack(rng: Rng, id: string, pp: PackPlayer, clubId: string): Player 
     position: pp.positions[0],
     rating: pp.rating,
     age: pp.age,
-    seasonsAtClub: rng.int(0, 4),
+    seasonsAtClub: rng.int(2, 4),
     clubId,
   });
   return {

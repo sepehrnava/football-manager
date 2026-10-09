@@ -28,7 +28,7 @@ report → next season window. State is one `GameState` object saved on the devi
 
 Rules live in `src/game/` (constants in `constants.ts`):
 - Team power: weighted slot ratings → attack and defense, adjusted by formation, tactic
-  and chemistry. Out-of-position players lose 3, 8, 18 or 40 rating.
+  and chemistry (links between neighbours since S011). Out-of-position players lose 3, 8, 18 or 40 rating.
 - Match: Poisson goals from attack vs. defense, home advantage.
 - Money: income = prize by position + fans × $4; costs = wages + $4M fixed + $2M
   stakeholder cashout (+ top-3 bonuses). Below −$5M after a season → sacked.
