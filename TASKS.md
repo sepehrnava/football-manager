@@ -32,7 +32,9 @@ Keep current work and a short completed baseline; avoid session logs.
 | T025: Easier swaps with a bench on the pitch | S012-AC01–AC03 | Done | tsc, lint, web swap flows; Android pending |
 | T026: New club builds its squad from empty | S013-AC01–AC03 | Done | tsc, lint, web flow, headless market balance; Android pending |
 | T027: League stats: scorers, assists, team records | S014-AC01, AC02 | Done | tsc, lint, web screenshots, headless season; Android pending |
-| T028: Simple start screen and random club | S015-AC01–AC04 | Done | tsc, lint, web screenshots and flows; Android pending |
+| T028: Simple start screen and random club | S015-AC01–AC04 | Done | tsc, lint, web screenshots and flows; Android layout seen |
+| T029: Simple in-career screens | S016-AC01–AC04 | Done | tsc, lint, web flows; Android screenshots of all tabs; full Android season pending |
+| T030: Crest shapes; CB–midfield chemistry links | S017-AC01–AC03, S011 | Done | tsc, lint, web and BlueStacks screenshots; chemistry mean 67.2 before and after |
 
 New implementation tasks reference one spec, relevant acceptance IDs, and a concrete check.
 Split work by observable behavior. Candidate ideas do not become authorized tasks automatically.

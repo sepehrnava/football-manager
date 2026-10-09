@@ -14,7 +14,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { LINE_OF } from '../game/constants';
-import type { Club, Crest as CrestData, Position } from '../game/types';
+import type { Club, Crest as CrestData, CrestShape, Position } from '../game/types';
 import { NATIVE, usePressScale } from './motion';
 import { colors, lineColors } from './theme';
 
@@ -104,7 +104,6 @@ export function SectionTitle({ children }: { children: string }) {
   return (
     <View style={styles.section}>
       <Text style={styles.sectionText}>{children}</Text>
-      <View style={styles.sectionLine} />
     </View>
   );
 }
@@ -173,14 +172,24 @@ export function PosTags({ positions, size = 13 }: { positions: Position[]; size?
 }
 
 /** True for colours where dark text reads better than white. */
-function isLight(hex: string) {
+export function isLight(hex: string) {
   const n = parseInt(hex.replace('#', '').padEnd(6, '0').slice(0, 6), 16);
   const [r, g, b] = [(n >> 16) & 255, (n >> 8) & 255, n & 255];
   return 0.299 * r + 0.587 * g + 0.114 * b > 170;
 }
 
+/** Height and corner radii of each crest outline; all fit the same size × 1.15 box. */
+function crestOutline(shape: CrestShape | undefined, size: number) {
+  const box = size * 1.15;
+  if (shape === 'round') return { h: size, top: size / 2, bottom: size / 2, box };
+  if (shape === 'square') return { h: size, top: size * 0.22, bottom: size * 0.22, box };
+  if (shape === 'oval') return { h: box, top: size / 2, bottom: size / 2, box };
+  return { h: box, top: size * 0.2, bottom: size * 0.5, box };
+}
+
 export function Crest({ crest, short, size = 40 }: { crest: CrestData; short?: string; size?: number }) {
-  const h = size * 1.15;
+  const o = crestOutline(crest.shape, size);
+  const h = o.h;
   // The initials sit on the band, or on the main colour; mixed patterns get an outline.
   const behind = crest.pattern === 'band' ? crest.secondary : crest.primary;
   const plain = crest.pattern === 'solid' || crest.pattern === 'band';
@@ -192,10 +201,11 @@ export function Crest({ crest, short, size = 40 }: { crest: CrestData; short?: s
         {
           width: size,
           height: h,
-          borderTopLeftRadius: size * 0.2,
-          borderTopRightRadius: size * 0.2,
-          borderBottomLeftRadius: size * 0.5,
-          borderBottomRightRadius: size * 0.5,
+          marginVertical: (o.box - h) / 2,
+          borderTopLeftRadius: o.top,
+          borderTopRightRadius: o.top,
+          borderBottomLeftRadius: o.bottom,
+          borderBottomRightRadius: o.bottom,
           borderWidth: Math.max(1.5, size * 0.05),
           backgroundColor: crest.primary,
         },
@@ -224,16 +234,22 @@ export function Crest({ crest, short, size = 40 }: { crest: CrestData; short?: s
           ]}
         />
       )}
-      {short && size >= 28 ? (
+      {short ? (
         <Text
           numberOfLines={1}
           style={[
             styles.crestText,
             {
-              fontSize: size * 0.3,
+              // Small crests get relatively larger, tighter text so the code stays readable.
+              fontSize: size < 32 ? size * 0.34 : size * 0.3,
+              letterSpacing: size < 32 ? -0.4 : 0,
+              // Wider than the crest and centred: a wide code (WHU) is trimmed at the edge, never "W…".
+              width: size * 1.4,
+              textAlign: 'center',
               color: dark ? colors.ink : '#FFFFFF',
             },
             !dark && styles.crestOutline,
+            !dark && size < 32 && { textShadowRadius: 1.5, textShadowColor: 'rgba(0,0,0,0.9)' },
           ]}
         >
           {short}
@@ -334,14 +350,87 @@ export function Sheet({
   );
 }
 
+/** A small button that shows the current choice and opens a list of options. */
+export function PickerButton({
+  label,
+  value,
+  onPress,
+  style,
+}: {
+  label: string;
+  value: string;
+  onPress: () => void;
+  style?: StyleProp<ViewStyle>;
+}) {
+  return (
+    <Pressable
+      onPress={onPress}
+      accessibilityRole="button"
+      accessibilityLabel={`${label}: ${value}`}
+      style={({ pressed }) => [styles.picker, pressed && { opacity: 0.6 }, style]}
+    >
+      <Text style={styles.pickerLabel}>{label}</Text>
+      <Text style={styles.pickerValue} numberOfLines={1}>
+        {value}
+      </Text>
+    </Pressable>
+  );
+}
+
+/** A sheet with a plain list of options; the current one is ticked. Picking closes it. */
+export function OptionSheet<T extends string>({
+  visible,
+  title,
+  options,
+  value,
+  onPick,
+  onClose,
+}: {
+  visible: boolean;
+  title: string;
+  options: { id: T; label: string; note?: string }[];
+  value: T;
+  onPick: (id: T) => void;
+  onClose: () => void;
+}) {
+  if (!visible) return null;
+  return (
+    <Sheet visible title={title} onClose={onClose}>
+      {options.map((o, i) => (
+        <Pressable
+          key={o.id}
+          onPress={() => {
+            onPick(o.id);
+            onClose();
+          }}
+          accessibilityRole="button"
+          accessibilityState={{ selected: o.id === value }}
+          style={({ pressed }) => [styles.option, i > 0 && styles.optionLine, pressed && { opacity: 0.6 }]}
+        >
+          <View style={{ flex: 1 }}>
+            <Text style={[styles.optionLabel, o.id === value && { color: colors.green }]}>{o.label}</Text>
+            {o.note ? <Text style={styles.optionNote}>{o.note}</Text> : null}
+          </View>
+          {o.id === value ? <Text style={styles.optionTick}>✓</Text> : null}
+        </Pressable>
+      ))}
+    </Sheet>
+  );
+}
+
 export const styles = StyleSheet.create({
+  picker: { backgroundColor: colors.card, borderRadius: 14, paddingHorizontal: 12, paddingVertical: 8 },
+  pickerLabel: { fontSize: 10, fontWeight: '900', letterSpacing: 1, color: colors.muted },
+  pickerValue: { fontSize: 16, fontWeight: '900', color: colors.ink },
+  option: { flexDirection: 'row', alignItems: 'center', paddingVertical: 14 },
+  optionLine: { borderTopWidth: 1, borderTopColor: colors.border },
+  optionLabel: { fontSize: 17, fontWeight: '800', color: colors.ink },
+  optionNote: { fontSize: 13, fontWeight: '600', color: colors.muted, marginTop: 2 },
+  optionTick: { fontSize: 18, fontWeight: '900', color: colors.green },
+  // Flat white panel: no outline or thick edge, so screens stay calm.
   card: {
     backgroundColor: colors.card,
-    borderRadius: 20,
-    borderWidth: 2,
-    borderColor: colors.border,
-    borderBottomWidth: 5,
-    borderBottomColor: colors.borderDark,
+    borderRadius: 18,
     padding: 16,
   },
   button: {
@@ -364,15 +453,12 @@ export const styles = StyleSheet.create({
     borderRadius: 999,
     borderWidth: 2,
     borderColor: colors.border,
-    borderBottomWidth: 4,
-    borderBottomColor: colors.borderDark,
     backgroundColor: colors.card,
   },
-  pillActive: { borderColor: colors.ink, borderBottomColor: colors.ink },
+  pillActive: { borderColor: colors.ink },
   pillText: { fontSize: 15, fontWeight: '800' },
-  section: { flexDirection: 'row', alignItems: 'center', gap: 12, marginTop: 22, marginBottom: 10 },
-  sectionText: { fontSize: 13, fontWeight: '800', letterSpacing: 2, color: colors.muted },
-  sectionLine: { flex: 1, height: 2, backgroundColor: colors.border, borderRadius: 1 },
+  section: { marginTop: 22, marginBottom: 8 },
+  sectionText: { fontSize: 12, fontWeight: '900', letterSpacing: 1.5, color: colors.muted },
   rating: {
     alignItems: 'center',
     justifyContent: 'center',

@@ -16,7 +16,7 @@ export function CupCard({ cup }: { cup: Cup }) {
   return (
     <Card style={s.card}>
       <View style={s.head}>
-        <Text style={s.title}>🏆 {cup.name}</Text>
+        <Text style={s.title}>{cup.name}</Text>
         <Text style={[s.badge, mine ? s.badgeIn : null]}>
           {!mine ? 'Not qualified' : mine.champion ? 'Winners!' : mine.out ? 'Knocked out' : 'You are in'}
         </Text>

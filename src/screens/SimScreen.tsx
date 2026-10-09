@@ -95,8 +95,8 @@ export function SimScreen({ until: initialUntil, onClose }: { until?: number; on
           {stopText ? (
             <View style={s.spacer} />
           ) : (
-            <Pressable onPress={skip} style={s.close} accessibilityLabel="Skip to the end">
-              <Text style={s.closeText}>⏭</Text>
+            <Pressable onPress={skip} style={[s.close, s.skip]} accessibilityRole="button" accessibilityLabel="Skip to the end">
+              <Text style={s.closeText}>Skip</Text>
             </Pressable>
           )}
         </View>
@@ -158,9 +158,9 @@ export function SimScreen({ until: initialUntil, onClose }: { until?: number; on
           ) : reached ? (
             <Button label="DONE" variant="green" onPress={onClose} />
           ) : active ? (
-            <Button label="⏸  PAUSE" variant="light" onPress={() => setRunning(false)} />
+            <Button label="PAUSE" variant="light" onPress={() => setRunning(false)} />
           ) : (
-            <Button label="▶  CONTINUE" variant="green" onPress={playOn} />
+            <Button label="CONTINUE" variant="green" onPress={playOn} />
           )}
         </View>
       </View>
@@ -250,7 +250,7 @@ function MyMatch({ fixture }: { fixture: Fixture }) {
         </View>
       </View>
       {r.scorers?.length ? (
-        <Text style={s.scorers}>⚽ {r.scorers.map(surname).join(', ')}</Text>
+        <Text style={s.scorers}>Goals: {r.scorers.map(surname).join(', ')}</Text>
       ) : null}
     </Card>
   );
@@ -293,6 +293,7 @@ const s = StyleSheet.create({
     justifyContent: 'center',
   },
   closeText: { fontSize: 15, fontWeight: '900', color: colors.muted },
+  skip: { width: undefined, paddingHorizontal: 14 },
   content: { gap: 12, paddingBottom: 12 },
   offer: { backgroundColor: colors.ink, borderRadius: 20, padding: 16, gap: 8 },
   offerTop: { flexDirection: 'row', alignItems: 'center', gap: 12 },

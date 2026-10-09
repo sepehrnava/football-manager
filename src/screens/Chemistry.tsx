@@ -1,4 +1,5 @@
 import { StyleSheet, Text, View } from 'react-native';
+import Svg, { Line } from 'react-native-svg';
 
 import { formationLinks, linkScore } from '../game/links';
 import { surname } from '../game/players';
@@ -15,7 +16,7 @@ export function linkColor(score: number) {
   return score >= 2 ? colors.green : score === 1 ? colors.orange : RED;
 }
 
-/** Coloured lines between neighbouring starters, drawn under the player tokens. */
+/** Thin dashed lines between neighbouring starters, drawn under the player tokens. */
 export function LinkLines({
   xi,
   formation,
@@ -30,34 +31,22 @@ export function LinkLines({
   if (!width || !height) return null;
   const slots = FORMATIONS[formation].slots;
   return (
-    <View pointerEvents="none" style={StyleSheet.absoluteFill}>
-      {formationLinks(formation).map(([a, b]) => {
-        const score = linkScore(xi[a], xi[b]);
-        const x1 = slots[a].x * width;
-        const y1 = slots[a].y * height;
-        const x2 = slots[b].x * width;
-        const y2 = slots[b].y * height;
-        const length = Math.hypot(x2 - x1, y2 - y1);
-        const angle = Math.atan2(y2 - y1, x2 - x1);
-        const thick = score === 3 ? 5 : 4;
-        return (
-          <View
-            key={`${a}-${b}`}
-            style={{
-              position: 'absolute',
-              left: (x1 + x2) / 2 - length / 2,
-              top: (y1 + y2) / 2 - thick / 2,
-              width: length,
-              height: thick,
-              borderRadius: thick / 2,
-              backgroundColor: linkColor(score),
-              opacity: xi[a] && xi[b] ? 0.95 : 0.35,
-              transform: [{ rotate: `${angle}rad` }],
-            }}
-          />
-        );
-      })}
-    </View>
+    <Svg pointerEvents="none" style={StyleSheet.absoluteFill} width={width} height={height}>
+      {formationLinks(formation).map(([a, b]) => (
+        <Line
+          key={`${a}-${b}`}
+          x1={slots[a].x * width}
+          y1={slots[a].y * height}
+          x2={slots[b].x * width}
+          y2={slots[b].y * height}
+          stroke={linkColor(linkScore(xi[a], xi[b]))}
+          strokeWidth={2}
+          strokeDasharray="6 5"
+          strokeLinecap="round"
+          strokeOpacity={xi[a] && xi[b] ? 0.85 : 0.3}
+        />
+      ))}
+    </Svg>
   );
 }
 

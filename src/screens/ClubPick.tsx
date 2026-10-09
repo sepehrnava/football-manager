@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 import { clubCrest, clubEconomy } from '../game/game';
-import { compName, divisionsIn, flagOf, LEAGUE } from '../game/leagues';
+import { compName, divisionsIn, LEAGUE } from '../game/leagues';
 import { Button, Crest, Pill, Sheet } from '../ui/components';
 import { FadeIn } from '../ui/motion';
 import { colors, formatMoney } from '../ui/theme';
@@ -44,7 +44,7 @@ export function PickedClub({ index }: { index: number }) {
     <View style={s.picked}>
       <Crest crest={clubCrest(index)} short={c.short} size={72} />
       <Text style={s.pickedMeta}>
-        {flagOf(c.country)} {compName({ country: c.country, division: c.division })}
+        {compName({ country: c.country, division: c.division })}
       </Text>
       <Stars count={tier.stars} />
       <View style={s.pickedStats}>
@@ -74,10 +74,12 @@ export function SpinSheet({
   visible,
   onClose,
   onManage,
+  starting,
 }: {
   visible: boolean;
   onClose: () => void;
   onManage: (index: number) => void;
+  starting?: boolean;
 }) {
   const [filter, setFilter] = useState<(typeof FILTERS)[number]>('Any');
   const [shown, setShown] = useState<number | null>(null);
@@ -156,7 +158,11 @@ export function SpinSheet({
       <View style={s.spinActions}>
         {landed && shown !== null ? (
           <>
-            <Button label={`MANAGE ${club!.name.toUpperCase()}`} variant="green" onPress={() => onManage(shown)} />
+            <Button
+              label={starting ? 'STARTING…' : `MANAGE ${club!.name.toUpperCase()}`}
+              variant="green"
+              onPress={() => onManage(shown)}
+            />
             <Button label="SPIN AGAIN" variant="light" onPress={spin} />
           </>
         ) : (

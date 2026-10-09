@@ -33,6 +33,8 @@ or hosting. These are not approved features.
 | S013 | [Build your squad (new club)](specs/013-build-your-squad.md) | Implemented; device observation pending |
 | S014 | [League stats](specs/014-league-stats.md) | Implemented; device observation pending |
 | S015 | [Simple start screen and random club](specs/015-start-screen.md) | Implemented; device observation pending |
+| S016 | [Simple in-career screens](specs/016-simple-career-screens.md) | Implemented; Android partly observed |
+| S017 | [Crest shapes](specs/017-crest-shapes.md) | Implemented; Android observed |
 
 Use [the template](specs/_template.md) for the next feature. Number specs sequentially.
 Keep IDs stable; criteria use S002-AC01 style IDs referenced by tasks and evidence.

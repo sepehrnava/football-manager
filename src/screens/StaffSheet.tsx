@@ -5,7 +5,7 @@ import { canTrade } from '../game/game';
 import { hireCost, ROLE_INFO, STAFF_ROLES, staffEffect } from '../game/staff';
 import type { Staff, StaffRole } from '../game/types';
 import { useCareer } from '../state/GameContext';
-import { Button, Card, Sheet } from '../ui/components';
+import { Button, Sheet } from '../ui/components';
 import { colors, formatMoney } from '../ui/theme';
 
 export function Stars({ n, size = 13 }: { n: number; size?: number }) {
@@ -14,28 +14,6 @@ export function Stars({ n, size = 13 }: { n: number; size?: number }) {
       {'★'.repeat(n)}
       <Text style={{ color: colors.border }}>{'★'.repeat(5 - n)}</Text>
     </Text>
-  );
-}
-
-/** One-row staff overview for the Squad tab: each role's stars. */
-export function StaffCard({ onPress }: { onPress: () => void }) {
-  const { state } = useCareer();
-  return (
-    <Pressable onPress={onPress} accessibilityRole="button" accessibilityLabel="Staff">
-      <Card style={s.card}>
-        <Text style={s.cardTitle}>Staff</Text>
-        {STAFF_ROLES.map((role) => {
-          const st = state.staff?.[role];
-          return (
-            <View key={role} style={s.chip}>
-              <Text style={s.lineIcon}>{ROLE_INFO[role].icon}</Text>
-              {st ? <Stars n={st.stars} size={11} /> : <Text style={s.muted}>–</Text>}
-            </View>
-          );
-        })}
-        <Text style={s.cardLink}>›</Text>
-      </Card>
-    </Pressable>
   );
 }
 
@@ -54,7 +32,7 @@ export function StaffSheet({ visible, onClose }: { visible: boolean; onClose: ()
         {STAFF_ROLES.map((r) => (
           <Pressable key={r} onPress={() => setRole(r)} style={[s.tab, role === r && s.tabOn]} accessibilityRole="tab">
             <Text style={[s.tabText, role === r && s.tabTextOn]}>
-              {ROLE_INFO[r].icon} {ROLE_INFO[r].title}
+              {ROLE_INFO[r].title}
             </Text>
           </Pressable>
         ))}
@@ -79,10 +57,7 @@ export function StaffSheet({ visible, onClose }: { visible: boolean; onClose: ()
           </StaffRow>
         );
       })}
-      <Text style={s.hint}>
-        Hiring costs one season of wages up front, plus half a season to release the person you replace. Wages are
-        paid every season.
-      </Text>
+      <Text style={s.hint}>Hiring costs a season of wages up front.</Text>
     </Sheet>
   );
 }
@@ -104,11 +79,6 @@ function StaffRow({ staff, children }: { staff: Staff; children?: ReactNode }) {
 }
 
 const s = StyleSheet.create({
-  card: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 10 },
-  cardTitle: { flex: 1, fontSize: 16, fontWeight: '900', color: colors.ink },
-  cardLink: { fontSize: 20, fontWeight: '900', color: colors.muted },
-  chip: { flexDirection: 'row', alignItems: 'center', gap: 3 },
-  lineIcon: { fontSize: 14 },
   tabs: { flexDirection: 'row', gap: 6, marginBottom: 8 },
   tab: { flex: 1, paddingVertical: 8, borderRadius: 12, alignItems: 'center', backgroundColor: colors.faint },
   tabOn: { backgroundColor: colors.ink },
@@ -120,12 +90,9 @@ const s = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10,
-    backgroundColor: colors.card,
-    borderRadius: 16,
-    borderWidth: 2,
-    borderColor: colors.border,
-    padding: 12,
-    marginBottom: 8,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
   },
   rowMain: { flex: 1, gap: 2 },
   name: { fontSize: 15, fontWeight: '900', color: colors.ink },

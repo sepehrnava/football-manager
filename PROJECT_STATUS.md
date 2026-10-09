@@ -30,6 +30,10 @@ Updated: 2026-10-09. Replace outdated entries; keep this as a snapshot.
   league stats (scorers, assists, team records) on the League tab (S014); swaps via a bench strip (S012).
 - Simple start screen: upright pitch with faint players and a 3D logo, three plain rows
   with animated icons, Random club (difficulty + slot-machine roll) and Honours links (S015).
+- Simple in-career screens: flat panels, no emoji icons, short text, pickers instead of chip
+  rows (formation, tactic, finder, league), Staff on the Club tab, one squad list (S016).
+- Crest shapes (shield, round, square, oval) (S017); chemistry links now include each slot's
+  nearest player ahead, so centre-backs link to midfield (S011, D010).
 - Game rules in src/game (pure TypeScript); screens in src/screens; theme in src/ui.
 - npm lockfile, lint configuration, and setup instructions in README.md.
 - Spec-driven documentation and selective context-reading workflow.
@@ -43,7 +47,7 @@ Updated: 2026-10-09. Replace outdated entries; keep this as a snapshot.
 - S004 web flows (scout, reject, counter, sign, free agent, renew, offers): no errors.
 - S005 balance, 30 careers × 6 seasons: frugal/rescue never sacked, reckless sacked
   2/30, smart trading climbs to ~4th. Simplified screens checked in Chrome.
-- Android display not yet observed (S001-AC03, S002-AC08, S003-AC06, S004-AC09, S005-AC08, S011-AC05, S012-AC04, S013-AC04, S014-AC03, S015-AC05).
+- Android display not yet observed (S001-AC03, S002-AC08, S003-AC06, S004-AC09, S005-AC08, S011-AC05, S012-AC04, S013-AC04, S014-AC03, S015-AC05, S016-AC05).
 - 2026-10-09 S015: start screen web flows (create, manage, daily, honours, random club by
   difficulty → career started); 0 console errors on a fresh load. Start screen layout seen
   on BlueStacks via adb screenshot (S015-AC05 partly); Expo Go on BlueStacks works with
@@ -54,8 +58,8 @@ Updated: 2026-10-09. Replace outdated entries; keep this as a snapshot.
 
 ## Limits and next step
 
-- Next: continue the simple UI pass on the in-career screens (Club, Squad, Transfers,
-  League); confirm on Android (T007).
+- Next: play a full season on Android (T007, S016-AC05); then gameplay ideas (board goals,
+  rival club, quick decision moments) if the user wants them.
 - Developed on macOS; README setup steps still describe the original Windows setup.
 - Initial npm audit: 23 warnings (7 moderate, 16 high). Historical result, not a fresh audit.
 - Work queue: [TASKS.md](TASKS.md). Product scope: [SPECS.md](SPECS.md).

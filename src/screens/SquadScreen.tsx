@@ -1,17 +1,16 @@
 import { useRef, useState, type ReactNode } from 'react';
 import { Animated, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
-import { BENCH_SIZE, FORMATION_IDS, FORMATIONS, SQUAD_MIN, TACTICS } from '../game/constants';
+import { BENCH_SIZE, FORMATION_IDS, FORMATIONS, TACTICS } from '../game/constants';
 import { userClub } from '../game/game';
 import { lineOf, ratingAt, surname, trend } from '../game/players';
 import { benchFor, starters, userStrength } from '../game/team';
 import type { Player, Position, Tactic } from '../game/types';
 import { useCareer } from '../state/GameContext';
 import {
-  Button,
-  Card,
+  OptionSheet,
   penaltyTone,
-  Pill,
+  PickerButton,
   PosTags,
   RatingBadge,
   SectionTitle,
@@ -23,9 +22,14 @@ import { colors, lineColors } from '../ui/theme';
 import { BuildSquadCard } from './BuildSquad';
 import { ChemistrySheet, LinkLines } from './Chemistry';
 import { PlayerSheet } from './PlayerSheet';
-import { StaffCard, StaffSheet } from './StaffSheet';
 
 const LINE_ORDER = { GK: 0, DF: 1, MD: 2, AT: 3 };
+
+const TACTIC_NOTE: Record<Tactic, string> = {
+  defensive: 'Harder to beat, scores less',
+  balanced: 'No change',
+  attacking: 'Scores more, concedes more',
+};
 
 /** What the user tapped first: a position on the pitch or a player in a list. */
 type Selection = { kind: 'slot'; index: number } | { kind: 'player'; id: string } | null;
@@ -38,8 +42,8 @@ export function SquadScreen({ onFindPlayers }: { onFindPlayers: () => void }) {
   const { state, dispatch } = useCareer();
   const [sel, setSel] = useState<Selection>(null);
   const [detail, setDetail] = useState<string | null>(null);
-  const [staffOpen, setStaffOpen] = useState(false);
   const [chemOpen, setChemOpen] = useState(false);
+  const [picker, setPicker] = useState<'formation' | 'tactic' | null>(null);
   const [pitch, setPitch] = useState({ w: 0, h: 0 });
   const scroller = useRef<ScrollView>(null);
   const view = useRef<{ y: number; height: number; wrap?: { y: number; height: number } }>({ y: 0, height: 0 });
@@ -52,6 +56,9 @@ export function SquadScreen({ onFindPlayers }: { onFindPlayers: () => void }) {
     .filter((p) => !state.lineup.includes(p.id) && !bench.includes(p))
     .sort((a, b) => LINE_ORDER[lineOf(a)] - LINE_ORDER[lineOf(b)] || b.rating - a.rating);
   const formation = FORMATIONS[state.formation];
+  const allPlayers = [...state.squad].sort(
+    (a, b) => LINE_ORDER[lineOf(a)] - LINE_ORDER[lineOf(b)] || b.rating - a.rating,
+  );
   const kit = userClub(state).crest;
 
   const assign = (slot: number, playerId: string) => {
@@ -109,34 +116,35 @@ export function SquadScreen({ onFindPlayers }: { onFindPlayers: () => void }) {
         scrollEventThrottle={32}
       >
         <BuildSquadCard onFindPlayers={onFindPlayers} />
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.pills}>
-          {FORMATION_IDS.map((id) => (
-            <Pill
-              key={id}
-              label={id}
-              active={state.formation === id}
-              onPress={() => dispatch({ type: 'formation', formation: id })}
-            />
-          ))}
-        </ScrollView>
-
-        <View style={s.tactics}>
-          {(Object.keys(TACTICS) as Tactic[]).map((t) => (
-            <Pressable
-              key={t}
-              onPress={() => dispatch({ type: 'tactic', tactic: t })}
-              style={[s.tactic, state.tactic === t && s.tacticActive]}
-              accessibilityRole="button"
-              accessibilityState={{ selected: state.tactic === t }}
-            >
-              <Text style={[s.tacticText, state.tactic === t && s.tacticTextActive]}>
-                {TACTICS[t].label}
-              </Text>
-            </Pressable>
-          ))}
+        <View style={s.controls}>
+          <PickerButton label="FORMATION" value={state.formation} onPress={() => setPicker('formation')} style={s.flex} />
+          <PickerButton label="TACTIC" value={TACTICS[state.tactic].label} onPress={() => setPicker('tactic')} style={s.flex} />
+          <Pressable
+            onPress={() => dispatch({ type: 'autoPick' })}
+            accessibilityRole="button"
+            style={({ pressed }) => [s.best, pressed && { opacity: 0.6 }]}
+          >
+            <Text style={s.bestText}>Best XI</Text>
+          </Pressable>
         </View>
+        <OptionSheet
+          visible={picker === 'formation'}
+          title="Formation"
+          options={FORMATION_IDS.map((id) => ({ id, label: id }))}
+          value={state.formation}
+          onPick={(id) => dispatch({ type: 'formation', formation: id })}
+          onClose={() => setPicker(null)}
+        />
+        <OptionSheet
+          visible={picker === 'tactic'}
+          title="Tactic"
+          options={(Object.keys(TACTICS) as Tactic[]).map((id) => ({ id, label: TACTICS[id].label, note: TACTIC_NOTE[id] }))}
+          value={state.tactic}
+          onPick={(id) => dispatch({ type: 'tactic', tactic: id })}
+          onClose={() => setPicker(null)}
+        />
 
-        <Card style={s.stats}>
+        <View style={s.stats}>
           <Stat label="POWER" value={strength.power} />
           <Stat label="ATTACK" value={strength.attack} color={lineColors.AT} />
           <Stat label="DEFENSE" value={strength.defense} color={lineColors.DF} />
@@ -149,13 +157,11 @@ export function SquadScreen({ onFindPlayers }: { onFindPlayers: () => void }) {
             <Stat label="CHEMISTRY" value={strength.chemistry} color={colors.green} />
             <Text style={s.chemHow}>
               {chemBonus >= 0 ? '+' : ''}
-              {chemBonus} · how? ›
+              {chemBonus} power ›
             </Text>
           </Pressable>
-        </Card>
+        </View>
         <ChemistrySheet visible={chemOpen} onClose={() => setChemOpen(false)} />
-
-        <StaffCard onPress={() => setStaffOpen(true)} />
 
         <View style={s.pitchWrap} onLayout={(e) => (view.current.wrap = e.nativeEvent.layout)}>
         <View style={s.pitch} onLayout={(e) => setPitch({ w: e.nativeEvent.layout.width, h: e.nativeEvent.layout.height })}>
@@ -250,57 +256,27 @@ export function SquadScreen({ onFindPlayers }: { onFindPlayers: () => void }) {
                 </Pressable>
               </View>
             ) : (
-              <Text style={s.benchTitle}>BENCH · TAP A PLAYER TO SWAP</Text>
+              <Text style={s.benchTitle}>BENCH · TAP TO SWAP</Text>
             )
           }
         />
         </View>
-        <Text style={s.legend}>
-          Tap a player, then another position or a substitute on the bench to swap. −N = rating lost out
-          of position.
-        </Text>
-
-        <Button label="AUTO-PICK BEST XI" variant="light" onPress={() => dispatch({ type: 'autoPick' })} />
-
-        <SectionTitle>{`SUBSTITUTES · ${bench.length}/${BENCH_SIZE}`}</SectionTitle>
-        <Card style={s.list}>
-          {bench.map((p, i) => (
+        <SectionTitle>{`PLAYERS · ${state.squad.length}`}</SectionTitle>
+        <View>
+          {allPlayers.map((p, i) => (
             <PlayerRow
               key={p.id}
               player={p}
-              last={i === bench.length - 1}
-              target={targetPos}
-              selected={sel?.kind === 'player' && sel.id === p.id}
-              onPress={() => tapPlayer(p.id)}
+              role={state.lineup.includes(p.id) ? 'XI' : bench.includes(p) ? 'Sub' : undefined}
+              last={i === allPlayers.length - 1}
+              onPress={() => setDetail(p.id)}
             />
           ))}
-        </Card>
-        <Text style={s.legend}>
-          {`You always have at least ${SQUAD_MIN} players (11 starters + ${BENCH_SIZE} subs). Sell someone and an academy youngster fills the gap.`}
-        </Text>
-
-        {reserves.length ? (
-          <>
-            <SectionTitle>{`OUTSIDE MATCHDAY SQUAD · ${reserves.length}`}</SectionTitle>
-            <Card style={s.list}>
-              {reserves.map((p, i) => (
-                <PlayerRow
-                  key={p.id}
-                  player={p}
-                  last={i === reserves.length - 1}
-                  target={targetPos}
-                  selected={sel?.kind === 'player' && sel.id === p.id}
-                  onPress={() => tapPlayer(p.id)}
-                />
-              ))}
-            </Card>
-          </>
-        ) : null}
+        </View>
 
       </ScrollView>
 
       <PlayerSheet playerId={detail} mode="squad" onClose={() => setDetail(null)} />
-      <StaffSheet visible={staffOpen} onClose={() => setStaffOpen(false)} />
     </View>
   );
 }
@@ -374,29 +350,25 @@ function BenchStrip({
   );
 }
 
+/** One squad player; tapping opens their details. */
 function PlayerRow({
   player,
+  role,
   onPress,
   last,
-  target,
-  selected,
 }: {
   player: Player;
+  /** In the starting XI or on the bench. */
+  role?: 'XI' | 'Sub';
   onPress: () => void;
   last?: boolean;
-  /** When a pitch position is selected, preview the rating there. */
-  target?: Position;
-  selected?: boolean;
 }) {
-  const r = target ? ratingAt(player, target) : player.rating;
-  const drop = player.rating - r;
   return (
     <Pressable
       onPress={onPress}
       accessibilityRole="button"
       accessibilityLabel={`Squad player ${player.name}`}
-      accessibilityState={{ selected: !!selected }}
-      style={({ pressed }) => [s.row, !last && s.rowBorder, selected && s.rowSelected, pressed && s.rowPressed]}
+      style={({ pressed }) => [s.row, !last && s.rowBorder, pressed && s.rowPressed]}
     >
       <View style={s.rowMain}>
         <Text style={s.rowName} numberOfLines={1}>
@@ -404,17 +376,13 @@ function PlayerRow({
         </Text>
         <View style={s.rowMeta}>
           <PosTags positions={player.positions} size={12} />
-          <Text style={s.rowAge}>Age {player.age}</Text>
+          <Text style={s.rowAge}>{player.age}</Text>
           <TrendTag trend={trend(player)} />
           {player.listed ? <Text style={s.forSale}>FOR SALE</Text> : null}
         </View>
       </View>
-      {target && drop > 0 ? (
-        <View style={[s.rowFit, { backgroundColor: fitColor(drop) }]}>
-          <Text style={s.fitText}>−{drop}</Text>
-        </View>
-      ) : null}
-      <RatingBadge value={r} size={34} tone={target ? penaltyTone(drop) : 'gold'} />
+      {role ? <Text style={s.role}>{role}</Text> : null}
+      <RatingBadge value={player.rating} size={34} />
     </Pressable>
   );
 }
@@ -426,20 +394,12 @@ const s = StyleSheet.create({
   chemHow: { textAlign: 'center', fontSize: 11, fontWeight: '800', color: colors.green, marginTop: 2 },
   screen: { flex: 1 },
   content: { padding: 16, paddingBottom: 40, gap: 12 },
-  pills: { gap: 8, paddingRight: 8 },
-  tactics: {
-    flexDirection: 'row',
-    backgroundColor: colors.faint,
-    borderRadius: 16,
-    padding: 4,
-    borderWidth: 2,
-    borderColor: colors.border,
-  },
-  tactic: { flex: 1, paddingVertical: 9, borderRadius: 12, alignItems: 'center' },
-  tacticActive: { backgroundColor: colors.ink },
-  tacticText: { fontWeight: '800', color: colors.muted },
-  tacticTextActive: { color: '#FFFFFF' },
-  stats: { flexDirection: 'row', paddingVertical: 12, paddingHorizontal: 4 },
+  controls: { flexDirection: 'row', gap: 8, alignItems: 'stretch' },
+  flex: { flex: 1 },
+  best: { backgroundColor: colors.ink, borderRadius: 14, paddingHorizontal: 14, justifyContent: 'center' },
+  bestText: { color: '#FFFFFF', fontSize: 14, fontWeight: '900' },
+  stats: { flexDirection: 'row', paddingVertical: 4 },
+  role: { fontSize: 12, fontWeight: '900', color: colors.muted, width: 28, textAlign: 'right' },
   pitchWrap: { borderRadius: 22, overflow: 'hidden', borderWidth: 3, borderColor: colors.pitchDark },
   pitch: {
     backgroundColor: colors.pitch,
@@ -592,7 +552,7 @@ const s = StyleSheet.create({
   list: { paddingVertical: 4, paddingHorizontal: 12 },
   emptyList: { color: colors.muted, fontWeight: '700', paddingVertical: 12, textAlign: 'center' },
   row: { flexDirection: 'row', alignItems: 'center', paddingVertical: 10, gap: 10 },
-  rowBorder: { borderBottomWidth: 1.5, borderBottomColor: colors.faint },
+  rowBorder: { borderBottomWidth: 1, borderBottomColor: colors.border },
   rowPressed: { opacity: 0.6 },
   rowSelected: {
     backgroundColor: '#FFF3D6',

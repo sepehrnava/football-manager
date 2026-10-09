@@ -1,11 +1,10 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
-import { Animated, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { clubById, compTable, midWindowRound, projectedPosition, seasonRounds, USER_ID } from '../game/game';
 import { userFixture } from '../game/insights';
 import { useCareer } from '../state/GameContext';
 import { Crest } from '../ui/components';
-import { usePulse } from '../ui/motion';
 import { colors, ordinal } from '../ui/theme';
 
 type Stop =
@@ -82,14 +81,13 @@ export function Roadmap({
         if (stop.kind === 'window') {
           const open = state.phase === 'window' && state.window === stop.which;
           return (
-            <Item key={`w${stop.which}`} label={stop.which === 'pre' ? 'START' : 'WINDOW'} lineIn={lineIn} lineOut={lineOut}
+            <Item key={`w${stop.which}`} label={stop.which === 'pre' ? 'START' : 'WINDOW'} lineIn={lineIn} lineOut={lineOut} current={current}
               caption={open ? 'Open' : reached ? 'Closed' : `After MD${mid}`}
               onPress={open ? onWindow : undefined}
             >
               <View style={[s.window, open && s.windowOpen, !reached && s.future]}>
-                <Text style={s.windowIcon}>🔁</Text>
+                <Text style={[s.windowIcon, open && { color: colors.green }]}>⇄</Text>
               </View>
-              {current ? <Pulse /> : null}
             </Item>
           );
         }
@@ -98,7 +96,7 @@ export function Roadmap({
           return (
             <Item key="finish" label="FINAL" lineIn={lineIn} lineOut={null} caption={`${done ? '' : '~'}${ordinal(finishPos)}`} onPress={onFinish}>
               <View style={[s.window, s.finish]}>
-                <Text style={s.windowIcon}>🏆</Text>
+                <Text style={[s.windowIcon, { color: '#B58A1E' }]}>★</Text>
               </View>
             </Item>
           );
@@ -118,13 +116,12 @@ export function Roadmap({
         }
         const isNext = current || (state.phase === 'window' && stop.round === state.round);
         return (
-          <Item key={stop.round} label={`MD${stop.round + 1}`} lineIn={lineIn} lineOut={lineOut} caption={caption}
+          <Item key={stop.round} label={`MD${stop.round + 1}`} lineIn={lineIn} lineOut={lineOut} caption={caption} current={current}
             captionColor={r ? ring : undefined} bold={isNext} onPress={() => onRound(stop.round)}
           >
             <View style={[s.node, { borderColor: isNext ? colors.ink : ring }, r && { backgroundColor: ring }, !r && !isNext && s.future]}>
-              <Crest crest={opp.crest} size={r ? 20 : 22} />
+              <Crest crest={opp.crest} short={opp.short} size={r ? 20 : 22} />
             </View>
-            {current ? <Pulse /> : null}
           </Item>
         );
       })}
@@ -137,11 +134,14 @@ function Item({
   caption,
   captionColor,
   bold,
+  current,
   lineIn,
   lineOut,
   onPress,
   children,
 }: {
+  /** "You are here": a soft highlight behind the stop. */
+  current?: boolean;
   label: string;
   caption: string;
   captionColor?: string;
@@ -152,7 +152,14 @@ function Item({
   children: ReactNode;
 }) {
   return (
-    <Pressable onPress={onPress} disabled={!onPress} style={s.item} accessibilityRole="button" accessibilityLabel={`${label} ${caption}`}>
+    <Pressable
+      onPress={onPress}
+      disabled={!onPress}
+      style={[s.item, current && s.itemCurrent]}
+      accessibilityRole="button"
+      accessibilityLabel={`${label} ${caption}`}
+      accessibilityState={{ selected: !!current }}
+    >
       <Text style={[s.label, bold && s.labelBold]}>{label}</Text>
       <View style={s.lineRow}>
         <View style={[s.line, lineIn === 'done' && s.lineDone, lineIn === null && s.lineNone]} />
@@ -166,28 +173,12 @@ function Item({
   );
 }
 
-/** Pulsing ring around the "you are here" stop. */
-function Pulse() {
-  const v = usePulse();
-  return (
-    <Animated.View
-      pointerEvents="none"
-      style={[
-        s.pulse,
-        {
-          opacity: v.interpolate({ inputRange: [0, 1], outputRange: [0.7, 0] }),
-          transform: [{ scale: v.interpolate({ inputRange: [0, 1], outputRange: [1, 1.45] }) }],
-        },
-      ]}
-    />
-  );
-}
-
 const NODE = 44;
 
 const s = StyleSheet.create({
   track: { paddingVertical: 4 },
-  item: { width: ITEM_W, alignItems: 'center', gap: 6 },
+  item: { width: ITEM_W, alignItems: 'center', gap: 6, paddingVertical: 6, borderRadius: 16 },
+  itemCurrent: { backgroundColor: '#FFF1CC' },
   label: { fontSize: 10, fontWeight: '800', color: colors.muted, letterSpacing: 0.5 },
   labelBold: { color: colors.ink, fontWeight: '900' },
   lineRow: { flexDirection: 'row', alignItems: 'center', width: '100%' },
@@ -217,14 +208,6 @@ const s = StyleSheet.create({
   },
   windowOpen: { borderColor: colors.green, backgroundColor: colors.greenSoft },
   finish: { borderColor: colors.gold, backgroundColor: '#FFF8E6' },
-  windowIcon: { fontSize: 20 },
-  pulse: {
-    position: 'absolute',
-    width: NODE,
-    height: NODE,
-    borderRadius: NODE / 2,
-    borderWidth: 3,
-    borderColor: colors.ink,
-  },
+  windowIcon: { fontSize: 22, fontWeight: '900', color: colors.muted },
   caption: { fontSize: 11, fontWeight: '800', color: colors.muted },
 });

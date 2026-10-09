@@ -23,15 +23,18 @@ export function formationLinks(id: FormationId): Link[] {
     if (a >= 0 && b >= 0 && a !== b) keys.add(a < b ? `${a}-${b}` : `${b}-${a}`);
   };
   slots.forEach((_, i) => {
-    slots
+    const others = slots
       .map((_, j) => j)
       .filter((j) => j !== i)
-      .sort((a, b) => dist(i, a) - dist(i, b))
-      .filter((j, k) => k < 2 || dist(i, j) < 0.28)
-      .forEach((j) => {
-        add(i, j);
-        add(mirror(i), mirror(j));
-      });
+      .sort((a, b) => dist(i, a) - dist(i, b));
+    // Each slot's two nearest, and anything close...
+    const near = others.filter((j, k) => k < 2 || dist(i, j) < 0.28);
+    // ...plus the nearest slot in the line ahead (smaller y), so the back line links to midfield.
+    const ahead = others.find((j) => slots[j].y < slots[i].y - 0.08);
+    [...near, ...(ahead === undefined ? [] : [ahead])].forEach((j) => {
+      add(i, j);
+      add(mirror(i), mirror(j));
+    });
   });
   const links = [...keys].map((k) => k.split('-').map(Number) as Link);
   cache.set(id, links);

@@ -8,6 +8,7 @@ import { squadNeeds } from '../game/market';
 import { DISCLAIMER } from '../game/leagues';
 import { useCareer, useGame } from '../state/GameContext';
 import { Button, ClubCrest, Sheet } from '../ui/components';
+import { CoinIcon, CrestIcon, PlayIcon, ShirtIcon, TrophyIcon } from '../ui/icons';
 import { FadeIn } from '../ui/motion';
 import { colors, formatMoney, seasonLabel } from '../ui/theme';
 import { ChallengeEndScreen } from './Challenge';
@@ -21,11 +22,11 @@ import { TransfersScreen } from './TransfersScreen';
 
 type Tab = 'club' | 'squad' | 'transfers' | 'league';
 
-const TABS: { id: Tab; icon: string; label: string }[] = [
-  { id: 'club', icon: '🏟️', label: 'CLUB' },
-  { id: 'squad', icon: '👕', label: 'SQUAD' },
-  { id: 'transfers', icon: '💰', label: 'TRANSFERS' },
-  { id: 'league', icon: '🏆', label: 'LEAGUE' },
+const TABS: { id: Tab; label: string }[] = [
+  { id: 'club', label: 'Club' },
+  { id: 'squad', label: 'Squad' },
+  { id: 'transfers', label: 'Transfers' },
+  { id: 'league', label: 'League' },
 ];
 
 export function MainScreen() {
@@ -56,37 +57,35 @@ export function MainScreen() {
     setSim({ until });
   };
   const club = userClub(state);
+  const locked = !ready && state.phase === 'window';
 
   return (
     <View style={[s.root, { paddingTop: insets.top }]}>
       <View style={s.top}>
         <Pressable
           onPress={() => setHonours(true)}
-          style={({ pressed }) => [s.chip, pressed && { opacity: 0.8 }]}
+          style={({ pressed }) => [s.club, pressed && { opacity: 0.6 }]}
           accessibilityRole="button"
           accessibilityLabel="Honours"
         >
-          <ClubCrest club={club} size={22} />
-          <Text style={s.chipText}>{club.short}</Text>
-          <Text style={s.chipCup}>🏆</Text>
+          <ClubCrest club={club} size={26} />
+          <Text style={s.money} numberOfLines={1}>
+            <Text style={state.money < 0 ? { color: colors.red } : null}>{formatMoney(state.money)}</Text>
+          </Text>
         </Pressable>
-        <View style={s.chip}>
-          <Text style={[s.chipText, state.money < 0 && { color: colors.red }]}>
-            💵 {formatMoney(state.money)}
-          </Text>
-        </View>
-        <View style={[s.chip, state.phase === 'window' && s.chipOpen]}>
-          <Text style={s.chipText}>
-            {state.challenge
-              ? '🎯 Daily'
-              : state.phase === 'window'
-                ? '🔁 Window'
-                : `📅 ${seasonLabel(state.season)}`}
-          </Text>
-        </View>
         <View style={s.spacer} />
-        <Pressable onPress={() => setSettings(true)} style={s.gear} accessibilityLabel="Settings">
-          <Text style={s.gearText}>⚙️</Text>
+        {state.phase === 'window' ? <View style={s.dot} /> : null}
+        <Text style={[s.status, state.phase === 'window' && { color: colors.green }]}>
+          {state.challenge
+            ? 'Daily challenge'
+            : state.phase === 'window'
+              ? 'Transfer window'
+              : seasonLabel(state.season)}
+        </Text>
+        <Pressable onPress={() => setSettings(true)} style={s.menu} accessibilityRole="button" accessibilityLabel="Settings">
+          {[0, 1, 2].map((i) => (
+            <View key={i} style={s.menuDot} />
+          ))}
         </Pressable>
       </View>
 
@@ -110,14 +109,18 @@ export function MainScreen() {
         ))}
         <Pressable
           onPress={() => play()}
-          style={({ pressed }) => [s.play, !ready && state.phase === 'window' && s.playLocked, pressed && { opacity: 0.85 }]}
+          style={({ pressed }) => [s.tab, pressed && { opacity: 0.7 }]}
           accessibilityRole="button"
           accessibilityLabel={state.phase === 'window' ? 'Kick off' : 'Play'}
         >
-          <Text style={s.playIcon}>▶</Text>
-          <Text style={s.playText}>
-            {state.phase !== 'window' ? 'PLAY' : ready ? 'KICK OFF' : `${state.squad.length}/${SQUAD_MIN}`}
-          </Text>
+          <View style={s.tabInner}>
+            <View style={s.iconBox}>
+              <PlayIcon locked={locked} />
+            </View>
+            <Text style={[s.playText, locked && { color: colors.muted }]}>
+              {state.phase !== 'window' ? 'Play' : ready ? 'Kick off' : `${state.squad.length}/${SQUAD_MIN}`}
+            </Text>
+          </View>
         </Pressable>
         {TABS.slice(2).map((t) => (
           <TabButton key={t.id} {...t} active={tab === t.id} onPress={() => setTab(t.id)} />
@@ -166,81 +169,69 @@ function SettingsSheet({ visible, onClose }: { visible: boolean; onClose: () => 
   );
 }
 
+/** Colourful vector tab icons: your crest, your shirt, a coin and a trophy. */
+function TabIcon({ tab }: { tab: Tab }) {
+  const { state } = useCareer();
+  const club = userClub(state);
+  const crest = club.crest;
+  if (tab === 'club') return <CrestIcon crest={crest} short={club.short} size={24} />;
+  if (tab === 'squad') return <ShirtIcon primary={crest.primary} secondary={crest.secondary} />;
+  if (tab === 'transfers') return <CoinIcon />;
+  return <TrophyIcon />;
+}
+
 function TabButton({
-  icon,
+  id,
   label,
   active,
   onPress,
 }: {
-  icon: string;
+  id: Tab;
   label: string;
   active: boolean;
   onPress: () => void;
 }) {
   return (
-    <Pressable
-      onPress={onPress}
-      style={s.tab}
-      accessibilityRole="tab"
-      accessibilityState={{ selected: active }}
-    >
-      <Text style={[s.tabIcon, !active && s.inactive]}>{icon}</Text>
-      <Text style={[s.tabText, active && s.tabTextActive]}>{label}</Text>
+    <Pressable onPress={onPress} style={s.tab} accessibilityRole="tab" accessibilityState={{ selected: active }}>
+      <View style={[s.tabInner, active && s.tabActive]}>
+        <View style={s.iconBox}>
+          <TabIcon tab={id} />
+        </View>
+        <Text style={[s.tabText, active && s.tabTextActive]}>{label}</Text>
+      </View>
     </Pressable>
   );
 }
 
+const ICON = 28;
+
 const s = StyleSheet.create({
-  playLocked: { backgroundColor: colors.borderDark },
   root: { flex: 1, backgroundColor: colors.bg },
-  top: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 12, paddingVertical: 8 },
-  chip: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    backgroundColor: colors.card,
-    borderRadius: 14,
-    borderWidth: 2,
-    borderColor: colors.border,
-    borderBottomWidth: 4,
-    borderBottomColor: colors.borderDark,
-    paddingHorizontal: 9,
-    paddingVertical: 6,
-    flexShrink: 1,
-  },
-  chipOpen: { backgroundColor: colors.greenSoft, borderColor: '#BFE6CC', borderBottomColor: '#9ED6B1' },
-  chipText: { fontWeight: '900', fontSize: 14, color: colors.ink },
-  chipCup: { fontSize: 12 },
+  top: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 16, paddingVertical: 10 },
+  club: { flexDirection: 'row', alignItems: 'center', gap: 10, flexShrink: 1 },
+  money: { fontWeight: '900', fontSize: 18, color: colors.ink },
+  status: { fontWeight: '800', fontSize: 14, color: colors.muted },
+  dot: { width: 8, height: 8, borderRadius: 4, backgroundColor: colors.green },
   body: { flex: 1 },
   spacer: { flex: 1 },
-  gear: { width: 34, height: 38, alignItems: 'center', justifyContent: 'center' },
-  gearText: { fontSize: 20, opacity: 0.6 },
-  play: {
-    flex: 1.15,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: colors.green,
-    borderRadius: 16,
-    marginHorizontal: 4,
-    marginBottom: 2,
-    paddingVertical: 6,
-    gap: 1,
-  },
-  playIcon: { color: '#FFFFFF', fontSize: 18, fontWeight: '900' },
-  playText: { color: '#FFFFFF', fontSize: 10, fontWeight: '900', letterSpacing: 0.5 },
+  menu: { flexDirection: 'row', gap: 3, alignItems: 'center', justifyContent: 'center', height: 36, paddingLeft: 12 },
+  menuDot: { width: 5, height: 5, borderRadius: 2.5, backgroundColor: colors.ink },
   disclaimer: { fontSize: 11, fontWeight: '600', color: colors.muted, lineHeight: 15, marginTop: 20 },
   settingsText: { fontSize: 14, fontWeight: '600', color: colors.muted, marginBottom: 14, lineHeight: 20 },
   tabs: {
     flexDirection: 'row',
-    alignItems: 'flex-end',
+    alignItems: 'center',
     backgroundColor: colors.card,
-    borderTopWidth: 2,
+    borderTopWidth: 1,
     borderTopColor: colors.border,
     paddingTop: 6,
+    paddingHorizontal: 6,
   },
-  tab: { flex: 1, alignItems: 'center', paddingVertical: 4, gap: 2 },
-  tabIcon: { fontSize: 24 },
-  inactive: { opacity: 0.45 },
-  tabText: { fontSize: 10, fontWeight: '900', color: colors.muted, letterSpacing: 0.5 },
-  tabTextActive: { color: colors.ink },
+  tab: { flex: 1, alignItems: 'center' },
+  tabInner: { alignItems: 'center', gap: 3, paddingVertical: 6, paddingHorizontal: 8, borderRadius: 16, minWidth: 64 },
+  tabActive: { backgroundColor: '#FFF1CC' },
+  iconBox: { width: ICON + 4, height: ICON, alignItems: 'center', justifyContent: 'center' },
+  tabText: { fontSize: 12, fontWeight: '800', color: colors.ink },
+  tabTextActive: { fontWeight: '900' },
+  playText: { fontSize: 12, fontWeight: '900', color: colors.green },
 });

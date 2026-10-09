@@ -11,11 +11,14 @@ way for the user to influence it except waiting. Real players could also start a
 
 ## Scope and exclusions
 
-- Neighbouring positions in each formation are linked. A link scores +1 per season the two
+- Neighbouring positions in each formation are linked: each slot's two nearest (or anything
+  close) and its nearest slot in the line ahead, so CBs link to CM/CDM (added 2026-10-09;
+  mean team chemistry over 156 club × formation cases unchanged at 67.2). A link scores +1 per season the two
   players have been together at the club (max 2) and +1 for the same country (max 3 in total).
 - Team chemistry = 40 + 20 × average link score, +10 when the captain starts, capped at 100.
   Its effect is unchanged: (chemistry − 50) / 10 added to attack and defence.
-- Coloured lines on the pitch: red 0, orange 1, green 2–3.
+- Coloured lines on the pitch: red 0, orange 1, green 2–3; thin dashed SVG lines (2 px) since
+  2026-10-09, after the user found the solid 4–5 px bars too loud.
 - Explanations: a tappable Chemistry stat with a sheet, each starter's links on his card, and
   a note on the transfer card that new signings start with red links.
 - Squads of existing clubs start with 2–4 seasons together; a new club's squad keeps 0–4.

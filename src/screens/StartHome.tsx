@@ -5,7 +5,7 @@ import { todayKey } from '../game/challenge';
 import { clubCrest } from '../game/game';
 import { COUNTRIES, LEAGUE } from '../game/leagues';
 import { currentStreak } from '../game/meta';
-import type { Crest as CrestData, CrestPattern } from '../game/types';
+import type { Crest as CrestData, CrestPattern, CrestShape } from '../game/types';
 import { useGame } from '../state/GameContext';
 import { Crest } from '../ui/components';
 import { FadeIn, NATIVE, usePulse } from '../ui/motion';
@@ -125,6 +125,7 @@ const BEAT = 2700;
 const SWAP = 450;
 
 const PATTERNS: CrestPattern[] = ['stripes', 'half', 'band', 'solid'];
+const CREST_SHAPES: CrestShape[] = ['shield', 'round', 'square', 'oval', 'shield'];
 
 /** A made-up crest that keeps redesigning itself: "this could be your club". */
 export function CyclingCrest() {
@@ -133,6 +134,7 @@ export function CyclingCrest() {
     primary: CREST_COLORS[(n * 3) % CREST_COLORS.length],
     secondary: CREST_COLORS[(n * 7 + 9) % CREST_COLORS.length],
     pattern: PATTERNS[n % PATTERNS.length],
+    shape: CREST_SHAPES[n % CREST_SHAPES.length],
   };
   if (crest.primary === crest.secondary) crest.secondary = '#FFFFFF';
   return (
@@ -170,6 +172,7 @@ export function MenuRow({
   value,
   onPress,
   last,
+  compact,
 }: {
   icon?: ReactNode;
   title: string;
@@ -177,17 +180,19 @@ export function MenuRow({
   value?: string;
   onPress: () => void;
   last?: boolean;
+  /** Smaller row for lists inside a career screen. */
+  compact?: boolean;
 }) {
   return (
     <Pressable
       onPress={onPress}
       accessibilityRole="button"
       accessibilityLabel={title}
-      style={({ pressed }) => [s.row, !last && s.rowLine, pressed && { opacity: 0.6 }]}
+      style={({ pressed }) => [s.row, compact && s.rowCompact, !last && s.rowLine, pressed && { opacity: 0.6 }]}
     >
-      {icon ? <View style={s.icon}>{icon}</View> : null}
+      {icon ? <View style={[s.icon, compact && s.iconCompact]}>{icon}</View> : null}
       <View style={s.rowMain}>
-        <Text style={s.rowTitle}>{title}</Text>
+        <Text style={[s.rowTitle, compact && s.rowTitleCompact]}>{title}</Text>
         {note ? <Text style={s.rowNote}>{note}</Text> : null}
       </View>
       {value ? <Text style={s.rowValue}>{value}</Text> : null}
@@ -217,7 +222,7 @@ function DartHit() {
 }
 
 /** Today's Daily Challenge as a menu row: the streak, or a tick once played. */
-export function DailyRow({ last }: { last?: boolean }) {
+export function DailyRow({ last, compact }: { last?: boolean; compact?: boolean }) {
   const { meta, openChallenge } = useGame();
   const [busy, setBusy] = useState(false);
   const today = todayKey();
@@ -236,6 +241,7 @@ export function DailyRow({ last }: { last?: boolean }) {
       value={streak > 0 ? `Streak ${streak}` : undefined}
       onPress={open}
       last={last}
+      compact={compact}
     />
   );
 }
@@ -296,6 +302,9 @@ const s = StyleSheet.create({
   logoEdge: { position: 'absolute', color: colors.ink },
   row: { flexDirection: 'row', alignItems: 'center', gap: 14, paddingVertical: 20 },
   icon: { width: 40, height: 44, alignItems: 'center', justifyContent: 'center' },
+  rowCompact: { paddingVertical: 12, gap: 10 },
+  iconCompact: { width: 28, height: 28, transform: [{ scale: 0.75 }] },
+  rowTitleCompact: { fontSize: 15, fontWeight: '800' },
   target: {
     width: 34,
     height: 34,

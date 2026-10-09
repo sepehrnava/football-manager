@@ -22,11 +22,14 @@ export type Tactic = 'defensive' | 'balanced' | 'attacking';
 export type Style = 'attack' | 'bus' | 'possession';
 
 export type CrestPattern = 'solid' | 'stripes' | 'half' | 'band';
+export type CrestShape = 'shield' | 'round' | 'square' | 'oval';
 
 export interface Crest {
   primary: string;
   secondary: string;
   pattern: CrestPattern;
+  /** Outline; crests saved before shapes existed are shields. */
+  shape?: CrestShape;
 }
 
 export interface Contract {

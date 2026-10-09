@@ -2,20 +2,21 @@ import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { clubById, compTable, USER_ID, userComp } from '../game/game';
-import { compKey, compName, COMPS, divisionsIn, flagOf, PROMOTION_SPOTS, zoneOf, type Comp } from '../game/leagues';
+import { compKey, compName, COMPS, divisionsIn, PROMOTION_SPOTS, zoneOf, type Comp } from '../game/leagues';
 import { leagueStats } from '../game/stats';
 import type { Club, Fixture, Player } from '../game/types';
 import { useCareer } from '../state/GameContext';
-import { Button, Card, ClubCrest, Pill, SectionTitle } from '../ui/components';
+import { Button, Card, ClubCrest, OptionSheet, PickerButton, Pill, SectionTitle } from '../ui/components';
 import { FadeIn } from '../ui/motion';
 import { CupCard } from './CupCard';
-import { colors, seasonLabel } from '../ui/theme';
+import { colors } from '../ui/theme';
 
 export function LeagueScreen() {
   const { state } = useCareer();
   const myComp = userComp(state);
   const [comp, setComp] = useState<Comp>(myComp);
   const [view, setView] = useState<'table' | 'stats'>('table');
+  const [picking, setPicking] = useState(false);
   const table = compTable(state, comp);
   const isMine = compKey(comp) === compKey(myComp);
   const deepest = divisionsIn(comp.country);
@@ -23,30 +24,29 @@ export function LeagueScreen() {
 
   return (
     <ScrollView contentContainerStyle={s.content}>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.divisions}>
-        {COMPS.map((c) => (
-          <Pill
-            key={compKey(c)}
-            label={`${flagOf(c.country)} ${divisionsIn(c.country) > 1 ? `Div ${c.division}` : ''}`.trim()}
-            active={compKey(c) === compKey(comp)}
-            onPress={() => setComp(c)}
-          />
-        ))}
-      </ScrollView>
-      <Text style={s.title}>
-        {flagOf(comp.country)} {compName(comp)}
-      </Text>
-      <Text style={s.subtitle}>
-        Season {seasonLabel(state.season)} ·{' '}
-        {deepest > 1
-          ? [
-              comp.division > 1 ? `top ${PROMOTION_SPOTS} promoted` : null,
-              comp.division < deepest ? `bottom ${PROMOTION_SPOTS} relegated` : null,
-            ]
-              .filter(Boolean)
-              .join(' · ')
-          : 'prize money is paid by final position'}
-      </Text>
+      <PickerButton label="LEAGUE" value={compName(comp)} onPress={() => setPicking(true)} />
+      <OptionSheet
+        visible={picking}
+        title="League"
+        options={COMPS.map((c) => ({
+          id: compKey(c),
+          label: compName(c),
+          note: compKey(c) === compKey(myComp) ? 'Your league' : undefined,
+        }))}
+        value={compKey(comp)}
+        onPick={(key) => setComp(COMPS.find((c) => compKey(c) === key) ?? myComp)}
+        onClose={() => setPicking(false)}
+      />
+      {deepest > 1 ? (
+        <Text style={s.subtitle}>
+          {[
+            comp.division > 1 ? `Top ${PROMOTION_SPOTS} up` : null,
+            comp.division < deepest ? `Bottom ${PROMOTION_SPOTS} down` : null,
+          ]
+            .filter(Boolean)
+            .join(' · ')}
+        </Text>
+      ) : null}
 
       <View style={s.switch}>
         {(['table', 'stats'] as const).map((v) => (
@@ -386,7 +386,7 @@ const s = StyleSheet.create({
   formText: { color: '#FFFFFF', fontSize: 10, fontWeight: '900' },
   statsBody: { gap: 12 },
   notMine: { gap: 10 },
-  switch: { flexDirection: 'row', backgroundColor: colors.faint, borderRadius: 16, padding: 4, borderWidth: 2, borderColor: colors.border },
+  switch: { flexDirection: 'row', backgroundColor: colors.card, borderRadius: 16, padding: 4 },
   switchItem: { flex: 1, paddingVertical: 9, borderRadius: 12, alignItems: 'center' },
   switchOn: { backgroundColor: colors.ink },
   switchText: { fontWeight: '800', color: colors.muted },

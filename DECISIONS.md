@@ -48,10 +48,18 @@ profit only, so a cheap squad can break even anywhere in the table and debt alwa
 to the player's spending. Selling is never blocked; academy call-ups keep the squad legal.
 Revisit if real league finances replace the generated economy.
 
+## D011: Vector icons with react-native-svg
+
+Accepted for S016 (2026-10-09): icons drawn from Views and borders looked pixelated at tab-bar
+size. `react-native-svg` (installed with `npx expo install`, supported in Expo Go) draws the
+tab icons in `src/ui/icons.tsx`. Use it for small icons; full-size crests stay View-based for
+now. Revisit if crests also need smoother edges.
+
 ## D010: Chemistry from links between neighbours
 
 Accepted for S011 at the user's request (FIFA-style). Chemistry comes from links between
-neighbouring positions: time together at the club and shared nationality. Club and league links
+neighbouring positions (each slot's nearest, plus its nearest slot in the line ahead, added
+2026-10-09 so centre-backs link to midfield): time together at the club and shared nationality. Club and league links
 are left out because every squad player shares them. Team chemistry keeps the old range and
 effect, so balance stays close to the previous rule.
 

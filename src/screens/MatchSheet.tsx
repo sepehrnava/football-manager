@@ -40,8 +40,8 @@ export function MatchSheet({
         label={
           count === 1
             ? kickoff
-              ? 'KICK OFF ▶'
-              : 'PLAY THIS MATCH ▶'
+              ? 'KICK OFF'
+              : 'PLAY THIS MATCH'
             : `${kickoff ? 'KICK OFF & ' : ''}PLAY ${count} MATCHES ⏩`
         }
         variant="green"
@@ -67,7 +67,7 @@ function PlayedMatch({ fixture }: { fixture: Fixture }) {
   return (
     <View style={s.gap}>
       <ScoreCard fixture={fixture} />
-      {r.scorers?.length ? <Text style={s.scorers}>⚽ {r.scorers.map(surname).join(', ')}</Text> : null}
+      {r.scorers?.length ? <Text style={s.scorers}>Goals: {r.scorers.map(surname).join(', ')}</Text> : null}
       <Card style={s.others}>
         {others.map((f, i) => (
           <View key={i} style={s.result}>

@@ -4,7 +4,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import { SQUAD_MAX } from '../game/constants';
 import { canTrade, clubById } from '../game/game';
 import { scoutCost } from '../game/staff';
-import { askingPrice, needsCover, quickSalePrice, releaseBlocker } from '../game/market';
+import { askingPrice, quickSalePrice, releaseBlocker } from '../game/market';
 import {
   playerValue,
   potentialRange,
@@ -49,11 +49,10 @@ function Signed({ player, onClose }: { player: Player; onClose: () => void }) {
   return (
     <Sheet visible title="Deal done!" onClose={onClose} footer={<Button label="DONE" variant="green" onPress={onClose} />}>
       <FadeIn from="scale" style={s.signed}>
-        <Text style={s.signedEmoji}>🤝</Text>
         <Text style={s.signedName}>{player.name}</Text>
         <Text style={s.hint}>
-          Signed for {player.contract.years} {player.contract.years === 1 ? 'season' : 'seasons'} at{' '}
-          {formatMoney(player.contract.wage)}/yr. Pick the new signing in your XI from the Squad tab.
+          {player.contract.years} {player.contract.years === 1 ? 'season' : 'seasons'} at{' '}
+          {formatMoney(player.contract.wage)} a season
         </Text>
       </FadeIn>
     </Sheet>
@@ -137,7 +136,7 @@ function MarketView({ player: p, onClose }: { player: Player; onClose: () => voi
       </View>
 
       <Button
-        label={(state.watch ?? []).includes(p.id) ? '★ Watching: tap to remove' : '☆ Watch this player'}
+        label={(state.watch ?? []).includes(p.id) ? 'WATCHING' : 'WATCH'}
         variant="light"
         small
         onPress={() => dispatch({ type: 'watch', playerId: p.id })}
@@ -146,15 +145,11 @@ function MarketView({ player: p, onClose }: { player: Player; onClose: () => voi
       <View style={s.box}>
         <Row label="Price" value={formatMoney(asking)} bold />
         <Row label="Wage" value={`${formatMoney(wage)} per season`} />
-        <Text style={s.hint}>
-          Chemistry: a new signing starts with red links to his teammates, unless they share his country. Links
-          grow with each season together.
-        </Text>
         {scouted ? (
-          <Text style={s.hint}>✓ Scouted: rating and potential are exact.</Text>
+          <Text style={s.hint}>Scouted: exact rating.</Text>
         ) : (
           <View style={s.scoutRow}>
-            <Text style={[s.hint, s.flex]}>The rating is a guess. Scout to see exactly how good the player is.</Text>
+            <Text style={[s.hint, s.flex]}>Rating is a guess.</Text>
             <Button
               label={`SCOUT ${formatMoney(scoutCost(state))}`}
               variant="light"
@@ -196,9 +191,6 @@ function MarketView({ player: p, onClose }: { player: Player; onClose: () => voi
         </FadeIn>
       ) : null}
 
-      <Text style={s.hint}>
-        A cheeky offer saves money but may be rejected. Too many low offers and the club stops talking.
-      </Text>
     </Sheet>
   );
 }
@@ -248,16 +240,15 @@ function SquadView({ player: p, onClose }: { player: Player; onClose: () => void
               }}
             />
           </View>
-          <Text style={s.reason}>
-            {p.listed
-              ? canTrade(state)
-                ? 'Listed: offers are waiting in Transfers.'
-                : 'Listed: clubs will make offers when the next window opens.'
-              : (sellBlocked ??
-                `Transfer list = fair offers from clubs. Quick sale = instant cash, but less money.${
-                  needsCover(state, p) ? ' An academy youngster fills any gap.' : ''
-                }`)}
-          </Text>
+          {p.listed || sellBlocked ? (
+            <Text style={s.reason}>
+              {p.listed
+                ? canTrade(state)
+                  ? 'Listed: offers are in Transfers.'
+                  : 'Listed: offers come next window.'
+                : sellBlocked}
+            </Text>
+          ) : null}
         </View>
       }
     >
@@ -280,9 +271,7 @@ function SquadView({ player: p, onClose }: { player: Player; onClose: () => void
       {p.retiring ? (
         <View style={[s.box, s.retireBox]}>
           <Text style={s.retireTitle}>Retiring at the end of this season</Text>
-          <Text style={s.hint}>
-            After this season the player is gone for nothing. Sell during a transfer window to get something back.
-          </Text>
+          <Text style={s.hint}>Sell in a window to get something back.</Text>
         </View>
       ) : null}
 
@@ -291,16 +280,12 @@ function SquadView({ player: p, onClose }: { player: Player; onClose: () => void
         <Row label="Value" value={formatMoney(playerValue(p))} />
         <Row label="Goals this season" value={String(p.goals)} />
         <Row label="Assists this season" value={String(p.assists ?? 0)} />
-        <Text style={s.hint}>
-          Contracts renew automatically. The new wage follows the player&apos;s rating: up when they improve,
-          down as they age.
-        </Text>
       </View>
 
       <View style={s.box}>
         <Row label="Chemistry links" value={slot >= 0 ? `${chem}` : '–'} />
         <PlayerLinks player={p} />
-        {isCaptain ? <Text style={s.hint}>As captain in the XI he adds +10 to team chemistry.</Text> : null}
+        {isCaptain ? <Text style={s.hint}>Captain: +10 team chemistry.</Text> : null}
       </View>
     </Sheet>
   );
@@ -317,8 +302,6 @@ const s = StyleSheet.create({
   box: {
     backgroundColor: colors.card,
     borderRadius: 16,
-    borderWidth: 2,
-    borderColor: colors.border,
     paddingHorizontal: 14,
     paddingVertical: 10,
     marginBottom: 12,
@@ -334,11 +317,10 @@ const s = StyleSheet.create({
   replyNo: { backgroundColor: colors.redSoft },
   replyTitle: { fontSize: 17, fontWeight: '900', color: colors.ink },
   replyText: { fontSize: 13, fontWeight: '600', color: colors.muted },
-  retireBox: { borderColor: '#F6C9CB', backgroundColor: '#FFF8F8' },
+  retireBox: { backgroundColor: '#FFF8F8' },
   retireTitle: { fontSize: 15, fontWeight: '900', color: colors.red },
   offerLabel: { textAlign: 'center', fontSize: 11, fontWeight: '900', color: colors.muted, marginTop: 4, letterSpacing: 0.5 },
   reason: { textAlign: 'center', color: colors.muted, fontWeight: '700', fontSize: 12 },
   signed: { alignItems: 'center', gap: 8, paddingVertical: 12 },
-  signedEmoji: { fontSize: 56 },
   signedName: { fontSize: 24, fontWeight: '900', color: colors.ink },
 });

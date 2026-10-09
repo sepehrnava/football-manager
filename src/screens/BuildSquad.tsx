@@ -22,10 +22,7 @@ export function BuildSquadCard({ onFindPlayers }: { onFindPlayers: () => void })
   return (
     <Card style={s.card}>
       <Text style={s.title}>Build your squad</Text>
-      <Text style={s.text}>
-        You need {SQUAD_MIN} players (11 starters and 7 substitutes) before you can kick off: at least 2 GK, 5 DEF,
-        5 MID and 3 ATT. Find, scout and buy them in Transfers.
-      </Text>
+      <Text style={s.text}>You need {SQUAD_MIN} players to kick off.</Text>
       <View style={s.needs}>
         <View style={[s.need, state.squad.length >= SQUAD_MIN && s.needDone]}>
           <Text style={[s.needText, state.squad.length >= SQUAD_MIN && s.needTextDone]}>
@@ -43,23 +40,19 @@ export function BuildSquadCard({ onFindPlayers }: { onFindPlayers: () => void })
       {firstWindow ? (
         <View style={s.money}>
           <View style={s.moneyRow}>
-            <Text style={s.moneyLabel}>Spent on players</Text>
+            <Text style={s.moneyLabel}>Spent</Text>
             <Text style={[s.moneyValue, over && { color: colors.orange }]}>
-              {formatMoney(spent)} / {formatMoney(plan.suggested)} suggested
+              {formatMoney(spent)} of {formatMoney(plan.suggested)}
             </Text>
           </View>
           <Bar value={(spent / plan.suggested) * 100} color={over ? colors.orange : colors.green} />
-          <Text style={s.hint}>
-            Spend about {formatMoney(plan.suggested)} on players (around {formatMoney(plan.suggested / SQUAD_MIN)} each)
-            and keep the rest of your {formatMoney(plan.budget)} for wages and running costs.
-            {over ? ' You are above the suggestion: money will be tight.' : ''}
-          </Text>
+          <Text style={s.hint}>Keep the rest for wages.</Text>
         </View>
       ) : null}
       <View style={s.buttons}>
         <Button label="FIND PLAYERS" variant="green" small style={s.flex} onPress={onFindPlayers} />
         <Button
-          label={`+${needs.missing} ACADEMY (FREE)`}
+          label={`+${needs.missing} FROM ACADEMY`}
           variant="light"
           small
           style={s.flex}
@@ -71,12 +64,12 @@ export function BuildSquadCard({ onFindPlayers }: { onFindPlayers: () => void })
 }
 
 const s = StyleSheet.create({
-  card: { gap: 10, backgroundColor: '#FFF8E6', borderColor: '#F6DFA6' },
+  card: { gap: 10 },
   title: { fontSize: 20, fontWeight: '900', color: colors.ink },
   text: { fontSize: 14, fontWeight: '600', color: colors.ink, lineHeight: 20 },
   needs: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
-  need: { paddingHorizontal: 10, paddingVertical: 5, borderRadius: 10, backgroundColor: '#FFFFFF' },
-  needDone: { backgroundColor: '#E1F4E8' },
+  need: { paddingHorizontal: 10, paddingVertical: 5, borderRadius: 10, backgroundColor: colors.faint },
+  needDone: { backgroundColor: colors.greenSoft },
   needText: { fontSize: 12, fontWeight: '900', color: colors.muted },
   needTextDone: { color: colors.green },
   money: { gap: 6 },

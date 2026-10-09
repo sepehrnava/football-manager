@@ -26,16 +26,13 @@ export function SeasonEndScreen() {
         <Text style={s.kicker}>SEASON {seasonLabel(sum.season)} COMPLETE</Text>
       </FadeIn>
       <FadeIn from="scale" delay={150} duration={420}>
-        <Text style={s.place}>{champion ? '🏆' : ordinal(sum.position)}</Text>
+        <Text style={s.place}>{ordinal(sum.position)}</Text>
       </FadeIn>
       <FadeIn delay={300}>
-        <Text style={s.headline}>
-          {champion ? 'Champions!' : `You finished ${ordinal(sum.position)}`}
-        </Text>
-        {!champion ? <Text style={s.sub}>Champions: {sum.championName}</Text> : null}
+        {champion ? <Text style={s.headline}>Champions!</Text> : <Text style={s.sub}>Champions: {sum.championName}</Text>}
         {sum.cupResults?.map((c) => (
           <Text key={c.name} style={s.sub}>
-            🏆 {c.name}: {c.result}
+            {c.name}: {c.result}
           </Text>
         ))}
         {sum.movement ? (
@@ -52,7 +49,7 @@ export function SeasonEndScreen() {
       {sum.board === 'sacked' || sum.board === 'warning' ? (
         <Card style={s.sacked}>
           <Text style={s.sackedTitle}>
-            {sacked ? 'The board has sacked you' : '🚨 Final warning from the board'}
+            {sacked ? 'The board has sacked you' : 'Final warning from the board'}
           </Text>
           <Text style={s.sackedText}>
             {sacked
@@ -130,7 +127,7 @@ export function SeasonEndScreen() {
           <Button label="START A NEW CAREER" onPress={resetCareer} />
         ) : (
           <Button
-            label={`START ${seasonLabel(sum.season + 1)} ▶`}
+            label={`START ${seasonLabel(sum.season + 1)}`}
             variant="green"
             onPress={() => dispatch({ type: 'nextSeason' })}
           />

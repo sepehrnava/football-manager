@@ -40,6 +40,7 @@ import type {
   BoardStatus,
   Club,
   Crest,
+  CrestShape,
   Cup,
   Fixture,
   FormationId,
@@ -116,9 +117,28 @@ export const STARTING_SQUAD: [Position, number, number][] = [
 ];
 
 /** Each league club always has the same crest, so pickers can show it. */
+/** About half the clubs keep the classic shield; the rest get a steady shape from their code. */
+const SHAPES: CrestShape[] = ['shield', 'shield', 'shield', 'round', 'round', 'square', 'oval'];
+
+export function crestShapeFor(short: string): CrestShape {
+  const code = [...short].reduce((h, ch) => (h * 31 + ch.charCodeAt(0)) >>> 0, 7);
+  return SHAPES[code % SHAPES.length];
+}
+
 export function clubCrest(index: number): Crest {
   const c = LEAGUE.clubs[index];
-  return { primary: c.primary, secondary: c.secondary, pattern: c.pattern };
+  return { primary: c.primary, secondary: c.secondary, pattern: c.pattern, shape: crestShapeFor(c.short) };
+}
+
+/** Saves from before crest shapes: give the other clubs theirs; the user's own crest stays as designed. */
+function withCrestShapes(state: GameState): GameState {
+  if (state.clubs.every((c) => c.id === USER_ID || c.crest.shape)) return state;
+  return {
+    ...state,
+    clubs: state.clubs.map((c) =>
+      c.id === USER_ID || c.crest.shape ? c : { ...c, crest: { ...c.crest, shape: crestShapeFor(c.short) } },
+    ),
+  };
 }
 
 export function divisionOf(club: Pick<Club, 'division'>) {
@@ -812,7 +832,7 @@ export function reducer(state: GameState | null, action: Action): GameState | nu
 
 function step(state: GameState | null, action: Action): GameState | null {
   if (action.type === 'new') return createGame(action);
-  if (action.type === 'load') return action.state;
+  if (action.type === 'load') return withCrestShapes(action.state);
   if (action.type === 'reset') return null;
   if (!state) return state;
   const rng = createRng(state.seed);

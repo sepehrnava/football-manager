@@ -10,19 +10,25 @@ import {
   COUNTRIES,
   DEFAULT_COUNTRY,
   DISCLAIMER,
-  flagOf,
   divisionsIn,
   LEAGUE,
   type Comp,
 } from '../game/leagues';
-import type { CrestPattern } from '../game/types';
+import type { Crest as CrestData, CrestPattern, CrestShape } from '../game/types';
 import { useGame } from '../state/GameContext';
 import { clubTier, PickedClub, SpinSheet, Stars } from './ClubPick';
 import { HonoursSheet } from './Honours';
 import { ClubCycle, CyclingCrest, DailyRow, Hero, MenuRow, StartLinks } from './StartHome';
-import { Button, Card, Crest, Pill, SectionTitle, Sheet } from '../ui/components';
+import { Button, Crest, Pill, SectionTitle, Sheet } from '../ui/components';
 import { FadeIn } from '../ui/motion';
 import { colors, CREST_COLORS, formatMoney } from '../ui/theme';
+
+const SHAPES: { id: CrestShape; label: string }[] = [
+  { id: 'shield', label: 'Shield' },
+  { id: 'round', label: 'Round' },
+  { id: 'square', label: 'Square' },
+  { id: 'oval', label: 'Oval' },
+];
 
 const PATTERNS: { id: CrestPattern; label: string }[] = [
   { id: 'solid', label: 'Solid' },
@@ -58,6 +64,7 @@ export function NewClubScreen() {
   const [short, setShort] = useState('');
   const [shortEdited, setShortEdited] = useState(false);
   const [pattern, setPattern] = useState<CrestPattern>('stripes');
+  const [shape, setShape] = useState<CrestShape>('shield');
   const [primary, setPrimary] = useState(CREST_COLORS[0]);
   const [secondary, setSecondary] = useState(CREST_COLORS[9]);
   const [mode, setMode] = useState<'create' | 'manage' | null>(null);
@@ -68,10 +75,17 @@ export function NewClubScreen() {
   const [country, setCountry] = useState(DEFAULT_COUNTRY);
   const [spinning, setSpinning] = useState(false);
   const [honours, setHonours] = useState(false);
+  // Building a career takes a moment on phones: show it, then start on the next frame.
+  const [starting, setStarting] = useState(false);
+  const start = (action: Parameters<typeof dispatch>[0]) => {
+    if (starting) return;
+    setStarting(true);
+    setTimeout(() => dispatch(action), 30);
+  };
   const seed = () => Date.now() % 2147483647;
 
   const shortCode = shortEdited ? short : makeShort(name);
-  const crest = { primary, secondary, pattern };
+  const crest = { primary, secondary, pattern, shape };
 
   return (
     <ScrollView
@@ -93,7 +107,8 @@ export function NewClubScreen() {
           <SpinSheet
             visible={spinning}
             onClose={() => setSpinning(false)}
-            onManage={(i) => dispatch({ type: 'new', name: '', short: '', crest: clubCrest(i), seed: seed(), takeOver: i })}
+            starting={starting}
+            onManage={(i) => start({ type: 'new', name: '', short: '', crest: clubCrest(i), seed: seed(), takeOver: i })}
           />
           <HonoursSheet visible={honours} onClose={() => setHonours(false)} />
         </View>
@@ -117,7 +132,6 @@ export function NewClubScreen() {
           {COUNTRIES.map((country) => (
             <View key={country.id} style={s.country}>
               <View style={s.countryHead}>
-                <Text style={s.countryFlag}>{country.flag}</Text>
                 <Text style={s.countryName}>{country.name}</Text>
               </View>
               {COMPS.filter((c2) => c2.country === country.id).map((c2) => {
@@ -132,23 +146,12 @@ export function NewClubScreen() {
                     accessibilityLabel={`League ${compName(c2)}`}
                     style={({ pressed }) => [s.league, pressed && { opacity: 0.85 }]}
                   >
-                    <View style={[s.divisionBadge, d === 1 ? s.divisionTop : s.divisionLower]}>
-                      <Text style={[s.divisionNumber, d === 1 && { color: colors.ink }]}>{d}</Text>
-                      <Text style={[s.divisionLabel, d === 1 && { color: colors.ink }]}>DIV</Text>
-                    </View>
+                    <Crest crest={clubCrest(LEAGUE.clubs.indexOf(clubs[0]))} short={clubs[0].short} size={32} />
                     <View style={s.clubMain}>
                       <Text style={s.leagueName}>{compName(c2)}</Text>
                       <Text style={s.leagueMeta}>
                         {clubs.length} clubs · {formatMoney(Math.min(...budgets))}–{formatMoney(Math.max(...budgets))}
                       </Text>
-                      <Text style={s.leagueMeta}>
-                        {d === 1 ? 'Win the title' : `Fight for promotion to Division ${d - 1}`}
-                      </Text>
-                      <View style={s.leagueCrests}>
-                        {clubs.slice(0, 5).map((c) => (
-                          <Crest key={c.short} crest={clubCrest(LEAGUE.clubs.indexOf(c))} short={c.short} size={26} />
-                        ))}
-                      </View>
                     </View>
                     <Text style={s.modeArrow}>›</Text>
                   </Pressable>
@@ -161,8 +164,7 @@ export function NewClubScreen() {
 
       {mode === 'manage' && comp !== null ? (
         <>
-          <SectionTitle>{`${flagOf(comp.country)} ${compName(comp).toUpperCase()} · CHOOSE YOUR CLUB`}</SectionTitle>
-          <Text style={s.hint}>Ranked by squad strength: where each club is expected to finish.</Text>
+          <SectionTitle>{compName(comp).toUpperCase()}</SectionTitle>
           {LEAGUE.clubs
             .map((c, i) => ({ c, i }))
             .filter(({ c }) => c.country === comp.country && c.division === comp.division)
@@ -194,19 +196,13 @@ export function NewClubScreen() {
                 </Pressable>
               );
             })}
-          <Text style={s.hint}>
-            Big clubs have stars, more money and sponsors, but big wages too: they must keep winning to pay
-            the bills. Underdogs are cheap and poor.
-          </Text>
           {picked !== null ? (
             <Sheet visible title={LEAGUE.clubs[picked].name} onClose={() => setPicked(null)}>
               <PickedClub index={picked} />
               <Button
-                label={`MANAGE ${LEAGUE.clubs[picked].name.toUpperCase()}`}
+                label={starting ? 'STARTING…' : `MANAGE ${LEAGUE.clubs[picked].name.toUpperCase()}`}
                 variant="green"
-                onPress={() =>
-                  dispatch({ type: 'new', name: '', short: '', crest, seed: seed(), takeOver: picked })
-                }
+                onPress={() => start({ type: 'new', name: '', short: '', crest, seed: seed(), takeOver: picked })}
               />
             </Sheet>
           ) : null}
@@ -248,16 +244,36 @@ export function NewClubScreen() {
           <SectionTitle>COUNTRY</SectionTitle>
           <View style={s.wrap}>
             {COUNTRIES.map((c) => (
-              <Pill key={c.id} label={`${c.flag} ${c.name}`} active={country === c.id} onPress={() => setCountry(c.id)} />
+              <Pill key={c.id} label={c.name} active={country === c.id} onPress={() => setCountry(c.id)} />
             ))}
           </View>
         </>
       ) : null}
 
-      <SectionTitle>CREST</SectionTitle>
-      <View style={s.wrap}>
+      <SectionTitle>SHAPE</SectionTitle>
+      <View style={s.choices}>
+        {SHAPES.map((x) => (
+          <CrestChoice
+            key={x.id}
+            label={x.label}
+            crest={{ ...crest, shape: x.id }}
+            short={shortCode || '???'}
+            active={shape === x.id}
+            onPress={() => setShape(x.id)}
+          />
+        ))}
+      </View>
+      <SectionTitle>PATTERN</SectionTitle>
+      <View style={s.choices}>
         {PATTERNS.map((p) => (
-          <Pill key={p.id} label={p.label} active={pattern === p.id} onPress={() => setPattern(p.id)} />
+          <CrestChoice
+            key={p.id}
+            label={p.label}
+            crest={{ ...crest, pattern: p.id }}
+            short={shortCode || '???'}
+            active={pattern === p.id}
+            onPress={() => setPattern(p.id)}
+          />
         ))}
       </View>
       <Text style={s.label}>Main colour</Text>
@@ -265,28 +281,48 @@ export function NewClubScreen() {
       <Text style={s.label}>Second colour</Text>
       <Swatches value={secondary} onChange={setSecondary} />
 
-      <Card style={s.info}>
-        <Text style={s.infoTitle}>Your situation</Text>
-        <Text style={s.infoText}>
-          Your new club starts in the {compName({ country, division: divisionsIn(country) })} with no players and
-          a budget: build your squad in the transfer window. Develop young players, sell at the right time and climb
-          {divisionsIn(country) > 1 ? ' all the way to the top' : ' the table'}. Spend too much and the board
-          sacks you.
-        </Text>
-      </Card>
+      <Text style={s.info}>
+        You start in the {compName({ country, division: divisionsIn(country) })} with no players and a budget.
+      </Text>
 
       <Button
-        label="START CAREER"
+        label={starting ? 'STARTING…' : 'START CAREER'}
         disabled={!name.trim()}
-        onPress={() =>
-          dispatch({ type: 'new', name, short: shortCode, crest, seed: seed(), country })
-        }
+        onPress={() => start({ type: 'new', name, short: shortCode, crest, seed: seed(), country })}
       />
       </>
       ) : null}
 
       {DISCLAIMER ? <Text style={[s.disclaimer, mode === null && s.disclaimerEnd]}>{DISCLAIMER}</Text> : null}
     </ScrollView>
+  );
+}
+
+/** One crest option shown as a small crest in your colours; the chosen one is ringed. */
+function CrestChoice({
+  label,
+  crest,
+  short,
+  active,
+  onPress,
+}: {
+  label: string;
+  crest: CrestData;
+  short: string;
+  active: boolean;
+  onPress: () => void;
+}) {
+  return (
+    <Pressable
+      onPress={onPress}
+      accessibilityRole="button"
+      accessibilityLabel={label}
+      accessibilityState={{ selected: active }}
+      style={({ pressed }) => [s.choice, active && s.choiceOn, pressed && { opacity: 0.7 }]}
+    >
+      <Crest crest={crest} short={short} size={36} />
+      <Text style={[s.choiceText, active && { color: colors.ink }]}>{label}</Text>
+    </Pressable>
   );
 }
 
@@ -313,43 +349,26 @@ const s = StyleSheet.create({
   league: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
-    backgroundColor: colors.card,
-    borderRadius: 22,
-    borderWidth: 2,
-    borderColor: colors.border,
-    borderBottomWidth: 5,
-    borderBottomColor: colors.borderDark,
-    padding: 18,
-    marginBottom: 12,
+    gap: 14,
+    paddingVertical: 14,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
   },
-  country: { marginBottom: 6 },
-  countryHead: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 8, marginBottom: 8 },
-  countryFlag: { fontSize: 26 },
-  countryName: { fontSize: 15, fontWeight: '900', letterSpacing: 1.5, color: colors.muted, textTransform: 'uppercase' },
-  divisionBadge: { width: 52, height: 62, borderRadius: 16, alignItems: 'center', justifyContent: 'center' },
-  divisionTop: { backgroundColor: colors.gold },
-  divisionLower: { backgroundColor: colors.ink },
-  divisionNumber: { fontSize: 28, fontWeight: '900', color: '#FFFFFF', lineHeight: 30 },
-  divisionLabel: { fontSize: 10, fontWeight: '900', letterSpacing: 1, color: '#BDBDB6' },
-  leagueName: { fontSize: 21, fontWeight: '900', color: colors.ink },
-  leagueMeta: { fontSize: 14, fontWeight: '700', color: colors.muted, marginTop: 2 },
-  leagueCrests: { flexDirection: 'row', gap: 6, marginTop: 10 },
+  country: { marginBottom: 10 },
+  countryHead: { marginTop: 10 },
+  countryName: { fontSize: 12, fontWeight: '900', letterSpacing: 1.5, color: colors.muted, textTransform: 'uppercase' },
+  leagueName: { fontSize: 18, fontWeight: '900', color: colors.ink },
+  leagueMeta: { fontSize: 13, fontWeight: '700', color: colors.muted, marginTop: 2 },
   rank: { width: 24, fontSize: 16, fontWeight: '900', color: colors.muted, textAlign: 'center' },
   clubRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
-    backgroundColor: colors.card,
-    borderRadius: 18,
-    borderWidth: 2,
-    borderColor: colors.border,
-    borderBottomWidth: 4,
-    borderBottomColor: colors.borderDark,
-    padding: 12,
-    marginBottom: 8,
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
   },
-  clubRowOn: { borderColor: colors.ink, borderBottomColor: colors.ink, backgroundColor: '#FFF8E6' },
+  clubRowOn: { backgroundColor: colors.card },
   clubMain: { flex: 1 },
   clubName: { fontSize: 16, fontWeight: '900', color: colors.ink },
   clubTier: { fontSize: 12, fontWeight: '800', color: colors.muted, marginTop: 1 },
@@ -373,10 +392,6 @@ const s = StyleSheet.create({
   previewName: { fontSize: 22, fontWeight: '900', color: colors.ink },
   input: {
     backgroundColor: colors.card,
-    borderWidth: 2,
-    borderColor: colors.border,
-    borderBottomWidth: 4,
-    borderBottomColor: colors.borderDark,
     borderRadius: 16,
     paddingHorizontal: 16,
     paddingVertical: 14,
@@ -386,6 +401,19 @@ const s = StyleSheet.create({
   },
   shortInput: { marginTop: 10, width: 110, textAlign: 'center', letterSpacing: 3 },
   wrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
+  choices: { flexDirection: 'row', gap: 8 },
+  choice: {
+    flex: 1,
+    alignItems: 'center',
+    gap: 6,
+    paddingVertical: 10,
+    borderRadius: 16,
+    borderWidth: 2,
+    borderColor: 'transparent',
+    backgroundColor: colors.card,
+  },
+  choiceOn: { borderColor: colors.ink },
+  choiceText: { fontSize: 12, fontWeight: '800', color: colors.muted },
   label: { marginTop: 16, marginBottom: 8, fontWeight: '800', color: colors.ink },
   swatch: {
     width: 38,
@@ -395,7 +423,5 @@ const s = StyleSheet.create({
     borderColor: colors.borderDark,
   },
   swatchActive: { borderWidth: 4, borderColor: colors.ink, transform: [{ scale: 1.1 }] },
-  info: { marginTop: 24, marginBottom: 20 },
-  infoTitle: { fontSize: 16, fontWeight: '900', color: colors.ink, marginBottom: 6 },
-  infoText: { fontSize: 15, lineHeight: 21, color: colors.muted, fontWeight: '600' },
+  info: { marginTop: 24, marginBottom: 14, fontSize: 14, lineHeight: 20, color: colors.muted, fontWeight: '700' },
 });
