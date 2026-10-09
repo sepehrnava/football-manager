@@ -1,13 +1,14 @@
 import { useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { userClub } from '../game/game';
-import { DISCLAIMER } from '../game/leagues';
+import { seasonRounds, userClub, userComp } from '../game/game';
+import { compName, DISCLAIMER } from '../game/leagues';
 import { useCareer, useGame } from '../state/GameContext';
-import { Button, ClubCrest, Sheet } from '../ui/components';
-import { FadeIn } from '../ui/motion';
-import { colors, formatMoney, seasonLabel } from '../ui/theme';
+import { Button, ClubCrest, CountBadge, Icon, IconButton, Sheet, Text, type IconName } from '../ui/components';
+import { FadeIn, haptic } from '../ui/motion';
+import { DISPLAY } from '../ui/text';
+import { colors, formatMoney, shadow } from '../ui/theme';
 import { ChallengeEndScreen } from './Challenge';
 import { ClubScreen } from './ClubScreen';
 import { HonoursSheet } from './Honours';
@@ -17,23 +18,20 @@ import { SimScreen } from './SimScreen';
 import { SquadScreen } from './SquadScreen';
 import { TransfersScreen } from './TransfersScreen';
 
-type Tab = 'club' | 'squad' | 'transfers' | 'league';
+export type Tab = 'club' | 'squad' | 'transfers' | 'league';
 
-const TABS: { id: Tab; icon: string; label: string }[] = [
-  { id: 'club', icon: '🏟️', label: 'CLUB' },
-  { id: 'squad', icon: '👕', label: 'SQUAD' },
-  { id: 'transfers', icon: '💰', label: 'TRANSFERS' },
-  { id: 'league', icon: '🏆', label: 'LEAGUE' },
+const TABS: { id: Tab; icon: IconName; iconOn: IconName; label: string }[] = [
+  { id: 'club', icon: 'home-variant-outline', iconOn: 'home-variant', label: 'Home' },
+  { id: 'squad', icon: 'tshirt-crew-outline', iconOn: 'tshirt-crew', label: 'Squad' },
+  { id: 'transfers', icon: 'swap-horizontal', iconOn: 'swap-horizontal-bold', label: 'Transfers' },
+  { id: 'league', icon: 'trophy-outline', iconOn: 'trophy', label: 'League' },
 ];
 
 export function MainScreen() {
   const { state, dispatch } = useCareer();
   const insets = useSafeAreaInsets();
   // New tabs slide in from the side they sit on in the tab bar.
-  const [{ tab, from }, setNav] = useState<{ tab: Tab; from: 'left' | 'right' }>({
-    tab: 'club',
-    from: 'right',
-  });
+  const [{ tab, from }, setNav] = useState<{ tab: Tab; from: 'left' | 'right' }>({ tab: 'club', from: 'right' });
   const setTab = (next: Tab) => {
     const order = TABS.map((t) => t.id);
     setNav({ tab: next, from: order.indexOf(next) < order.indexOf(tab) ? 'left' : 'right' });
@@ -51,69 +49,80 @@ export function MainScreen() {
     setSim({ until });
   };
   const club = userClub(state);
+  const inWindow = state.phase === 'window';
+  const status = state.challenge
+    ? `Daily challenge · ${state.challenge.title}`
+    : inWindow
+      ? 'Transfer window open'
+      : `Matchday ${state.round + 1} of ${seasonRounds(state)}`;
 
   return (
     <View style={[s.root, { paddingTop: insets.top }]}>
-      <View style={s.top}>
+      <View style={s.header}>
         <Pressable
           onPress={() => setHonours(true)}
-          style={({ pressed }) => [s.chip, pressed && { opacity: 0.8 }]}
+          style={({ pressed }) => [s.identity, pressed && { opacity: 0.7 }]}
           accessibilityRole="button"
           accessibilityLabel="Honours"
         >
-          <ClubCrest club={club} size={22} />
-          <Text style={s.chipText}>{club.short}</Text>
-          <Text style={s.chipCup}>🏆</Text>
+          <ClubCrest club={club} size={34} />
+          <View style={s.identityText}>
+            <Text style={s.clubName} numberOfLines={1}>
+              {club.name}
+            </Text>
+            <View style={s.statusLine}>
+              {inWindow ? <View style={s.liveDot} /> : null}
+              <Text style={[s.status, inWindow && { color: colors.greenDark }]} numberOfLines={1}>
+                {status}
+              </Text>
+            </View>
+          </View>
         </Pressable>
-        <View style={s.chip}>
-          <Text style={[s.chipText, state.money < 0 && { color: colors.red }]}>
-            💵 {formatMoney(state.money)}
-          </Text>
-        </View>
-        <View style={[s.chip, state.phase === 'window' && s.chipOpen]}>
-          <Text style={s.chipText}>
-            {state.challenge
-              ? '🎯 Daily'
-              : state.phase === 'window'
-                ? '🔁 Window'
-                : `📅 ${seasonLabel(state.season)}`}
-          </Text>
-        </View>
-        <View style={s.spacer} />
-        <Pressable onPress={() => setSettings(true)} style={s.gear} accessibilityLabel="Settings">
-          <Text style={s.gearText}>⚙️</Text>
+        <Pressable
+          onPress={() => setTab('transfers')}
+          style={[s.money, state.money < 0 && s.moneyDebt]}
+          accessibilityRole="button"
+          accessibilityLabel={`Money ${formatMoney(state.money)}`}
+        >
+          <Icon name="cash" size={17} color={state.money < 0 ? colors.red : colors.green} />
+          <Text style={[s.moneyText, state.money < 0 && { color: colors.red }]}>{formatMoney(state.money)}</Text>
         </Pressable>
+        <IconButton icon="cog-outline" label="Settings" onPress={() => setSettings(true)} size={38} />
       </View>
 
-      <FadeIn key={tab} from={from} distance={24} duration={220} style={s.body}>
-        {tab === 'club' && (
-          <ClubScreen
-            onPlay={play}
-            onOpenTransfers={() => setTab('transfers')}
-            onOpenLeague={() => setTab('league')}
-            onOpenSquad={() => setTab('squad')}
-          />
-        )}
+      <FadeIn key={tab} from={from} distance={18} duration={200} style={s.body}>
+        {tab === 'club' && <ClubScreen onPlay={play} onTab={setTab} />}
         {tab === 'squad' && <SquadScreen />}
         {tab === 'transfers' && <TransfersScreen />}
         {tab === 'league' && <LeagueScreen />}
       </FadeIn>
 
-      <View style={[s.tabs, { paddingBottom: Math.max(insets.bottom, 8) }]}>
+      <View style={[s.tabs, { paddingBottom: Math.max(insets.bottom, 10) }]}>
         {TABS.slice(0, 2).map((t) => (
           <TabButton key={t.id} {...t} active={tab === t.id} onPress={() => setTab(t.id)} />
         ))}
-        <Pressable
-          onPress={() => play()}
-          style={({ pressed }) => [s.play, pressed && { opacity: 0.85 }]}
-          accessibilityRole="button"
-          accessibilityLabel={state.phase === 'window' ? 'Kick off' : 'Play'}
-        >
-          <Text style={s.playIcon}>▶</Text>
-          <Text style={s.playText}>{state.phase === 'window' ? 'KICK OFF' : 'PLAY'}</Text>
-        </Pressable>
+        <View style={s.playSlot}>
+          <Pressable
+            onPress={() => {
+              haptic();
+              play();
+            }}
+            style={({ pressed }) => [s.play, pressed && s.playPressed]}
+            accessibilityRole="button"
+            accessibilityLabel={inWindow ? 'Kick off' : 'Play'}
+          >
+            <Icon name="play" size={30} color="#FFFFFF" />
+          </Pressable>
+          <Text style={s.playLabel}>{inWindow ? 'Kick off' : 'Play'}</Text>
+        </View>
         {TABS.slice(2).map((t) => (
-          <TabButton key={t.id} {...t} active={tab === t.id} onPress={() => setTab(t.id)} />
+          <TabButton
+            key={t.id}
+            {...t}
+            badge={t.id === 'transfers' ? state.offers.length : 0}
+            active={tab === t.id}
+            onPress={() => setTab(t.id)}
+          />
         ))}
       </View>
 
@@ -126,34 +135,34 @@ export function MainScreen() {
 
 /** Rarely used options, kept out of the way. */
 function SettingsSheet({ visible, onClose }: { visible: boolean; onClose: () => void }) {
-  const { resetCareer, slot, leaveChallenge } = useGame();
+  const { state, resetCareer, slot, leaveChallenge } = useGame();
   const [confirm, setConfirm] = useState(false);
-  if (!visible) return null;
+  if (!visible || !state) return null;
   const close = () => {
     setConfirm(false);
     onClose();
   };
-  if (slot === 'challenge') {
-    return (
-      <Sheet visible title="Daily challenge" onClose={close}>
-        <Text style={s.settingsText}>
-          Your challenge is saved. Come back any time today to finish it.
-        </Text>
-        <Button label="BACK TO MY CAREER" variant="light" onPress={() => leaveChallenge()} />
-        {DISCLAIMER ? <Text style={s.disclaimer}>{DISCLAIMER}</Text> : null}
-      </Sheet>
-    );
-  }
+  const club = userClub(state);
   return (
-    <Sheet visible title="Settings" onClose={close}>
-      <Text style={s.settingsText}>
-        Starting a new career deletes this one. You can create a new club or manage another one.
-      </Text>
-      <Button
-        label={confirm ? 'TAP AGAIN TO DELETE THIS CAREER' : 'START A NEW CAREER'}
-        variant={confirm ? 'red' : 'light'}
-        onPress={() => (confirm ? resetCareer() : setConfirm(true))}
-      />
+    <Sheet visible title="Settings" subtitle={`${club.name} · ${compName(userComp(state))}`} onClose={close}>
+      {slot === 'challenge' ? (
+        <>
+          <Text style={s.settingsText}>Your challenge is saved. Come back any time today to finish it.</Text>
+          <Button label="Back to my career" icon="arrow-left" variant="secondary" onPress={() => leaveChallenge()} />
+        </>
+      ) : (
+        <>
+          <Text style={s.settingsText}>
+            Starting a new career deletes this one. You can create a new club or take over another.
+          </Text>
+          <Button
+            label={confirm ? 'Tap again to delete this career' : 'Start a new career'}
+            icon={confirm ? 'alert-circle' : 'refresh'}
+            variant={confirm ? 'danger' : 'secondary'}
+            onPress={() => (confirm ? resetCareer() : setConfirm(true))}
+          />
+        </>
+      )}
       {DISCLAIMER ? <Text style={s.disclaimer}>{DISCLAIMER}</Text> : null}
     </Sheet>
   );
@@ -161,78 +170,92 @@ function SettingsSheet({ visible, onClose }: { visible: boolean; onClose: () => 
 
 function TabButton({
   icon,
+  iconOn,
   label,
   active,
+  badge = 0,
   onPress,
 }: {
-  icon: string;
+  icon: IconName;
+  iconOn: IconName;
   label: string;
   active: boolean;
+  badge?: number;
   onPress: () => void;
 }) {
   return (
     <Pressable
-      onPress={onPress}
+      onPress={() => {
+        if (!active) haptic();
+        onPress();
+      }}
       style={s.tab}
       accessibilityRole="tab"
+      accessibilityLabel={label}
       accessibilityState={{ selected: active }}
     >
-      <Text style={[s.tabIcon, !active && s.inactive]}>{icon}</Text>
-      <Text style={[s.tabText, active && s.tabTextActive]}>{label}</Text>
+      <View style={[s.tabIcon, active && s.tabIconOn]}>
+        <Icon name={active ? iconOn : icon} size={24} color={active ? colors.ink : colors.muted} />
+        <CountBadge n={badge} style={s.tabBadge} />
+      </View>
+      <Text style={[s.tabText, active && s.tabTextOn]}>{label}</Text>
     </Pressable>
   );
 }
 
 const s = StyleSheet.create({
   root: { flex: 1, backgroundColor: colors.bg },
-  top: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 12, paddingVertical: 8 },
-  chip: {
+  header: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 16, paddingTop: 6, paddingBottom: 10 },
+  identity: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 10, minWidth: 0 },
+  identityText: { flex: 1, minWidth: 0 },
+  clubName: { fontSize: 17, fontWeight: '800', color: colors.ink },
+  statusLine: { flexDirection: 'row', alignItems: 'center', gap: 5, marginTop: 1 },
+  liveDot: { width: 7, height: 7, borderRadius: 4, backgroundColor: colors.green },
+  status: { fontSize: 12, fontWeight: '600', color: colors.muted, flexShrink: 1 },
+  money: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
+    gap: 5,
+    height: 38,
+    paddingHorizontal: 12,
+    borderRadius: 19,
     backgroundColor: colors.card,
-    borderRadius: 14,
-    borderWidth: 2,
+    borderWidth: 1,
     borderColor: colors.border,
-    borderBottomWidth: 4,
-    borderBottomColor: colors.borderDark,
-    paddingHorizontal: 9,
-    paddingVertical: 6,
-    flexShrink: 1,
   },
-  chipOpen: { backgroundColor: colors.greenSoft, borderColor: '#BFE6CC', borderBottomColor: '#9ED6B1' },
-  chipText: { fontWeight: '900', fontSize: 14, color: colors.ink },
-  chipCup: { fontSize: 12 },
+  moneyDebt: { backgroundColor: colors.redSoft, borderColor: '#F6CACC' },
+  moneyText: { fontSize: 19, fontFamily: DISPLAY, fontWeight: '800', color: colors.ink },
   body: { flex: 1 },
-  spacer: { flex: 1 },
-  gear: { width: 34, height: 38, alignItems: 'center', justifyContent: 'center' },
-  gearText: { fontSize: 20, opacity: 0.6 },
-  play: {
-    flex: 1.15,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: colors.green,
-    borderRadius: 16,
-    marginHorizontal: 4,
-    marginBottom: 2,
-    paddingVertical: 6,
-    gap: 1,
-  },
-  playIcon: { color: '#FFFFFF', fontSize: 18, fontWeight: '900' },
-  playText: { color: '#FFFFFF', fontSize: 10, fontWeight: '900', letterSpacing: 0.5 },
-  disclaimer: { fontSize: 11, fontWeight: '600', color: colors.muted, lineHeight: 15, marginTop: 20 },
-  settingsText: { fontSize: 14, fontWeight: '600', color: colors.muted, marginBottom: 14, lineHeight: 20 },
   tabs: {
     flexDirection: 'row',
     alignItems: 'flex-end',
     backgroundColor: colors.card,
-    borderTopWidth: 2,
+    borderTopWidth: 1,
     borderTopColor: colors.border,
     paddingTop: 6,
+    paddingHorizontal: 6,
   },
-  tab: { flex: 1, alignItems: 'center', paddingVertical: 4, gap: 2 },
-  tabIcon: { fontSize: 24 },
-  inactive: { opacity: 0.45 },
-  tabText: { fontSize: 10, fontWeight: '900', color: colors.muted, letterSpacing: 0.5 },
-  tabTextActive: { color: colors.ink },
+  tab: { flex: 1, alignItems: 'center', gap: 2 },
+  tabIcon: { width: 52, height: 30, borderRadius: 15, alignItems: 'center', justifyContent: 'center' },
+  tabIconOn: { backgroundColor: colors.faint },
+  tabBadge: { position: 'absolute', top: -4, right: 6 },
+  tabText: { fontSize: 11, fontWeight: '600', color: colors.muted },
+  tabTextOn: { color: colors.ink, fontWeight: '800' },
+  playSlot: { flex: 1, alignItems: 'center', gap: 2 },
+  play: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    marginTop: -26,
+    backgroundColor: colors.green,
+    borderWidth: 4,
+    borderColor: colors.card,
+    alignItems: 'center',
+    justifyContent: 'center',
+    ...shadow.float,
+  },
+  playPressed: { transform: [{ scale: 0.94 }], backgroundColor: colors.greenDark },
+  playLabel: { fontSize: 11, fontWeight: '800', color: colors.greenDark },
+  settingsText: { fontSize: 15, fontWeight: '500', color: colors.ink2, lineHeight: 21 },
+  disclaimer: { fontSize: 11, fontWeight: '500', color: colors.muted, lineHeight: 16, marginTop: 8 },
 });

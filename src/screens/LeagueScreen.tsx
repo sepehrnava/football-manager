@@ -1,5 +1,7 @@
 import { useState } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
+
+import { Text } from '../ui/text';
 
 import { clubById, compTable, USER_ID, userComp } from '../game/game';
 import { compKey, compName, COMPS, divisionsIn, flagOf, PROMOTION_SPOTS, zoneOf, type Comp } from '../game/leagues';

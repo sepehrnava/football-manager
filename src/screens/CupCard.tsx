@@ -1,4 +1,6 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
+
+import { Text } from '../ui/text';
 
 import { clubById, USER_ID } from '../game/game';
 import { cupProgress } from '../game/cups';

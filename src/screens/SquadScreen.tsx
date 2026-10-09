@@ -1,31 +1,41 @@
 import { useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 
-import { BENCH_SIZE, FORMATION_IDS, FORMATIONS, SQUAD_MIN, TACTICS } from '../game/constants';
+import { BENCH_SIZE, FORMATION_IDS, FORMATIONS } from '../game/constants';
 import { userClub } from '../game/game';
-import { lineOf, ratingAt, surname, trend } from '../game/players';
-import { benchFor, starters, userStrength } from '../game/team';
-import type { Player, Position, Tactic } from '../game/types';
+import { lineOf, playerValue, ratingAt, surname, trend } from '../game/players';
+import { benchFor, starters, userStrength, wageBill } from '../game/team';
+import type { FormationId, Line, Player, Position, StaffRole } from '../game/types';
 import { useCareer } from '../state/GameContext';
 import {
   Button,
   Card,
+  Chip,
+  ChipScroll,
+  Icon,
+  ListRow,
   penaltyTone,
-  Pill,
   PosTags,
   RatingBadge,
-  SectionTitle,
-  Stat,
+  Section,
+  Segmented,
+  Sheet,
+  Tag,
+  Text,
   TrendTag,
 } from '../ui/components';
 import { animateNextLayout, FadeIn } from '../ui/motion';
-import { colors, lineColors } from '../ui/theme';
+import { DISPLAY } from '../ui/text';
+import { colors, formatMoney, shadow } from '../ui/theme';
+import { TACTIC_OPTIONS } from './MatchSheet';
 import { PlayerSheet } from './PlayerSheet';
-import { StaffCard, StaffSheet } from './StaffSheet';
+import { StaffPanel, StaffSheet } from './StaffSheet';
 
-const LINE_ORDER = { GK: 0, DF: 1, MD: 2, AT: 3 };
+type View_ = 'lineup' | 'players' | 'staff';
 
-/** What the user tapped first: a position on the pitch or a player in a list. */
+const LINE_ORDER: Record<Line, number> = { GK: 0, DF: 1, MD: 2, AT: 3 };
+
+/** What the user tapped first: a position on the pitch or a player off it. */
 type Selection = { kind: 'slot'; index: number } | { kind: 'player'; id: string } | null;
 
 function fitColor(drop: number) {
@@ -33,11 +43,62 @@ function fitColor(drop: number) {
 }
 
 export function SquadScreen() {
-  const { state, dispatch } = useCareer();
-  const [sel, setSel] = useState<Selection>(null);
+  const { state } = useCareer();
+  const [view, setView] = useState<View_>('lineup');
   const [detail, setDetail] = useState<string | null>(null);
-  const [staffOpen, setStaffOpen] = useState(false);
+  const [staffRole, setStaffRole] = useState<StaffRole | null>(null);
+  const [sel, setSel] = useState<Selection>(null);
 
+  return (
+    <View style={s.screen}>
+      <View style={s.top}>
+        <Segmented
+          options={[
+            { id: 'lineup', label: 'Lineup', icon: 'soccer-field' },
+            { id: 'players', label: `Players ${state.squad.length}`, icon: 'account-group' },
+            { id: 'staff', label: 'Staff', icon: 'whistle' },
+          ]}
+          value={view}
+          onChange={(v) => {
+            setSel(null);
+            setView(v);
+          }}
+        />
+      </View>
+
+      {view === 'lineup' ? <LineupView sel={sel} setSel={setSel} onDetails={setDetail} /> : null}
+      {view === 'players' ? (
+        <FadeIn key="players" style={s.flex}>
+          <PlayersView onOpen={setDetail} />
+        </FadeIn>
+      ) : null}
+      {view === 'staff' ? (
+        <FadeIn key="staff" style={s.flex}>
+          <ScrollView contentContainerStyle={s.content}>
+            <StaffPanel onChange={setStaffRole} />
+          </ScrollView>
+        </FadeIn>
+      ) : null}
+
+      <PlayerSheet playerId={detail} mode="squad" onClose={() => setDetail(null)} />
+      <StaffSheet role={staffRole} onClose={() => setStaffRole(null)} />
+    </View>
+  );
+}
+
+/* ------------------------------------------------------------------- lineup */
+
+function LineupView({
+  sel,
+  setSel,
+  onDetails,
+}: {
+  sel: Selection;
+  setSel: (s: Selection) => void;
+  onDetails: (id: string) => void;
+}) {
+  const { state, dispatch } = useCareer();
+  const [formationOpen, setFormationOpen] = useState(false);
   const strength = userStrength(state);
   const xi = starters(state.squad, state.lineup);
   const bench = benchFor(state.squad, state.lineup, BENCH_SIZE);
@@ -53,8 +114,8 @@ export function SquadScreen() {
     setSel(null);
   };
 
-  // Pitch: first tap selects; a second tap on another position swaps them,
-  // and a tap after picking a substitute brings that player on.
+  // First tap selects; a second tap on another position swaps them, and a tap
+  // on a bench player (before or after) brings that player on.
   const tapSlot = (i: number) => {
     if (sel?.kind === 'player') return assign(i, sel.id);
     if (sel?.kind === 'slot') {
@@ -67,232 +128,334 @@ export function SquadScreen() {
     }
     setSel({ kind: 'slot', index: i });
   };
-
   const tapPlayer = (id: string) => {
     if (sel?.kind === 'slot') return assign(sel.index, id);
     setSel(sel?.kind === 'player' && sel.id === id ? null : { kind: 'player', id });
   };
 
   const targetPos: Position | undefined = sel?.kind === 'slot' ? formation.slots[sel.index].pos : undefined;
-  const selectedSlot = sel?.kind === 'slot' ? sel.index : null;
   const selectedPlayer =
-    sel?.kind === 'player'
-      ? state.squad.find((p) => p.id === sel.id)
-      : sel?.kind === 'slot'
-        ? xi[sel.index]
-        : null;
+    sel?.kind === 'player' ? state.squad.find((p) => p.id === sel.id) : sel?.kind === 'slot' ? xi[sel.index] : null;
 
   return (
-    <View style={s.screen}>
+    <View style={s.flex}>
       <ScrollView contentContainerStyle={[s.content, sel && s.contentWithBar]}>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.pills}>
-          {FORMATION_IDS.map((id) => (
-            <Pill
-              key={id}
-              label={id}
-              active={state.formation === id}
-              onPress={() => dispatch({ type: 'formation', formation: id })}
-            />
-          ))}
-        </ScrollView>
-
-        <View style={s.tactics}>
-          {(Object.keys(TACTICS) as Tactic[]).map((t) => (
-            <Pressable
-              key={t}
-              onPress={() => dispatch({ type: 'tactic', tactic: t })}
-              style={[s.tactic, state.tactic === t && s.tacticActive]}
-              accessibilityRole="button"
-              accessibilityState={{ selected: state.tactic === t }}
-            >
-              <Text style={[s.tacticText, state.tactic === t && s.tacticTextActive]}>
-                {TACTICS[t].label}
-              </Text>
-            </Pressable>
-          ))}
+        <View style={s.controls}>
+          <Pressable
+            onPress={() => setFormationOpen(true)}
+            style={({ pressed }) => [s.formation, pressed && { opacity: 0.7 }]}
+            accessibilityRole="button"
+            accessibilityLabel={`Formation ${state.formation}`}
+          >
+            <Text style={s.formationText}>{state.formation}</Text>
+            <Icon name="chevron-down" size={18} color={colors.ink2} />
+          </Pressable>
+          <Button
+            label="Best XI"
+            icon="auto-fix"
+            variant="secondary"
+            size="sm"
+            style={s.flex}
+            onPress={() => {
+              animateNextLayout();
+              dispatch({ type: 'autoPick' });
+              setSel(null);
+            }}
+          />
         </View>
+        <Segmented options={TACTIC_OPTIONS} value={state.tactic} onChange={(t) => dispatch({ type: 'tactic', tactic: t })} />
 
-        <Card style={s.stats}>
-          <Stat label="POWER" value={strength.power} />
-          <Stat label="ATTACK" value={strength.attack} color={lineColors.AT} />
-          <Stat label="DEFENSE" value={strength.defense} color={lineColors.DF} />
-          <Stat label="CHEMISTRY" value={strength.chemistry} color={colors.green} />
-        </Card>
-
-        <StaffCard onPress={() => setStaffOpen(true)} />
-
-        <View style={s.pitch}>
-          <View style={s.boxTop} />
-          <View style={s.halfway} />
-          <View style={s.circle} />
-          <View style={s.boxBottom} />
-          {formation.slots.map((sl, i) => {
-            const p = xi[i];
-            const r = p ? ratingAt(p, sl.pos) : 0;
-            return (
-              <Pressable
-                key={i}
-                onPress={() => tapSlot(i)}
-                accessibilityLabel={
-                  p
-                    ? `${sl.pos}: ${p.name}, ${r}${p.rating > r ? `, out of position −${p.rating - r}` : ', natural position'}`
-                    : `Empty ${sl.pos} slot`
-                }
-                style={[s.token, { left: `${sl.x * 100}%`, top: `${sl.y * 100}%` }]}
-              >
-                {p ? (
-                  <>
-                    <View
-                      style={[
-                        s.shirt,
-                        {
-                          backgroundColor: kit.primary,
-                          borderColor: kit.secondary,
-                        },
-                        selectedSlot === i && s.selected,
-                      ]}
-                    >
-                      <Text style={s.shirtPos}>{sl.pos}</Text>
-                    </View>
-                    <View style={s.tokenBadge}>
-                      <RatingBadge value={r} size={24} tone={penaltyTone(p.rating - r)} />
-                    </View>
-                    {state.captainId === p.id ? <Text style={s.captain}>C</Text> : null}
-                    <View
-                      style={[
-                        s.fit,
-                        { backgroundColor: fitColor(p.rating - r) },
-                      ]}
-                    >
-                      <Text style={s.fitText}>{p.rating > r ? `−${p.rating - r}` : '✓'}</Text>
-                    </View>
-                    <Text style={s.tokenName} numberOfLines={1}>
-                      {surname(p.name)}
-                    </Text>
-                    {p.retiring ? <Text style={s.retiring}>LAST SEASON</Text> : null}
-                  </>
-                ) : (
-                  <>
-                    <View style={[s.empty, selectedSlot === i && s.selected]}>
-                      <Text style={s.emptyPos}>{sl.pos}</Text>
-                    </View>
-                    <Text style={s.tokenName}>Empty</Text>
-                  </>
-                )}
-              </Pressable>
-            );
-          })}
+        <View style={s.pitchCard}>
+          <View style={s.strength}>
+            <Strength label="ATT" value={strength.attack} />
+            <Strength label="DEF" value={strength.defense} />
+            <Strength label="CHEM" value={strength.chemistry} />
+            <Strength label="POWER" value={strength.power} strong />
+          </View>
+          <View style={s.pitch}>
+            {[0, 1, 2, 3, 4, 5].map((i) => (
+              <View key={i} style={[s.stripe, { top: `${(i * 100) / 6}%` }, i % 2 === 1 && s.stripeAlt]} />
+            ))}
+            <View style={s.boxTop} />
+            <View style={s.halfway} />
+            <View style={s.circle} />
+            <View style={s.boxBottom} />
+            {formation.slots.map((sl, i) => {
+              const p = xi[i];
+              const r = p ? ratingAt(p, sl.pos) : 0;
+              const drop = p ? p.rating - r : 0;
+              const selected = sel?.kind === 'slot' && sel.index === i;
+              return (
+                <Pressable
+                  key={i}
+                  onPress={() => tapSlot(i)}
+                  accessibilityLabel={
+                    p
+                      ? `${sl.pos}: ${p.name}, ${r}${drop > 0 ? `, out of position −${drop}` : ', natural position'}`
+                      : `Empty ${sl.pos} slot`
+                  }
+                  style={[s.token, { left: `${sl.x * 100}%`, top: `${sl.y * 100}%` }]}
+                >
+                  {p ? (
+                    <>
+                      <View
+                        style={[
+                          s.shirt,
+                          { backgroundColor: kit.primary, borderColor: kit.secondary },
+                          selected && s.selected,
+                        ]}
+                      >
+                        <Text style={s.shirtPos}>{sl.pos}</Text>
+                      </View>
+                      <View style={s.tokenRating}>
+                        <RatingBadge value={r} size={24} tone={penaltyTone(drop)} />
+                      </View>
+                      {state.captainId === p.id ? (
+                        <View style={s.captain}>
+                          <Text style={s.captainText}>C</Text>
+                        </View>
+                      ) : null}
+                      {drop > 0 ? (
+                        <View style={[s.fit, { backgroundColor: fitColor(drop) }]}>
+                          <Text style={s.fitText}>−{drop}</Text>
+                        </View>
+                      ) : null}
+                      <View style={[s.nameChip, p.retiring && s.nameChipRetiring]}>
+                        <Text style={s.tokenName} numberOfLines={1}>
+                          {surname(p.name)}
+                        </Text>
+                      </View>
+                    </>
+                  ) : (
+                    <>
+                      <View style={[s.empty, selected && s.selected]}>
+                        <Icon name="plus" size={18} color="#FFFFFF" />
+                      </View>
+                      <View style={s.nameChip}>
+                        <Text style={s.tokenName}>{sl.pos}</Text>
+                      </View>
+                    </>
+                  )}
+                </Pressable>
+              );
+            })}
+          </View>
         </View>
-        <Text style={s.legend}>
-          Tap a player, then another position or a substitute below to swap. ✓ = natural position; −N =
-          rating lost out of position.
-        </Text>
+        <Text style={s.legend}>Tap a player, then another position or a substitute to swap.</Text>
 
-        <Button label="AUTO-PICK BEST XI" variant="light" onPress={() => dispatch({ type: 'autoPick' })} />
-
-        <SectionTitle>{`SUBSTITUTES · ${bench.length}/${BENCH_SIZE}`}</SectionTitle>
-        <Card style={s.list}>
-          {bench.map((p, i) => (
-            <PlayerRow
-              key={p.id}
-              player={p}
-              last={i === bench.length - 1}
-              target={targetPos}
-              selected={sel?.kind === 'player' && sel.id === p.id}
-              onPress={() => tapPlayer(p.id)}
-            />
-          ))}
-        </Card>
-        <Text style={s.legend}>
-          {`You always have at least ${SQUAD_MIN} players (11 starters + ${BENCH_SIZE} subs). Sell someone and an academy youngster fills the gap.`}
-        </Text>
-
+        <Section title={`Substitutes · ${bench.length}/${BENCH_SIZE}`} />
+        <BenchStrip players={bench} target={targetPos} sel={sel} onTap={tapPlayer} />
         {reserves.length ? (
           <>
-            <SectionTitle>{`OUTSIDE MATCHDAY SQUAD · ${reserves.length}`}</SectionTitle>
-            <Card style={s.list}>
-              {reserves.map((p, i) => (
-                <PlayerRow
-                  key={p.id}
-                  player={p}
-                  last={i === reserves.length - 1}
-                  target={targetPos}
-                  selected={sel?.kind === 'player' && sel.id === p.id}
-                  onPress={() => tapPlayer(p.id)}
-                />
-              ))}
-            </Card>
+            <Section title={`Not in the matchday squad · ${reserves.length}`} />
+            <BenchStrip players={reserves} target={targetPos} sel={sel} onTap={tapPlayer} />
           </>
         ) : null}
-
       </ScrollView>
 
       {sel ? (
-        <FadeIn key={sel.kind === 'slot' ? `s${sel.index}` : sel.id} style={s.bar} distance={20} duration={180}>
+        <FadeIn key={sel.kind === 'slot' ? `s${sel.index}` : sel.id} style={s.bar} distance={16} duration={160}>
+          <Icon name="swap-vertical" size={22} color={colors.gold} />
           <Text style={s.barText} numberOfLines={2}>
             {sel.kind === 'player'
-              ? `Bring on ${surname(selectedPlayer?.name ?? '')}: tap a position on the pitch`
+              ? `Bring on ${surname(selectedPlayer?.name ?? '')}: tap a position`
               : selectedPlayer
-                ? `Swap ${surname(selectedPlayer.name)} (${targetPos}): tap a substitute or another position`
-                : `Fill ${targetPos}: tap a substitute below`}
+                ? `Swap ${surname(selectedPlayer.name)}: tap a sub or a position`
+                : `Fill ${targetPos}: tap a substitute`}
           </Text>
-          <View style={s.barButtons}>
-            {selectedPlayer ? (
-              <Button label="DETAILS" variant="light" small onPress={() => setDetail(selectedPlayer.id)} />
-            ) : null}
-            <Button label="CANCEL" variant="light" small onPress={() => setSel(null)} />
-          </View>
+          {selectedPlayer ? (
+            <Pressable onPress={() => onDetails(selectedPlayer.id)} style={s.barButton} accessibilityRole="button">
+              <Icon name="account-details" size={20} color="#FFFFFF" />
+            </Pressable>
+          ) : null}
+          <Pressable onPress={() => setSel(null)} style={s.barButton} accessibilityRole="button" accessibilityLabel="Cancel">
+            <Icon name="close" size={20} color="#FFFFFF" />
+          </Pressable>
         </FadeIn>
       ) : null}
 
-      <PlayerSheet playerId={detail} mode="squad" onClose={() => setDetail(null)} />
-      <StaffSheet visible={staffOpen} onClose={() => setStaffOpen(false)} />
+      {formationOpen ? (
+        <FormationSheet
+          value={state.formation}
+          onPick={(f) => {
+            animateNextLayout();
+            dispatch({ type: 'formation', formation: f });
+            setFormationOpen(false);
+          }}
+          onClose={() => setFormationOpen(false)}
+        />
+      ) : null}
     </View>
   );
 }
 
-function PlayerRow({
-  player,
-  onPress,
-  last,
-  target,
-  selected,
-}: {
-  player: Player;
-  onPress: () => void;
-  last?: boolean;
-  /** When a pitch position is selected, preview the rating there. */
-  target?: Position;
-  selected?: boolean;
-}) {
-  const r = target ? ratingAt(player, target) : player.rating;
-  const drop = player.rating - r;
+function Strength({ label, value, strong }: { label: string; value: number; strong?: boolean }) {
   return (
-    <Pressable
-      onPress={onPress}
-      accessibilityRole="button"
-      accessibilityLabel={`Squad player ${player.name}`}
-      accessibilityState={{ selected: !!selected }}
-      style={({ pressed }) => [s.row, !last && s.rowBorder, selected && s.rowSelected, pressed && s.rowPressed]}
-    >
-      <View style={s.rowMain}>
-        <Text style={s.rowName} numberOfLines={1}>
-          {player.flag} {player.name}
-        </Text>
-        <View style={s.rowMeta}>
-          <PosTags positions={player.positions} size={12} />
-          <Text style={s.rowAge}>Age {player.age}</Text>
-          <TrendTag trend={trend(player)} />
-          {player.listed ? <Text style={s.forSale}>FOR SALE</Text> : null}
-        </View>
+    <View style={s.strengthItem}>
+      <Text style={[s.strengthValue, strong && { color: colors.gold }]}>{value}</Text>
+      <Text style={s.strengthLabel}>{label}</Text>
+    </View>
+  );
+}
+
+/** Substitutes (or reserves) as a row of tokens; shows the fit for a selected position. */
+function BenchStrip({
+  players,
+  target,
+  sel,
+  onTap,
+}: {
+  players: Player[];
+  target?: Position;
+  sel: Selection;
+  onTap: (id: string) => void;
+}) {
+  const { state } = useCareer();
+  const kit = userClub(state).crest;
+  return (
+    <ChipScroll style={s.bench}>
+      {players.map((p) => {
+        const r = target ? ratingAt(p, target) : p.rating;
+        const drop = p.rating - r;
+        const on = sel?.kind === 'player' && sel.id === p.id;
+        return (
+          <Pressable
+            key={p.id}
+            onPress={() => onTap(p.id)}
+            accessibilityRole="button"
+            accessibilityLabel={`Squad player ${p.name}`}
+            accessibilityState={{ selected: on }}
+            style={({ pressed }) => [s.benchCard, on && s.benchCardOn, pressed && { opacity: 0.8 }]}
+          >
+            <View style={[s.benchShirt, { backgroundColor: kit.primary, borderColor: kit.secondary }]}>
+              <Text style={s.shirtPos}>{p.positions[0]}</Text>
+            </View>
+            <View style={s.benchRating}>
+              <RatingBadge value={r} size={22} tone={target ? penaltyTone(drop) : undefined} />
+            </View>
+            <Text style={s.benchName} numberOfLines={1}>
+              {surname(p.name)}
+            </Text>
+            <Text style={s.benchMeta}>
+              {target && drop > 0 ? `−${drop} at ${target}` : `Age ${p.age}`}
+            </Text>
+            {p.retiring ? <Tag label="LAST SEASON" tone="red" /> : p.listed ? <Tag label="FOR SALE" tone="blue" /> : null}
+          </Pressable>
+        );
+      })}
+    </ChipScroll>
+  );
+}
+
+function FormationSheet({
+  value,
+  onPick,
+  onClose,
+}: {
+  value: FormationId;
+  onPick: (f: FormationId) => void;
+  onClose: () => void;
+}) {
+  return (
+    <Sheet visible title="Formation" subtitle="Your players move to the closest positions" onClose={onClose}>
+      <View style={s.formGrid}>
+        {FORMATION_IDS.map((id) => (
+          <Pressable
+            key={id}
+            onPress={() => onPick(id)}
+            accessibilityRole="button"
+            accessibilityLabel={`Formation ${id}`}
+            accessibilityState={{ selected: id === value }}
+            style={({ pressed }) => [s.formCard, id === value && s.formCardOn, pressed && { opacity: 0.8 }]}
+          >
+            <View style={s.mini}>
+              <View style={s.miniHalf} />
+              {FORMATIONS[id].slots.map((sl, i) => (
+                <View key={i} style={[s.miniDot, { left: `${sl.x * 100}%`, top: `${sl.y * 100}%` }]} />
+              ))}
+            </View>
+            <Text style={s.formName}>{id}</Text>
+          </Pressable>
+        ))}
       </View>
-      {target ? (
-        <View style={[s.rowFit, { backgroundColor: fitColor(drop) }]}>
-          <Text style={s.fitText}>{drop > 0 ? `−${drop}` : '✓'}</Text>
-        </View>
-      ) : null}
-      <RatingBadge value={r} size={34} tone={target ? penaltyTone(drop) : 'gold'} />
-    </Pressable>
+    </Sheet>
+  );
+}
+
+/* ------------------------------------------------------------------ players */
+
+const LINES: { id: Line | 'ALL'; label: string }[] = [
+  { id: 'ALL', label: 'All' },
+  { id: 'GK', label: 'Goalkeepers' },
+  { id: 'DF', label: 'Defenders' },
+  { id: 'MD', label: 'Midfielders' },
+  { id: 'AT', label: 'Attackers' },
+];
+
+function PlayersView({ onOpen }: { onOpen: (id: string) => void }) {
+  const { state } = useCareer();
+  const [line, setLine] = useState<Line | 'ALL'>('ALL');
+  const bench = new Set(benchFor(state.squad, state.lineup, BENCH_SIZE).map((p) => p.id));
+  const list = state.squad
+    .filter((p) => line === 'ALL' || lineOf(p) === line)
+    .sort((a, b) => LINE_ORDER[lineOf(a)] - LINE_ORDER[lineOf(b)] || b.rating - a.rating);
+  const avgAge = state.squad.reduce((a, p) => a + p.age, 0) / Math.max(1, state.squad.length);
+
+  return (
+    <ScrollView contentContainerStyle={s.content}>
+      <View style={s.summary}>
+        <SummaryItem label="Players" value={String(state.squad.length)} />
+        <SummaryItem label="Avg age" value={avgAge.toFixed(1)} />
+        <SummaryItem label="Wages / season" value={formatMoney(wageBill(state.squad))} />
+      </View>
+      <ChipScroll>
+        {LINES.map((l) => (
+          <Chip key={l.id} label={l.label} active={line === l.id} onPress={() => setLine(l.id)} />
+        ))}
+      </ChipScroll>
+      <Card style={s.list}>
+        {list.map((p, i) => {
+          const role = state.lineup.includes(p.id) ? 'XI' : bench.has(p.id) ? 'SUB' : null;
+          return (
+            <ListRow
+              key={p.id}
+              left={<RatingBadge value={p.rating} size={38} />}
+              title={`${p.flag} ${p.name}`}
+              subtitle={
+                <View style={s.rowMeta}>
+                  <PosTags positions={p.positions} size={11} />
+                  <Text style={s.rowAge}>{p.age}y</Text>
+                  <TrendTag trend={trend(p)} size={10} />
+                </View>
+              }
+              right={
+                <View style={s.rowRight}>
+                  <View style={s.rowTags}>
+                    {state.captainId === p.id ? <Tag label="C" tone="dark" /> : null}
+                    {p.listed ? <Tag label="FOR SALE" tone="blue" /> : null}
+                    {role ? <Tag label={role} tone={role === 'XI' ? 'green' : 'muted'} /> : null}
+                  </View>
+                  <Text style={s.rowValue}>{formatMoney(playerValue(p))}</Text>
+                </View>
+              }
+              onPress={() => onOpen(p.id)}
+              accessibilityLabel={`Squad player ${p.name}`}
+              last={i === list.length - 1}
+            />
+          );
+        })}
+      </Card>
+      <Text style={s.legend}>Tap a player to sell, list or make captain.</Text>
+    </ScrollView>
+  );
+}
+
+function SummaryItem({ label, value }: { label: string; value: string }) {
+  return (
+    <View style={s.summaryItem}>
+      <Text style={s.summaryValue}>{value}</Text>
+      <Text style={s.summaryLabel}>{label}</Text>
+    </View>
   );
 }
 
@@ -300,77 +463,58 @@ const TOKEN_W = 76;
 
 const s = StyleSheet.create({
   screen: { flex: 1 },
-  content: { padding: 16, paddingBottom: 40, gap: 12 },
-  contentWithBar: { paddingBottom: 140 },
-  bar: {
-    position: 'absolute',
-    left: 12,
-    right: 12,
-    bottom: 12,
-    backgroundColor: colors.ink,
-    borderRadius: 20,
-    padding: 14,
-    gap: 10,
-    shadowColor: '#000',
-    shadowOpacity: 0.25,
-    shadowRadius: 10,
-    shadowOffset: { width: 0, height: 4 },
-    elevation: 8,
-  },
-  barText: { color: '#FFFFFF', fontWeight: '800', fontSize: 15 },
-  barButtons: { flexDirection: 'row', gap: 10, justifyContent: 'flex-end' },
-  pills: { gap: 8, paddingRight: 8 },
-  tactics: {
+  flex: { flex: 1 },
+  top: { paddingHorizontal: 16, paddingBottom: 4 },
+  content: { padding: 16, paddingTop: 10, paddingBottom: 32, gap: 12 },
+  contentWithBar: { paddingBottom: 110 },
+  controls: { flexDirection: 'row', gap: 10 },
+  formation: {
     flexDirection: 'row',
-    backgroundColor: colors.faint,
-    borderRadius: 16,
-    padding: 4,
-    borderWidth: 2,
-    borderColor: colors.border,
+    alignItems: 'center',
+    gap: 4,
+    height: 38,
+    paddingHorizontal: 14,
+    borderRadius: 12,
+    backgroundColor: colors.ink,
   },
-  tactic: { flex: 1, paddingVertical: 9, borderRadius: 12, alignItems: 'center' },
-  tacticActive: { backgroundColor: colors.ink },
-  tacticText: { fontWeight: '800', color: colors.muted },
-  tacticTextActive: { color: '#FFFFFF' },
-  stats: { flexDirection: 'row', paddingVertical: 12, paddingHorizontal: 4 },
-  pitch: {
-    backgroundColor: colors.pitch,
-    borderRadius: 22,
-    aspectRatio: 0.8,
-    width: '100%',
-    overflow: 'hidden',
-    borderWidth: 3,
-    borderColor: colors.pitchDark,
-  },
+  formationText: { fontSize: 20, fontFamily: DISPLAY, fontWeight: '800', color: '#FFFFFF', letterSpacing: 0.5 },
+  pitchCard: { borderRadius: 20, overflow: 'hidden', backgroundColor: colors.night, ...shadow.card },
+  strength: { flexDirection: 'row', paddingVertical: 8, paddingHorizontal: 8 },
+  strengthItem: { flex: 1, alignItems: 'center' },
+  strengthValue: { fontSize: 22, fontFamily: DISPLAY, fontWeight: '800', color: '#FFFFFF' },
+  strengthLabel: { fontSize: 10, fontWeight: '700', letterSpacing: 1, color: colors.nightMuted },
+  pitch: { backgroundColor: colors.pitch, aspectRatio: 0.82, width: '100%', overflow: 'hidden' },
+  stripe: { position: 'absolute', left: 0, right: 0, height: `${100 / 6}%` },
+  stripeAlt: { backgroundColor: colors.pitchStripe },
   boxTop: {
     position: 'absolute',
-    top: -3,
+    top: -2,
     left: '28%',
     right: '28%',
     height: '13%',
-    borderWidth: 2.5,
+    borderWidth: 2,
     borderColor: colors.pitchLine,
   },
   boxBottom: {
     position: 'absolute',
-    bottom: -3,
+    bottom: -2,
     left: '28%',
     right: '28%',
     height: '13%',
-    borderWidth: 2.5,
+    borderWidth: 2,
     borderColor: colors.pitchLine,
   },
-  halfway: { position: 'absolute', top: '50%', left: 0, right: 0, height: 2.5, backgroundColor: colors.pitchLine },
+  halfway: { position: 'absolute', top: '50%', left: 0, right: 0, height: 2, backgroundColor: colors.pitchLine },
   circle: {
     position: 'absolute',
     top: '50%',
     left: '50%',
-    width: 96,
-    height: 96,
-    marginLeft: -48,
-    marginTop: -48,
-    borderRadius: 48,
-    borderWidth: 2.5,
+    width: 90,
+    height: 90,
+    marginLeft: -45,
+    marginTop: -45,
+    borderRadius: 45,
+    borderWidth: 2,
     borderColor: colors.pitchLine,
   },
   token: { position: 'absolute', width: TOKEN_W, marginLeft: -TOKEN_W / 2, marginTop: -26, alignItems: 'center' },
@@ -381,41 +525,37 @@ const s = StyleSheet.create({
     borderWidth: 3,
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#000',
-    shadowOpacity: 0.25,
-    shadowRadius: 3,
-    shadowOffset: { width: 0, height: 2 },
-    elevation: 3,
+    ...shadow.card,
   },
   shirtPos: {
     color: '#FFFFFF',
-    fontWeight: '900',
-    fontSize: 11,
-    textShadowColor: 'rgba(0,0,0,0.6)',
+    fontSize: 14,
+    fontFamily: DISPLAY,
+    fontWeight: '800',
+    textShadowColor: 'rgba(0,0,0,0.7)',
     textShadowRadius: 2,
     textShadowOffset: { width: 0, height: 1 },
   },
-  selected: { borderColor: colors.gold, transform: [{ scale: 1.08 }] },
-  tokenBadge: { position: 'absolute', top: -6, right: 6 },
+  selected: { borderColor: colors.gold, borderWidth: 4, transform: [{ scale: 1.12 }] },
+  tokenRating: { position: 'absolute', top: -6, right: 6 },
   captain: {
     position: 'absolute',
     top: -4,
     left: 8,
-    backgroundColor: colors.ink,
-    color: '#FFFFFF',
-    fontWeight: '900',
-    fontSize: 11,
     width: 20,
     height: 20,
-    lineHeight: 20,
-    textAlign: 'center',
     borderRadius: 10,
-    overflow: 'hidden',
+    backgroundColor: colors.ink,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1.5,
+    borderColor: '#FFFFFF',
   },
+  captainText: { color: '#FFFFFF', fontSize: 12, fontFamily: DISPLAY, fontWeight: '800' },
   fit: {
     position: 'absolute',
     top: 28,
-    left: 6,
+    left: 8,
     minWidth: 22,
     height: 18,
     paddingHorizontal: 4,
@@ -425,62 +565,104 @@ const s = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  fitText: { color: '#FFFFFF', fontWeight: '900', fontSize: 10 },
-  retiring: {
-    marginTop: 2,
-    backgroundColor: colors.red,
-    color: '#FFFFFF',
-    fontSize: 8,
-    fontWeight: '900',
+  fitText: { color: '#FFFFFF', fontSize: 12, fontFamily: DISPLAY, fontWeight: '800' },
+  nameChip: {
+    marginTop: 3,
+    backgroundColor: 'rgba(8,20,12,0.55)',
+    borderRadius: 6,
     paddingHorizontal: 5,
     paddingVertical: 1,
-    borderRadius: 6,
-    overflow: 'hidden',
+    maxWidth: TOKEN_W,
   },
-  tokenName: {
-    color: '#FFFFFF',
-    fontWeight: '800',
-    fontSize: 12,
-    marginTop: 3,
-    textShadowColor: 'rgba(0,0,0,0.5)',
-    textShadowRadius: 2,
-    textShadowOffset: { width: 0, height: 1 },
-  },
+  nameChipRetiring: { backgroundColor: colors.red },
+  tokenName: { color: '#FFFFFF', fontWeight: '700', fontSize: 11 },
   empty: {
     width: 44,
     height: 44,
     borderRadius: 22,
-    borderWidth: 2.5,
+    borderWidth: 2,
     borderStyle: 'dashed',
-    borderColor: 'rgba(255,255,255,0.75)',
+    borderColor: 'rgba(255,255,255,0.85)',
+    backgroundColor: 'rgba(255,255,255,0.12)',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  emptyPos: { color: '#FFFFFF', fontWeight: '900', fontSize: 11 },
-  legend: { color: colors.muted, fontWeight: '600', fontSize: 13, textAlign: 'center' },
-  list: { paddingVertical: 4, paddingHorizontal: 12 },
-  emptyList: { color: colors.muted, fontWeight: '700', paddingVertical: 12, textAlign: 'center' },
-  row: { flexDirection: 'row', alignItems: 'center', paddingVertical: 10, gap: 10 },
-  rowBorder: { borderBottomWidth: 1.5, borderBottomColor: colors.faint },
-  rowPressed: { opacity: 0.6 },
-  rowSelected: {
-    backgroundColor: '#FFF3D6',
-    borderRadius: 12,
-    marginHorizontal: -8,
-    paddingHorizontal: 8,
+  legend: { color: colors.muted, fontWeight: '500', fontSize: 13, textAlign: 'center' },
+  bench: { paddingVertical: 4 },
+  benchCard: {
+    width: 92,
+    alignItems: 'center',
+    gap: 3,
+    paddingVertical: 10,
+    paddingHorizontal: 6,
+    borderRadius: 16,
+    backgroundColor: colors.card,
+    borderWidth: 1,
+    borderColor: colors.border,
+    ...shadow.card,
   },
-  rowFit: {
-    minWidth: 26,
-    height: 20,
-    paddingHorizontal: 5,
-    borderRadius: 10,
+  benchCardOn: { borderColor: colors.gold, borderWidth: 2, backgroundColor: colors.goldSoft },
+  benchShirt: { width: 38, height: 38, borderRadius: 19, borderWidth: 3, alignItems: 'center', justifyContent: 'center' },
+  benchRating: { position: 'absolute', top: 6, right: 8 },
+  benchName: { fontSize: 13, fontWeight: '700', color: colors.ink, marginTop: 2 },
+  benchMeta: { fontSize: 11, fontWeight: '600', color: colors.muted },
+  bar: {
+    position: 'absolute',
+    left: 12,
+    right: 12,
+    bottom: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    backgroundColor: colors.night,
+    borderRadius: 18,
+    paddingVertical: 10,
+    paddingLeft: 14,
+    paddingRight: 8,
+    ...shadow.float,
+  },
+  barText: { flex: 1, color: '#FFFFFF', fontWeight: '700', fontSize: 14 },
+  barButton: {
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+    backgroundColor: colors.night3,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  rowMain: { flex: 1, gap: 3 },
-  rowName: { fontSize: 16, fontWeight: '800', color: colors.ink },
-  rowMeta: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  rowAge: { fontSize: 12, color: colors.muted, fontWeight: '700' },
-  forSale: { fontSize: 11, color: colors.blue, fontWeight: '900' },
+  formGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
+  formCard: {
+    width: '31%',
+    flexGrow: 1,
+    alignItems: 'center',
+    gap: 6,
+    padding: 8,
+    borderRadius: 16,
+    backgroundColor: colors.card,
+    borderWidth: 1.5,
+    borderColor: colors.border,
+  },
+  formCardOn: { borderColor: colors.ink, borderWidth: 2.5 },
+  mini: { width: '100%', aspectRatio: 0.82, backgroundColor: colors.pitch, borderRadius: 10, overflow: 'hidden' },
+  miniHalf: { position: 'absolute', top: '50%', left: 0, right: 0, height: 1.5, backgroundColor: colors.pitchLine },
+  miniDot: {
+    position: 'absolute',
+    width: 10,
+    height: 10,
+    marginLeft: -5,
+    marginTop: -5,
+    borderRadius: 5,
+    backgroundColor: '#FFFFFF',
+  },
+  formName: { fontSize: 20, fontFamily: DISPLAY, fontWeight: '800', color: colors.ink },
+  summary: { flexDirection: 'row', backgroundColor: colors.card, borderRadius: 18, borderWidth: 1, borderColor: colors.border, paddingVertical: 10 },
+  summaryItem: { flex: 1, alignItems: 'center' },
+  summaryValue: { fontSize: 22, fontFamily: DISPLAY, fontWeight: '800', color: colors.ink },
+  summaryLabel: { fontSize: 11, fontWeight: '600', color: colors.muted },
+  list: { padding: 0, overflow: 'hidden' },
+  rowMeta: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  rowAge: { fontSize: 12, fontWeight: '600', color: colors.muted },
+  rowRight: { alignItems: 'flex-end', gap: 4 },
+  rowTags: { flexDirection: 'row', gap: 4 },
+  rowValue: { fontSize: 12, fontWeight: '600', color: colors.muted },
 });
-

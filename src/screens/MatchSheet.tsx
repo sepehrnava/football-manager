@@ -1,14 +1,27 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
 import { STYLES, TACTICS } from '../game/constants';
 import { clubById, midWindowRound, USER_ID, userClub } from '../game/game';
-import { matchInsight, percent, userFixture } from '../game/insights';
+import { matchInsight, userFixture } from '../game/insights';
 import { surname } from '../game/players';
 import { userTeam } from '../game/team';
 import type { Fixture, Tactic } from '../game/types';
 import { useCareer } from '../state/GameContext';
-import { Button, Card, ClubCrest, Sheet } from '../ui/components';
+import { Button, Card, ClubCrest, Icon, OddsBar, Segmented, Sheet, Text, type IconName } from '../ui/components';
+import { DISPLAY } from '../ui/text';
 import { colors } from '../ui/theme';
+
+export const TACTIC_ICONS: Record<Tactic, IconName> = {
+  defensive: 'shield-half-full',
+  balanced: 'scale-balance',
+  attacking: 'sword',
+};
+
+export const TACTIC_OPTIONS = (Object.keys(TACTICS) as Tactic[]).map((t) => ({
+  id: t,
+  label: TACTICS[t].label,
+  icon: TACTIC_ICONS[t],
+}));
 
 /** Result of a played round, or a preview with "play to here" for an upcoming one. */
 export function MatchSheet({
@@ -30,31 +43,33 @@ export function MatchSheet({
   const mid = midWindowRound(state);
   const crossesWindow = state.round < mid && round >= mid && state.phase === 'season';
   const kickoff = state.phase === 'window';
+  const home = fixture.homeId === USER_ID;
 
   const footer = played ? undefined : (
-    <View style={s.footer}>
+    <>
       {crossesWindow ? (
         <Text style={s.note}>The simulation stops at the transfer window after matchday {mid}.</Text>
       ) : null}
       <Button
-        label={
-          count === 1
-            ? kickoff
-              ? 'KICK OFF ▶'
-              : 'PLAY THIS MATCH ▶'
-            : `${kickoff ? 'KICK OFF & ' : ''}PLAY ${count} MATCHES ⏩`
-        }
-        variant="green"
+        label={count === 1 ? (kickoff ? 'Kick off' : 'Play this match') : `Play ${count} matches`}
+        icon={count === 1 ? 'play' : 'fast-forward'}
+        size="lg"
         onPress={() => {
           onClose();
           onPlayTo(round + 1);
         }}
       />
-    </View>
+    </>
   );
 
   return (
-    <Sheet visible title={`Matchday ${round + 1}`} onClose={onClose} footer={footer}>
+    <Sheet
+      visible
+      title={`Matchday ${round + 1}`}
+      subtitle={played ? 'Full time' : home ? 'Home match' : 'Away match'}
+      onClose={onClose}
+      footer={footer}
+    >
       {played ? <PlayedMatch fixture={fixture} /> : <MatchPreview fixture={fixture} />}
     </Sheet>
   );
@@ -62,68 +77,77 @@ export function MatchSheet({
 
 function PlayedMatch({ fixture }: { fixture: Fixture }) {
   const { state } = useCareer();
-  const r = fixture.result!;
-  const others = state.fixtures.filter((f) => f.round === fixture.round && f !== fixture);
+  // Only the same league's games: other leagues share round numbers.
+  const others = state.fixtures.filter(
+    (f) => f.round === fixture.round && f !== fixture && f.country === fixture.country && f.division === fixture.division,
+  );
   return (
-    <View style={s.gap}>
+    <>
       <ScoreCard fixture={fixture} />
-      {r.scorers?.length ? <Text style={s.scorers}>⚽ {r.scorers.map(surname).join(', ')}</Text> : null}
-      <Card style={s.others}>
-        {others.map((f, i) => (
-          <View key={i} style={s.result}>
-            <Text style={[s.rname, s.right]} numberOfLines={1}>
-              {clubById(state, f.homeId).name}
-            </Text>
-            <Text style={s.rscore}>
-              {f.result?.home} – {f.result?.away}
-            </Text>
-            <Text style={s.rname} numberOfLines={1}>
-              {clubById(state, f.awayId).name}
-            </Text>
-          </View>
-        ))}
-      </Card>
-    </View>
+      {others.length ? (
+        <Card style={s.others}>
+          {others.map((f, i) => (
+            <View key={i} style={s.result}>
+              <Text style={[s.rname, s.right]} numberOfLines={1}>
+                {clubById(state, f.homeId).name}
+              </Text>
+              <Text style={s.rscore}>
+                {f.result?.home}–{f.result?.away}
+              </Text>
+              <Text style={s.rname} numberOfLines={1}>
+                {clubById(state, f.awayId).name}
+              </Text>
+            </View>
+          ))}
+        </Card>
+      ) : null}
+    </>
   );
 }
 
-export function ScoreCard({ fixture }: { fixture: Fixture }) {
+function ScoreCard({ fixture }: { fixture: Fixture }) {
+  const { state } = useCareer();
   const r = fixture.result!;
   const us = fixture.homeId === USER_ID ? r.home : r.away;
   const them = fixture.homeId === USER_ID ? r.away : r.home;
   const verdict = us > them ? 'WIN' : us < them ? 'LOSS' : 'DRAW';
   const color = us > them ? colors.green : us < them ? colors.red : colors.draw;
+  const home = clubById(state, fixture.homeId);
+  const away = clubById(state, fixture.awayId);
   return (
     <Card style={s.scoreCard}>
       <View style={[s.verdict, { backgroundColor: color }]}>
         <Text style={s.verdictText}>{verdict}</Text>
       </View>
       <View style={s.scoreRow}>
-        <Side id={fixture.homeId} />
+        <View style={s.team}>
+          <ClubCrest club={home} size={52} />
+          <Text style={s.teamName} numberOfLines={2}>
+            {home.name}
+          </Text>
+        </View>
         <Text style={s.score}>
-          {r.home} – {r.away}
+          {r.home}–{r.away}
         </Text>
-        <Side id={fixture.awayId} />
+        <View style={s.team}>
+          <ClubCrest club={away} size={52} />
+          <Text style={s.teamName} numberOfLines={2}>
+            {away.name}
+          </Text>
+        </View>
       </View>
+      {r.scorers?.length ? (
+        <View style={s.scorers}>
+          <Icon name="soccer" size={15} color={colors.muted} />
+          <Text style={s.scorersText}>{r.scorers.map(surname).join(', ')}</Text>
+        </View>
+      ) : null}
     </Card>
   );
 }
 
-function Side({ id }: { id: string }) {
-  const { state } = useCareer();
-  const c = clubById(state, id);
-  return (
-    <View style={s.team}>
-      <ClubCrest club={c} size={52} />
-      <Text style={s.teamName} numberOfLines={2}>
-        {c.name}
-      </Text>
-    </View>
-  );
-}
-
-/** Opponent strength, win/draw/loss odds and a one-tap tactic suggestion. */
-export function MatchPreview({ fixture, compact }: { fixture: Fixture; compact?: boolean }) {
+/** Opponent strength, win/draw/loss odds and a one-tap tactic for this match. */
+function MatchPreview({ fixture }: { fixture: Fixture }) {
   const { state, dispatch } = useCareer();
   const report = matchInsight(state, fixture);
   const opp = clubById(state, report.opponentId);
@@ -131,130 +155,102 @@ export function MatchPreview({ fixture, compact }: { fixture: Fixture; compact?:
   const base = userTeam(state, report.tactic);
   const mine = { attack: base.attack + report.effect, defense: base.defense + report.effect };
   const style = report.style ? STYLES[report.style] : null;
-  const { win, draw, loss } = report.odds;
+  const verdict =
+    report.effect > 0
+      ? { text: `${TACTICS[report.tactic].label} counters their style`, color: colors.green, icon: 'check-circle' as IconName }
+      : report.effect < 0
+        ? { text: `${TACTICS[report.tactic].label} plays into their hands`, color: colors.red, icon: 'alert-circle' as IconName }
+        : null;
 
   return (
-    <View style={s.gap}>
-      {compact ? null : (
-        <Card style={s.vsCard}>
+    <>
+      <Card style={s.vsCard}>
+        <View style={s.vsRow}>
           <View style={s.team}>
-            <ClubCrest club={me} size={44} />
+            <ClubCrest club={me} size={48} />
             <Text style={s.teamName} numberOfLines={1}>
               {me.name}
             </Text>
           </View>
-          <View style={s.vs}>
-            <Text style={s.vsText}>VS</Text>
-            <Text style={s.muted}>{report.home ? 'Home' : 'Away'}</Text>
-          </View>
+          <Text style={s.vsText}>VS</Text>
           <View style={s.team}>
-            <ClubCrest club={opp} size={44} />
+            <ClubCrest club={opp} size={48} />
             <Text style={s.teamName} numberOfLines={1}>
               {opp.name}
             </Text>
           </View>
-        </Card>
-      )}
-
-      <Card style={s.compare}>
+        </View>
         <CompareRow label="Attack" mine={mine.attack} theirs={opp.attack} />
         <CompareRow label="Defense" mine={mine.defense} theirs={opp.defense} />
-        <View style={s.odds}>
-          <View style={[s.oddsSeg, { flex: Math.max(win, 0.04), backgroundColor: colors.green }]} />
-          <View style={[s.oddsSeg, { flex: Math.max(draw, 0.04), backgroundColor: colors.draw }]} />
-          <View style={[s.oddsSeg, { flex: Math.max(loss, 0.04), backgroundColor: colors.red }]} />
-        </View>
-        <View style={s.oddsLabels}>
-          <Text style={[s.oddsText, { color: colors.green }]}>Win {percent(win)}</Text>
-          <Text style={[s.oddsText, { color: colors.muted }]}>Draw {percent(draw)}</Text>
-          <Text style={[s.oddsText, { color: colors.red }]}>Loss {percent(loss)}</Text>
-        </View>
+        <OddsBar {...report.odds} />
       </Card>
 
-      <View style={s.tip}>
-        <Text style={s.tipTitle}>
-          {style ? `Style: ${style.label}` : 'Style: unknown'}
-        </Text>
-        <Text style={s.tipText}>
-          {style
-            ? `${style.text} ${
-                report.effect > 0
-                  ? `${TACTICS[report.tactic].label} counters it.`
-                  : report.effect < 0
-                    ? `${TACTICS[report.tactic].label} plays into their hands.`
-                    : `${TACTICS[report.tactic].label} is neutral here.`
-              }`
-            : 'You learn how a club plays after facing them once.'}
-        </Text>
-        <Text style={s.planLabel}>
-          Tactic for this match
-        </Text>
-        <View style={s.tactics}>
-          {(Object.keys(TACTICS) as Tactic[]).map((t) => (
-            <Pressable
-              key={t}
-              onPress={() => dispatch({ type: 'plan', round: fixture.round, tactic: t })}
-              style={[s.tactic, report.tactic === t && s.tacticOn]}
-              accessibilityRole="button"
-              accessibilityState={{ selected: report.tactic === t }}
-            >
-              <Text style={[s.tacticText, report.tactic === t && s.tacticTextOn]}>{TACTICS[t].label}</Text>
-            </Pressable>
-          ))}
+      <Card style={s.tactic}>
+        <Text style={s.tacticTitle}>Tactic for this match</Text>
+        <Segmented
+          options={TACTIC_OPTIONS}
+          value={report.tactic}
+          onChange={(t) => dispatch({ type: 'plan', round: fixture.round, tactic: t })}
+        />
+        <View style={s.styleLine}>
+          <Icon name="binoculars" size={18} color={colors.muted} />
+          <Text style={s.styleText}>
+            {style ? (
+              <>
+                <Text style={s.styleName}>{opp.short} play {style.label.toLowerCase()}. </Text>
+                {style.text}
+              </>
+            ) : (
+              'You learn how a club plays after facing them once.'
+            )}
+          </Text>
         </View>
-      </View>
-    </View>
+        {verdict ? (
+          <View style={s.styleLine}>
+            <Icon name={verdict.icon} size={18} color={verdict.color} />
+            <Text style={[s.styleText, { color: verdict.color, fontWeight: '700' }]}>{verdict.text}</Text>
+          </View>
+        ) : null}
+      </Card>
+    </>
   );
 }
 
 function CompareRow({ label, mine, theirs }: { label: string; mine: number; theirs: number }) {
-  const better = mine > theirs;
-  const worse = mine < theirs;
   return (
     <View style={s.cmp}>
-      <Text style={[s.cmpValue, better && { color: colors.green }]}>{mine}</Text>
+      <Text style={[s.cmpValue, mine > theirs && { color: colors.green }]}>{mine}</Text>
       <Text style={s.cmpLabel}>{label}</Text>
-      <Text style={[s.cmpValue, s.right, worse && { color: colors.red }]}>{theirs}</Text>
+      <Text style={[s.cmpValue, s.right, theirs > mine && { color: colors.red }]}>{theirs}</Text>
     </View>
   );
 }
 
 const s = StyleSheet.create({
-  gap: { gap: 12, paddingBottom: 4 },
-  footer: { gap: 8, paddingTop: 8 },
-  note: { textAlign: 'center', color: colors.muted, fontWeight: '700', fontSize: 13 },
+  note: { textAlign: 'center', color: colors.muted, fontWeight: '600', fontSize: 13 },
   scoreCard: { alignItems: 'center', gap: 10 },
-  verdict: { paddingHorizontal: 14, paddingVertical: 4, borderRadius: 10 },
-  verdictText: { color: '#FFFFFF', fontWeight: '900', letterSpacing: 2 },
+  verdict: { paddingHorizontal: 12, paddingVertical: 3, borderRadius: 8 },
+  verdictText: { color: '#FFFFFF', fontWeight: '800', letterSpacing: 1.5, fontSize: 12 },
   scoreRow: { flexDirection: 'row', alignItems: 'center', width: '100%' },
   team: { flex: 1, alignItems: 'center', gap: 6 },
-  teamName: { fontSize: 14, fontWeight: '800', color: colors.ink, textAlign: 'center' },
-  score: { fontSize: 40, fontWeight: '900', color: colors.ink, paddingHorizontal: 8 },
-  scorers: { fontSize: 14, fontWeight: '700', color: colors.muted, textAlign: 'center' },
-  others: { paddingVertical: 8 },
-  result: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 4 },
-  rname: { flex: 1, fontSize: 13, fontWeight: '700', color: colors.ink },
+  teamName: { fontSize: 13, fontWeight: '700', color: colors.ink, textAlign: 'center' },
+  score: { fontSize: 52, fontFamily: DISPLAY, fontWeight: '800', color: colors.ink, paddingHorizontal: 6 },
+  scorers: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 8 },
+  scorersText: { fontSize: 13, fontWeight: '600', color: colors.muted, flexShrink: 1, textAlign: 'center' },
+  others: { paddingVertical: 8, gap: 2 },
+  result: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingVertical: 3 },
+  rname: { flex: 1, fontSize: 13, fontWeight: '600', color: colors.ink },
   right: { textAlign: 'right' },
-  rscore: { width: 50, textAlign: 'center', fontWeight: '900', color: colors.ink },
-  vsCard: { flexDirection: 'row', alignItems: 'center' },
-  vs: { alignItems: 'center', paddingHorizontal: 8 },
-  vsText: { fontSize: 22, fontWeight: '900', fontStyle: 'italic', color: colors.ink },
-  muted: { color: colors.muted, fontWeight: '700', fontSize: 13 },
-  compare: { gap: 8 },
+  rscore: { width: 40, textAlign: 'center', fontSize: 16, fontFamily: DISPLAY, fontWeight: '800', color: colors.ink },
+  vsCard: { gap: 10 },
+  vsRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 4 },
+  vsText: { fontSize: 26, fontFamily: DISPLAY, fontStyle: 'italic', color: colors.muted },
   cmp: { flexDirection: 'row', alignItems: 'center' },
-  cmpValue: { width: 44, fontSize: 20, fontWeight: '900', color: colors.ink },
-  cmpLabel: { flex: 1, textAlign: 'center', fontSize: 12, fontWeight: '800', letterSpacing: 1.2, color: colors.muted, textTransform: 'uppercase' },
-  odds: { flexDirection: 'row', height: 12, borderRadius: 6, overflow: 'hidden', gap: 2, marginTop: 4 },
-  oddsSeg: { height: 12 },
-  oddsLabels: { flexDirection: 'row', justifyContent: 'space-between' },
-  oddsText: { fontWeight: '900', fontSize: 13 },
-  tip: { backgroundColor: '#FFF8E6', borderRadius: 18, borderWidth: 2, borderColor: '#F6DFA6', padding: 14, gap: 6 },
-  tipTitle: { fontSize: 15, fontWeight: '900', color: colors.ink },
-  tipText: { fontSize: 14, fontWeight: '600', color: colors.muted },
-  tactics: { flexDirection: 'row', gap: 6, marginTop: 4 },
-  tactic: { flex: 1, paddingVertical: 8, borderRadius: 12, alignItems: 'center', backgroundColor: '#FFFFFF', borderWidth: 2, borderColor: colors.border },
-  tacticOn: { backgroundColor: colors.ink, borderColor: colors.ink },
-  planLabel: { fontSize: 12, fontWeight: '800', color: colors.muted, marginTop: 4 },
-  tacticText: { fontWeight: '800', color: colors.muted, fontSize: 13 },
-  tacticTextOn: { color: '#FFFFFF' },
+  cmpValue: { width: 48, fontSize: 26, fontFamily: DISPLAY, fontWeight: '800', color: colors.ink },
+  cmpLabel: { flex: 1, textAlign: 'center', fontSize: 12, fontWeight: '700', letterSpacing: 1, color: colors.muted, textTransform: 'uppercase' },
+  tactic: { gap: 10 },
+  tacticTitle: { fontSize: 15, fontWeight: '800', color: colors.ink },
+  styleLine: { flexDirection: 'row', gap: 8, alignItems: 'flex-start' },
+  styleText: { flex: 1, fontSize: 14, fontWeight: '500', color: colors.ink2, lineHeight: 20 },
+  styleName: { fontWeight: '800', color: colors.ink },
 });

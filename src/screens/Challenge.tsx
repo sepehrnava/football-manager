@@ -1,5 +1,7 @@
 import { useState } from 'react';
-import { Pressable, ScrollView, Share, StyleSheet, Text, View } from 'react-native';
+import { Pressable, ScrollView, Share, StyleSheet, View } from 'react-native';
+
+import { Text } from '../ui/text';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { challengeScore, todayKey } from '../game/challenge';

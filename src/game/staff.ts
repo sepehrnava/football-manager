@@ -49,7 +49,7 @@ export function staffEffect(s: Staff) {
     return b === 0 && !style ? 'Average: no bonus' : `${sign(b)} team strength${style}`;
   }
   if (s.role === 'youth') return s.stars === 1 ? 'No extra growth' : `${s.stars * 15 - 15}% chance of extra growth`;
-  return `Scouting ${s.stars * 15 - 15}% cheaper`;
+  return s.stars === 1 ? 'Standard scouting price' : `Scouting ${s.stars * 15 - 15}% cheaper`;
 }
 
 export function makeStaff(rng: Rng, id: string, role: StaffRole, stars: number): Staff {
