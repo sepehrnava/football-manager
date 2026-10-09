@@ -1,4 +1,3 @@
-import { useFonts } from 'expo-font';
 import { StatusBar } from 'expo-status-bar';
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -7,38 +6,27 @@ import { AchievementToast } from './src/screens/Honours';
 import { MainScreen } from './src/screens/MainScreen';
 import { NewClubScreen } from './src/screens/NewClubScreen';
 import { GameProvider, useGame } from './src/state/GameContext';
-import { FONTS } from './src/ui/text';
 import { colors } from './src/ui/theme';
 
 function Root() {
   const { state, loaded } = useGame();
-  if (!loaded) return <Loading />;
+  if (!loaded) {
+    return (
+      <View style={styles.loading}>
+        <ActivityIndicator color={colors.ink} />
+      </View>
+    );
+  }
   return state ? <MainScreen /> : <NewClubScreen />;
 }
 
-function Loading() {
-  return (
-    <View style={styles.loading}>
-      <ActivityIndicator color={colors.ink} />
-    </View>
-  );
-}
-
 export default function App() {
-  // A font that fails to load falls back to the system font rather than blocking the game.
-  const [fontsLoaded, fontError] = useFonts(FONTS);
   return (
     <SafeAreaProvider>
       <GameProvider>
         <View style={styles.app}>
-          {fontsLoaded || fontError ? (
-            <>
-              <Root />
-              <AchievementToast />
-            </>
-          ) : (
-            <Loading />
-          )}
+          <Root />
+          <AchievementToast />
         </View>
         <StatusBar style="dark" />
       </GameProvider>

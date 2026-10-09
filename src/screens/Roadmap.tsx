@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
-import { Animated, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { Animated, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { clubById, compTable, midWindowRound, projectedPosition, seasonRounds, USER_ID } from '../game/game';
 import { userFixture } from '../game/insights';
 import { useCareer } from '../state/GameContext';
-import { Crest, Icon, Text } from '../ui/components';
+import { Crest } from '../ui/components';
 import { usePulse } from '../ui/motion';
 import { colors, ordinal } from '../ui/theme';
 
@@ -87,7 +87,7 @@ export function Roadmap({
               onPress={open ? onWindow : undefined}
             >
               <View style={[s.window, open && s.windowOpen, !reached && s.future]}>
-                <Icon name="swap-horizontal-bold" size={22} color={open ? colors.greenDark : colors.muted} />
+                <Text style={s.windowIcon}>🔁</Text>
               </View>
               {current ? <Pulse /> : null}
             </Item>
@@ -98,7 +98,7 @@ export function Roadmap({
           return (
             <Item key="finish" label="FINAL" lineIn={lineIn} lineOut={null} caption={`${done ? '' : '~'}${ordinal(finishPos)}`} onPress={onFinish}>
               <View style={[s.window, s.finish]}>
-                <Icon name="trophy" size={22} color={colors.goldDark} />
+                <Text style={s.windowIcon}>🏆</Text>
               </View>
             </Item>
           );
@@ -188,10 +188,10 @@ const NODE = 44;
 const s = StyleSheet.create({
   track: { paddingVertical: 4 },
   item: { width: ITEM_W, alignItems: 'center', gap: 6 },
-  label: { fontSize: 10, fontWeight: '700', color: colors.muted, letterSpacing: 0.5 },
+  label: { fontSize: 10, fontWeight: '800', color: colors.muted, letterSpacing: 0.5 },
   labelBold: { color: colors.ink, fontWeight: '900' },
   lineRow: { flexDirection: 'row', alignItems: 'center', width: '100%' },
-  line: { flex: 1, height: 3, backgroundColor: colors.border },
+  line: { flex: 1, height: 4, backgroundColor: colors.border },
   lineDone: { backgroundColor: colors.ink },
   lineNone: { backgroundColor: 'transparent' },
   nodeWrap: { width: NODE, height: NODE, alignItems: 'center', justifyContent: 'center' },
@@ -199,7 +199,7 @@ const s = StyleSheet.create({
     width: NODE,
     height: NODE,
     borderRadius: NODE / 2,
-    borderWidth: 2.5,
+    borderWidth: 3,
     backgroundColor: colors.card,
     alignItems: 'center',
     justifyContent: 'center',
@@ -209,14 +209,15 @@ const s = StyleSheet.create({
     width: NODE,
     height: NODE,
     borderRadius: 14,
-    borderWidth: 2.5,
+    borderWidth: 3,
     borderColor: colors.border,
     backgroundColor: colors.card,
     alignItems: 'center',
     justifyContent: 'center',
   },
   windowOpen: { borderColor: colors.green, backgroundColor: colors.greenSoft },
-  finish: { borderColor: colors.gold, backgroundColor: colors.goldSoft },
+  finish: { borderColor: colors.gold, backgroundColor: '#FFF8E6' },
+  windowIcon: { fontSize: 20 },
   pulse: {
     position: 'absolute',
     width: NODE,
@@ -225,5 +226,5 @@ const s = StyleSheet.create({
     borderWidth: 3,
     borderColor: colors.ink,
   },
-  caption: { fontSize: 11, fontWeight: '700', color: colors.muted },
+  caption: { fontSize: 11, fontWeight: '800', color: colors.muted },
 });

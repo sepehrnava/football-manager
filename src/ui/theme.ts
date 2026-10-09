@@ -1,83 +1,32 @@
 import type { Line } from '../game/types';
 
-/**
- * Design tokens. Light, calm surfaces; green is the one action colour; gold marks
- * quality and rewards; the live match screen uses the dark "night" set.
- */
 export const colors = {
-  bg: '#F2F3EF',
+  bg: '#F4F4F1',
   card: '#FFFFFF',
-  inset: '#F6F7F3',
-  border: '#E3E5DF',
-  borderDark: '#CDD1C8',
-  ink: '#121614',
-  ink2: '#3A423C',
-  muted: '#7A817B',
-  faint: '#EDEFEA',
-
-  green: '#1F9D55',
-  greenDark: '#167A41',
-  greenSoft: '#E3F4E9',
-  gold: '#F2B33D',
-  goldDark: '#C98C14',
-  goldInk: '#8A5E07',
-  goldSoft: '#FFF4DB',
+  border: '#E2E2DE',
+  borderDark: '#CACAC5',
+  ink: '#141414',
+  muted: '#85857F',
+  faint: '#F0F0EC',
+  pitch: '#3B8548',
+  pitchDark: '#347A41',
+  pitchLine: 'rgba(255,255,255,0.7)',
+  gold: '#F2B544',
+  green: '#25A55A',
   red: '#E5484D',
-  redDark: '#B9363A',
-  redSoft: '#FDEBEC',
-  orange: '#EE8A1A',
-  orangeSoft: '#FFF0DF',
-  blue: '#2F6FE4',
-  blueSoft: '#E6EEFD',
-  draw: '#9AA09B',
-
-  night: '#0D1712',
-  night2: '#15231B',
-  night3: '#1F3127',
-  nightLine: '#2A4034',
-  nightMuted: '#8FA597',
-
-  pitch: '#2F8A48',
-  pitchDark: '#287A3E',
-  pitchStripe: '#33924D',
-  pitchLine: 'rgba(255,255,255,0.65)',
-};
-
-export const radius = { sm: 10, md: 14, lg: 18, xl: 24 };
-
-export const space = { xs: 4, sm: 8, md: 12, lg: 16, xl: 24 };
-
-/** Soft elevation for cards and floating elements. */
-export const shadow = {
-  card: {
-    shadowColor: '#1B2A20',
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
-    shadowOffset: { width: 0, height: 2 },
-    elevation: 1,
-  },
-  float: {
-    shadowColor: '#0B140F',
-    shadowOpacity: 0.18,
-    shadowRadius: 16,
-    shadowOffset: { width: 0, height: 6 },
-    elevation: 8,
-  },
+  redSoft: '#FDECEC',
+  orange: '#F08C1B',
+  blue: '#3D7BE0',
+  greenSoft: '#E6F6EC',
+  draw: '#9A9A94',
 };
 
 export const lineColors: Record<Line, string> = {
   GK: '#6B7280',
-  DF: '#E5821A',
-  MD: '#1F9D55',
+  DF: '#F08C1B',
+  MD: '#25A55A',
   AT: '#E5484D',
 };
-
-/** FIFA-style card tiers: gold, silver, bronze. */
-export function ratingTier(rating: number) {
-  if (rating >= 75) return { bg: colors.gold, fg: '#3D2A04', ring: colors.goldDark };
-  if (rating >= 65) return { bg: '#C9CFD3', fg: '#22292D', ring: '#A7AFB4' };
-  return { bg: '#D49A6A', fg: '#3A2210', ring: '#B37A4C' };
-}
 
 export const CREST_COLORS = [
   '#C8102E',

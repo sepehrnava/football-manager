@@ -1,4 +1,3 @@
-import * as Haptics from 'expo-haptics';
 import { useEffect, useState, type ReactNode } from 'react';
 import {
   Animated,
@@ -82,14 +81,4 @@ export function animateNextLayout() {
   LayoutAnimation.configureNext(
     LayoutAnimation.create(220, LayoutAnimation.Types.easeInEaseOut, LayoutAnimation.Properties.opacity),
   );
-}
-
-/** A light tap felt on phones for presses that change something. */
-export function haptic(kind: 'tap' | 'success' | 'warning' = 'tap') {
-  if (Platform.OS === 'web') return;
-  if (kind === 'tap') Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
-  else
-    Haptics.notificationAsync(
-      kind === 'success' ? Haptics.NotificationFeedbackType.Success : Haptics.NotificationFeedbackType.Warning,
-    ).catch(() => {});
 }

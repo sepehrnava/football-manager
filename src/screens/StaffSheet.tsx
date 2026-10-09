@@ -1,151 +1,135 @@
-import type { ReactNode } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { useState, type ReactNode } from 'react';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { canTrade } from '../game/game';
 import { hireCost, ROLE_INFO, STAFF_ROLES, staffEffect } from '../game/staff';
 import type { Staff, StaffRole } from '../game/types';
 import { useCareer } from '../state/GameContext';
-import { Button, Card, Icon, Sheet, Text, type IconName } from '../ui/components';
+import { Button, Card, Sheet } from '../ui/components';
 import { colors, formatMoney } from '../ui/theme';
 
-export const ROLE_ICONS: Record<StaffRole, IconName> = {
-  coach: 'whistle',
-  youth: 'sprout',
-  scout: 'binoculars',
-};
-
-export function Stars({ n, size = 14 }: { n: number; size?: number }) {
+export function Stars({ n, size = 13 }: { n: number; size?: number }) {
   return (
-    <View style={s.stars} accessibilityLabel={`${n} stars`}>
-      {[1, 2, 3, 4, 5].map((i) => (
-        <Icon key={i} name="star" size={size} color={i <= n ? colors.gold : colors.border} />
-      ))}
-    </View>
+    <Text style={{ fontSize: size, color: colors.gold, fontWeight: '900' }}>
+      {'★'.repeat(n)}
+      <Text style={{ color: colors.border }}>{'★'.repeat(5 - n)}</Text>
+    </Text>
   );
 }
 
-/** The Staff view on the Squad tab: one card per role. */
-export function StaffPanel({ onChange }: { onChange: (role: StaffRole) => void }) {
+/** One-row staff overview for the Squad tab: each role's stars. */
+export function StaffCard({ onPress }: { onPress: () => void }) {
   const { state } = useCareer();
-  const open = canTrade(state);
   return (
-    <View style={s.panel}>
-      {STAFF_ROLES.map((role) => {
-        const st = state.staff?.[role];
-        return (
-          <Card key={role} style={s.roleCard}>
-            <View style={s.roleHead}>
-              <View style={s.roleIcon}>
-                <Icon name={ROLE_ICONS[role]} size={22} color={colors.greenDark} />
-              </View>
-              <View style={s.flex}>
-                <Text style={s.roleTitle}>{ROLE_INFO[role].title}</Text>
-                <Text style={s.roleWhat}>{ROLE_INFO[role].what}</Text>
-              </View>
+    <Pressable onPress={onPress} accessibilityRole="button" accessibilityLabel="Staff">
+      <Card style={s.card}>
+        <Text style={s.cardTitle}>Staff</Text>
+        {STAFF_ROLES.map((role) => {
+          const st = state.staff?.[role];
+          return (
+            <View key={role} style={s.chip}>
+              <Text style={s.lineIcon}>{ROLE_INFO[role].icon}</Text>
+              {st ? <Stars n={st.stars} size={11} /> : <Text style={s.muted}>–</Text>}
             </View>
-            {st ? (
-              <View style={s.person}>
-                <View style={s.flex}>
-                  <Text style={s.name} numberOfLines={1}>
-                    {st.flag} {st.name}
-                  </Text>
-                  <Stars n={st.stars} />
-                  <Text style={s.effect}>{staffEffect(st)}</Text>
-                </View>
-                <View style={s.right}>
-                  <Text style={s.wage}>{formatMoney(st.wage)}</Text>
-                  <Text style={s.per}>per season</Text>
-                </View>
-              </View>
-            ) : (
-              <Text style={s.muted}>Nobody yet</Text>
-            )}
-            <Button label="See candidates" icon="account-search" variant="secondary" size="sm" onPress={() => onChange(role)} />
-          </Card>
-        );
-      })}
-      <Text style={s.hint}>
-        {open ? 'The transfer window is open: you can hire staff now.' : 'You can hire staff during a transfer window.'}
-      </Text>
-    </View>
+          );
+        })}
+        <Text style={s.cardLink}>›</Text>
+      </Card>
+    </Pressable>
   );
 }
 
-/** Candidates for one role, with the cost of hiring each. */
-export function StaffSheet({ role, onClose }: { role: StaffRole | null; onClose: () => void }) {
+/** Current staff per role and the candidates you can hire this window. */
+export function StaffSheet({ visible, onClose }: { visible: boolean; onClose: () => void }) {
   const { state, dispatch } = useCareer();
-  if (!role) return null;
+  const [role, setRole] = useState<StaffRole>('coach');
+  if (!visible) return null;
   const open = canTrade(state);
   const current = state.staff?.[role];
   const candidates = (state.staffMarket ?? []).filter((c) => c.role === role).sort((a, b) => b.stars - a.stars);
 
   return (
-    <Sheet visible title={ROLE_INFO[role].title} subtitle={ROLE_INFO[role].what} onClose={onClose}>
-      {current ? (
-        <>
-          <Text style={s.section}>YOURS NOW</Text>
-          <StaffRow staff={current} />
-        </>
-      ) : null}
-      <Text style={s.section}>{open ? 'AVAILABLE' : 'AVAILABLE IN THE NEXT WINDOW'}</Text>
+    <Sheet visible title="Staff" onClose={onClose}>
+      <View style={s.tabs}>
+        {STAFF_ROLES.map((r) => (
+          <Pressable key={r} onPress={() => setRole(r)} style={[s.tab, role === r && s.tabOn]} accessibilityRole="tab">
+            <Text style={[s.tabText, role === r && s.tabTextOn]}>
+              {ROLE_INFO[r].icon} {ROLE_INFO[r].title}
+            </Text>
+          </Pressable>
+        ))}
+      </View>
+      <Text style={s.what}>{ROLE_INFO[role].what}.</Text>
+
+      <Text style={s.section}>YOUR {ROLE_INFO[role].title.toUpperCase()}</Text>
+      {current ? <StaffRow staff={current} /> : <Text style={s.muted}>Nobody yet.</Text>}
+
+      <Text style={s.section}>AVAILABLE {open ? '' : '(HIRE IN A TRANSFER WINDOW)'}</Text>
       {candidates.map((c) => {
         const cost = hireCost(state, c);
         return (
           <StaffRow key={c.id} staff={c}>
             <Button
-              label={`Hire ${formatMoney(cost)}`}
-              size="sm"
+              label={`HIRE ${formatMoney(cost)}`}
+              variant="green"
+              small
               disabled={!open || cost > state.money}
               onPress={() => dispatch({ type: 'hireStaff', staffId: c.id })}
             />
           </StaffRow>
         );
       })}
-      <Text style={s.hint}>Hiring costs one season of wages up front, plus half a season to release the person you replace.</Text>
+      <Text style={s.hint}>
+        Hiring costs one season of wages up front, plus half a season to release the person you replace. Wages are
+        paid every season.
+      </Text>
     </Sheet>
   );
 }
 
 function StaffRow({ staff, children }: { staff: Staff; children?: ReactNode }) {
   return (
-    <Card style={s.row}>
-      <View style={s.flex}>
-        <Text style={s.name} numberOfLines={1}>
+    <View style={s.row}>
+      <View style={s.rowMain}>
+        <Text style={s.name}>
           {staff.flag} {staff.name}
         </Text>
-        <Stars n={staff.stars} />
+        <Stars n={staff.stars} size={14} />
         <Text style={s.effect}>{staffEffect(staff)}</Text>
-        <Text style={s.per}>{formatMoney(staff.wage)} per season</Text>
+        <Text style={s.muted}>{formatMoney(staff.wage)} per season</Text>
       </View>
       {children}
-    </Card>
+    </View>
   );
 }
 
 const s = StyleSheet.create({
-  flex: { flex: 1, minWidth: 0, gap: 3 },
-  stars: { flexDirection: 'row', gap: 1 },
-  panel: { gap: 12 },
-  roleCard: { gap: 12 },
-  roleHead: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  roleIcon: {
-    width: 42,
-    height: 42,
-    borderRadius: 21,
-    backgroundColor: colors.greenSoft,
+  card: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 10 },
+  cardTitle: { flex: 1, fontSize: 16, fontWeight: '900', color: colors.ink },
+  cardLink: { fontSize: 20, fontWeight: '900', color: colors.muted },
+  chip: { flexDirection: 'row', alignItems: 'center', gap: 3 },
+  lineIcon: { fontSize: 14 },
+  tabs: { flexDirection: 'row', gap: 6, marginBottom: 8 },
+  tab: { flex: 1, paddingVertical: 8, borderRadius: 12, alignItems: 'center', backgroundColor: colors.faint },
+  tabOn: { backgroundColor: colors.ink },
+  tabText: { fontSize: 12, fontWeight: '800', color: colors.muted },
+  tabTextOn: { color: '#FFFFFF' },
+  what: { fontSize: 14, fontWeight: '600', color: colors.muted, marginBottom: 6 },
+  section: { fontSize: 11, fontWeight: '900', letterSpacing: 1.2, color: colors.muted, marginTop: 12, marginBottom: 6 },
+  row: {
+    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
+    gap: 10,
+    backgroundColor: colors.card,
+    borderRadius: 16,
+    borderWidth: 2,
+    borderColor: colors.border,
+    padding: 12,
+    marginBottom: 8,
   },
-  roleTitle: { fontSize: 16, fontWeight: '800', color: colors.ink },
-  roleWhat: { fontSize: 13, fontWeight: '500', color: colors.muted },
-  person: { flexDirection: 'row', alignItems: 'center', gap: 10, backgroundColor: colors.inset, borderRadius: 12, padding: 12 },
-  right: { alignItems: 'flex-end' },
-  name: { fontSize: 15, fontWeight: '700', color: colors.ink },
-  effect: { fontSize: 13, fontWeight: '700', color: colors.greenDark },
-  wage: { fontSize: 15, fontWeight: '800', color: colors.ink },
-  per: { fontSize: 12, fontWeight: '500', color: colors.muted },
-  muted: { fontSize: 14, fontWeight: '600', color: colors.muted },
-  section: { fontSize: 12, fontWeight: '800', letterSpacing: 1.2, color: colors.muted, marginBottom: -4 },
-  row: { flexDirection: 'row', alignItems: 'center', gap: 10, padding: 14 },
-  hint: { fontSize: 13, fontWeight: '500', color: colors.muted, textAlign: 'center', lineHeight: 18 },
+  rowMain: { flex: 1, gap: 2 },
+  name: { fontSize: 15, fontWeight: '900', color: colors.ink },
+  effect: { fontSize: 13, fontWeight: '800', color: colors.green },
+  muted: { fontSize: 12, fontWeight: '700', color: colors.muted },
+  hint: { fontSize: 12, fontWeight: '600', color: colors.muted, marginTop: 8, lineHeight: 17 },
 });
