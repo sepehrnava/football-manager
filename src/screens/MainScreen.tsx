@@ -10,6 +10,7 @@ import { FadeIn } from '../ui/motion';
 import { colors, formatMoney, seasonLabel } from '../ui/theme';
 import { ChallengeEndScreen } from './Challenge';
 import { ClubScreen } from './ClubScreen';
+import { FacesPreview } from './FacesPreview';
 import { HonoursSheet } from './Honours';
 import { LeagueScreen } from './LeagueScreen';
 import { SeasonEndScreen } from './SeasonEndScreen';
@@ -128,6 +129,7 @@ export function MainScreen() {
 function SettingsSheet({ visible, onClose }: { visible: boolean; onClose: () => void }) {
   const { resetCareer, slot, leaveChallenge } = useGame();
   const [confirm, setConfirm] = useState(false);
+  const [faces, setFaces] = useState(false);
   if (!visible) return null;
   const close = () => {
     setConfirm(false);
@@ -154,7 +156,9 @@ function SettingsSheet({ visible, onClose }: { visible: boolean; onClose: () => 
         variant={confirm ? 'red' : 'light'}
         onPress={() => (confirm ? resetCareer() : setConfirm(true))}
       />
+      <Button label="PLAYER FACES (PREVIEW)" variant="light" onPress={() => setFaces(true)} />
       {DISCLAIMER ? <Text style={s.disclaimer}>{DISCLAIMER}</Text> : null}
+      <FacesPreview visible={faces} onClose={() => setFaces(false)} />
     </Sheet>
   );
 }

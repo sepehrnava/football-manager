@@ -28,6 +28,7 @@ Keep current work and a short completed baseline; avoid session logs.
 | T019: Fill remaining player data | S009-AC07 | Todo | Real players for the other clubs of the five new leagues and the Second Division |
 | T022: Staff, daily challenge, honours, news | S010-AC01–AC06 | Done | tsc, lint, headless sims, web flows |
 | T023: UI/UX pass over every screen | User request 2026-10-09 | Done (first pass) | 26-screen web audit: readable crests, top bar fits, club confirm sheet, compact staff row, offers lead with player, sim fixes |
+| T024: Player faces prototype | S011-AC01, AC02 | Done (prototype) | Web preview; user to judge the look and decide step 2 |
 
 New implementation tasks reference one spec, relevant acceptance IDs, and a concrete check.
 Split work by observable behavior. Candidate ideas do not become authorized tasks automatically.
