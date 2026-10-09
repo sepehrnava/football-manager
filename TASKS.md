@@ -18,7 +18,12 @@ Keep current work and a short completed baseline; avoid session logs.
 | T011: Club choice, transfer list, simpler home | S006-AC01–AC04 | Done | tsc, lint, web flows; per-club headless careers |
 | T012: Real-name league from editable data | S007-AC01–AC05 | Done | Converter validation, web English league, headless economy |
 | T013: Fill English player data | S007-AC06 | Done | 400 players added; user to verify recent transfers and ratings |
-| T014: Legal check before publishing | D008 | Todo (user) | Short IP-lawyer review; no real names in store assets | tsc, lint, web flow; 6 strategies × 30 careers | tsc, lint, web flows; 3 strategies × 30 careers × 5 seasons |
+| T014: Legal check before publishing | D008 | Todo (user) | Short IP-lawyer review; no real names in store assets |
+| T015: Divisions, promotion and relegation | S008-AC01–AC05 | Done | Headless seasons, web promotion flow |
+| T016: Second Division player data | S008 | Todo | Fill real players for the 24 Second Division clubs (optional) |
+| T017: Continental cups | S009-AC03 | Done | Champions Cup and Europa Cup built |
+| T018: Six leagues | S009-AC01–AC06 | Done | Converter, picker, headless per-league economy |
+| T019: Fill remaining player data | S009-AC07 | Todo | Real players for the other clubs of the five new leagues and the Second Division | tsc, lint, web flow; 6 strategies × 30 careers | tsc, lint, web flows; 3 strategies × 30 careers × 5 seasons |
 
 New implementation tasks reference one spec, relevant acceptance IDs, and a concrete check.
 Split work by observable behavior. Candidate ideas do not become authorized tasks automatically.

@@ -1,9 +1,19 @@
 import { useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 
-import { clubById, MONEY_STATUS_TEXT, moneyStatus, seasonRounds, USER_ID, userClub } from '../game/game';
+import {
+  clubById,
+  compTable,
+  MONEY_STATUS_TEXT,
+  moneyStatus,
+  seasonRounds,
+  USER_ID,
+  userClub,
+  userComp,
+} from '../game/game';
+import { compName, flagOf } from '../game/leagues';
+import { cupProgress } from '../game/cups';
 import { matchInsight, percent, userFixture } from '../game/insights';
-import { leagueTable } from '../game/league';
 import { useCareer } from '../state/GameContext';
 import { Card, ClubCrest } from '../ui/components';
 import { FadeIn } from '../ui/motion';
@@ -28,7 +38,7 @@ export function ClubScreen({
   const [sheetRound, setSheetRound] = useState<number | null>(null);
 
   const club = userClub(state);
-  const table = leagueTable(state.clubs, state.fixtures);
+  const table = compTable(state);
   const myRow = table.find((r) => r.clubId === USER_ID)!;
   const position = table.indexOf(myRow) + 1;
   const status = moneyStatus(state);
@@ -47,6 +57,13 @@ export function ClubScreen({
   const notes: { text: string; onPress?: () => void; color?: string }[] = [];
   if (status !== 'ok') {
     notes.push({ text: `${status === 'warning' ? '🚨' : '⚠️'} ${MONEY_STATUS_TEXT[status]}`, color: colors.red });
+  }
+  const inCups = (state.cups ?? []).filter((c) => cupProgress(c, USER_ID) && !cupProgress(c, USER_ID)!.out);
+  if (inCups.length) {
+    notes.push({
+      text: `🏆 ${inCups.map((c) => c.name).join(' and ')}: you are in, see the League tab ›`,
+      onPress: onOpenLeague,
+    });
   }
   if (state.offers.length) {
     notes.push({
@@ -69,7 +86,10 @@ export function ClubScreen({
           <Text style={s.clubName} numberOfLines={1}>
             {club.name}
           </Text>
-          <Text style={s.heroMeta}>Season {seasonLabel(state.season)}</Text>
+          <Text style={s.heroMeta}>
+            Season {seasonLabel(state.season)}
+            {` · ${flagOf(userComp(state).country)} ${compName(userComp(state))}`}
+          </Text>
         </View>
         <View style={s.posBadge}>
           <Text style={s.posValue}>{myRow.played ? ordinal(position) : '–'}</Text>

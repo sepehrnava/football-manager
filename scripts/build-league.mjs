@@ -1,11 +1,20 @@
-// Turns data/<league>/clubs.csv and players.csv into src/data/<league>.json,
-// the league pack the game loads. Usage: npm run build:league [-- english]
-import { readFileSync, writeFileSync } from 'node:fs';
+// Turns data/<country>/clubs.csv and players.csv for every country into
+// src/data/leagues.json, the world the game loads. Usage: npm run build:league
+import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
-const league = process.argv[2] ?? 'english';
+/** Countries in display order, with the adjective used in league names. */
+const COUNTRIES = [
+  ['english', 'English'],
+  ['spanish', 'Spanish'],
+  ['german', 'German'],
+  ['italian', 'Italian'],
+  ['french', 'French'],
+  ['dutch', 'Dutch'],
+];
+let league = '';
 const POSITIONS = new Set(['GK', 'CB', 'LB', 'RB', 'CDM', 'CM', 'CAM', 'LM', 'RM', 'LW', 'RW', 'ST']);
 const PATTERNS = new Set(['solid', 'stripes', 'half', 'band']);
 const errors = [];
@@ -46,8 +55,9 @@ function flag(code) {
   return String.fromCodePoint(...[...c].map((ch) => 0x1f1e6 + ch.charCodeAt(0) - 65));
 }
 
+function buildCountry() {
 const clubs = readCsv('clubs.csv').map((r) => {
-  const where = `clubs.csv line ${r.line}`;
+  const where = `${league}/clubs.csv line ${r.line}`;
   if (!/^[A-Z]{3}$/.test(r.short)) errors.push(`${where}: short must be 3 capital letters`);
   if (!r.name) errors.push(`${where}: name is empty`);
   for (const col of ['primary', 'secondary']) {
@@ -56,6 +66,8 @@ const clubs = readCsv('clubs.csv').map((r) => {
   if (!PATTERNS.has(r.pattern)) errors.push(`${where}: pattern must be solid, stripes, half or band`);
   const strength = Number(r.strength);
   if (!(strength >= 55 && strength <= 90)) errors.push(`${where}: strength must be 55-90`);
+  const division = r.division ? Number(r.division) : 1;
+  if (!Number.isInteger(division) || division < 1 || division > 4) errors.push(`${where}: division must be 1-4`);
   return {
     short: r.short,
     name: r.name,
@@ -63,15 +75,21 @@ const clubs = readCsv('clubs.csv').map((r) => {
     secondary: r.secondary.toUpperCase(),
     pattern: r.pattern,
     level: Math.round(strength),
+    division,
   };
 });
 
 const shorts = new Set(clubs.map((c) => c.short));
 if (shorts.size !== clubs.length) errors.push('clubs.csv: two clubs share the same short code');
-if (clubs.length % 2) errors.push(`clubs.csv: the league needs an even number of clubs (has ${clubs.length})`);
+const divisions = [...new Set(clubs.map((c) => c.division))].sort();
+divisions.forEach((d, i) => {
+  if (d !== i + 1) errors.push(`clubs.csv: divisions must be numbered 1, 2, ... without gaps`);
+  const n = clubs.filter((c) => c.division === d).length;
+  if (n % 2 || n < 4) errors.push(`clubs.csv: division ${d} needs an even number of clubs, at least 4 (has ${n})`);
+});
 
 const players = readCsv('players.csv').map((r) => {
-  const where = `players.csv line ${r.line}`;
+  const where = `${league}/players.csv line ${r.line}`;
   if (!shorts.has(r.club)) errors.push(`${where}: unknown club "${r.club}"`);
   if (!r.name) errors.push(`${where}: name is empty`);
   const positions = r.positions.split('/').map((p) => p.trim().toUpperCase()).filter(Boolean);
@@ -89,13 +107,29 @@ const players = readCsv('players.csv').map((r) => {
   return { club: r.club, name: r.name, positions, age, flag: flag(r.nation), rating, potential };
 });
 
+  return { clubs, players, divisions };
+}
+
+const countries = [];
+for (const [id, adjective] of COUNTRIES) {
+  if (!existsSync(join(root, 'data', id, 'clubs.csv'))) continue;
+  league = id;
+  const before = errors.length;
+  const { clubs, players, divisions } = buildCountry();
+  if (errors.length > before) continue;
+  countries.push({ id, name: adjective, clubs, players });
+  const filled = clubs.filter((c) => players.some((p) => p.club === c.short)).length;
+  console.log(
+    `${adjective}: ${divisions.map((d) => `division ${d} ${clubs.filter((c) => c.division === d).length} clubs`).join(', ')}; ` +
+      `${players.length} players (${filled} clubs with real players)`,
+  );
+}
+
 if (errors.length) {
-  console.error(`League "${league}" has ${errors.length} problem(s):\n- ${errors.join('\n- ')}`);
+  console.error(`${errors.length} problem(s):\n- ${errors.join('\n- ')}`);
   process.exit(1);
 }
 
-const name = { english: 'English League' }[league] ?? `${league[0].toUpperCase()}${league.slice(1)} League`;
-const out = join(root, 'src', 'data', `${league}.json`);
-writeFileSync(out, `${JSON.stringify({ id: league, name, clubs, players }, null, 2)}\n`);
-const perClub = clubs.map((c) => `${c.short} ${players.filter((p) => p.club === c.short).length}`);
-console.log(`Wrote ${out}\n${clubs.length} clubs, ${players.length} players (${perClub.join(', ')})`);
+const out = join(root, 'src', 'data', 'leagues.json');
+writeFileSync(out, `${JSON.stringify({ countries }, null, 1)}\n`);
+console.log(`Wrote ${out}`);

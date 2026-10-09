@@ -1,9 +1,11 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { AppState } from 'react-native';
 import {
   createContext,
   useContext,
   useEffect,
   useReducer,
+  useRef,
   useState,
   type Dispatch,
   type ReactNode,
@@ -38,10 +40,26 @@ export function GameProvider({ children }: { children: ReactNode }) {
       .finally(() => setLoaded(true));
   }, []);
 
+  // Saves are batched: the world is large, and a fast simulation changes the
+  // state every matchday. Write at most about once a second, and right away
+  // when the app goes to the background.
+  const latest = useRef<GameState | null>(null);
   useEffect(() => {
     if (!loaded || !state) return;
-    AsyncStorage.setItem(SAVE_KEY, JSON.stringify(state)).catch(() => {});
+    latest.current = state;
+    const t = setTimeout(() => {
+      AsyncStorage.setItem(SAVE_KEY, JSON.stringify(state)).catch(() => {});
+    }, 1000);
+    return () => clearTimeout(t);
   }, [state, loaded]);
+  useEffect(() => {
+    const sub = AppState.addEventListener('change', (next) => {
+      if (next !== 'active' && latest.current) {
+        AsyncStorage.setItem(SAVE_KEY, JSON.stringify(latest.current)).catch(() => {});
+      }
+    });
+    return () => sub.remove();
+  }, []);
 
   const resetCareer = () => {
     AsyncStorage.removeItem(SAVE_KEY).catch(() => {});

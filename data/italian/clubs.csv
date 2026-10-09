@@ -1,0 +1,43 @@
+# Clubs (2025/26 season). short: 3 letters, unique within the country. pattern: solid, stripes, half or band.
+# strength: typical rating of the starters (55-90). division: 1 = top division.
+short,name,primary,secondary,pattern,strength,division
+INT,Inter,#0068A8,#000000,stripes,84,1
+NAP,Napoli,#12A0D7,#FFFFFF,solid,83,1
+JUV,Juventus,#FFFFFF,#000000,stripes,82,1
+MIL,AC Milan,#FB090B,#000000,stripes,81,1
+ATA,Atalanta,#1E71B8,#000000,stripes,81,1
+ROM,Roma,#8E1F2F,#F0BC42,solid,80,1
+BOL,Bologna,#1A2F48,#A21C26,half,79,1
+FIO,Fiorentina,#482E92,#FFFFFF,solid,78,1
+LAZ,Lazio,#87D8F7,#FFFFFF,solid,78,1
+COM,Como,#003DA5,#FFFFFF,solid,78,1
+TOR,Torino,#8A1E03,#FFFFFF,solid,75,1
+UDI,Udinese,#FFFFFF,#000000,stripes,74,1
+GEN,Genoa,#A6192E,#002F6C,half,74,1
+CAG,Cagliari,#A6192E,#002F6C,half,73,1
+PAR,Parma,#FFFFFF,#FFD700,band,73,1
+SAS,Sassuolo,#00A752,#000000,stripes,73,1
+VER,Hellas Verona,#FFE000,#003399,solid,72,1
+LEC,Lecce,#FFE300,#E30613,stripes,72,1
+PIS,Pisa,#00205B,#000000,stripes,71,1
+CRE,Cremonese,#E30613,#9E9E9E,stripes,71,1
+VEN,Venezia,#F26B21,#00663B,band,70,2
+FRO,Frosinone,#FFDD00,#005CA9,solid,69,2
+MON,Monza,#E30613,#FFFFFF,stripes,70,2
+PAL,Palermo,#F7A8B8,#000000,half,70,2
+MOD,Modena,#FFDD00,#005CA9,stripes,66,2
+CAT,Catanzaro,#E30613,#FFDD00,stripes,67,2
+JST,Juve Stabia,#FFDD00,#0057B8,solid,64,2
+CES,Cesena,#FFFFFF,#000000,band,65,2
+AVE,Avellino,#00A650,#FFFFFF,solid,65,2
+PAD,Padova,#FFFFFF,#E30613,band,65,2
+CAR,Carrarese,#FFDD00,#0057B8,stripes,63,2
+SAM,Sampdoria,#0057B8,#FFFFFF,band,68,2
+MAN,Mantova,#E30613,#FFFFFF,solid,63,2
+EMP,Empoli,#0057B8,#FFFFFF,solid,68,2
+BAR,Bari,#FFFFFF,#E30613,solid,67,2
+SPE,Spezia,#FFFFFF,#000000,band,66,2
+REG,Reggiana,#9E1B32,#FFFFFF,solid,64,2
+SUD,Südtirol,#FFFFFF,#E30613,solid,63,2
+PES,Pescara,#FFFFFF,#0057B8,stripes,64,2
+ENT,Virtus Entella,#FFFFFF,#0057B8,solid,62,2

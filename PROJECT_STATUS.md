@@ -15,6 +15,11 @@ Updated: 2026-10-08. Replace outdated entries; keep this as a snapshot.
 - English league (20 clubs, 400 real players, no badges) from editable CSV data with a
   validating converter and a disclaimer (S007). Economy is priced relative to the league.
   Squads reflect 2025/26 knowledge; recent transfers need checking before publishing.
+- Two divisions with promotion and relegation; Second Division clubs use generated
+  players for now; new clubs start in the Second Division (S008).
+- Six countries (England with two divisions, Spain, Germany, Italy, France, Netherlands),
+  138 clubs; Champions Cup and Europa Cup knockouts for top finishers (S009). Real players
+  exist for 20 English clubs and the top 2-4 clubs elsewhere; the rest are generated.
 - Game rules in src/game (pure TypeScript); screens in src/screens; theme in src/ui.
 - npm lockfile, lint configuration, and setup instructions in README.md.
 - Spec-driven documentation and selective context-reading workflow.

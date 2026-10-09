@@ -1,0 +1,9560 @@
+{
+ "countries": [
+  {
+   "id": "english",
+   "name": "English",
+   "clubs": [
+    {
+     "short": "ARS",
+     "name": "Arsenal",
+     "primary": "#EF0107",
+     "secondary": "#FFFFFF",
+     "pattern": "band",
+     "level": 82,
+     "division": 1
+    },
+    {
+     "short": "AVL",
+     "name": "Aston Villa",
+     "primary": "#670E36",
+     "secondary": "#95BFE5",
+     "pattern": "half",
+     "level": 77,
+     "division": 1
+    },
+    {
+     "short": "BOU",
+     "name": "Bournemouth",
+     "primary": "#DA291C",
+     "secondary": "#000000",
+     "pattern": "stripes",
+     "level": 73,
+     "division": 1
+    },
+    {
+     "short": "BRE",
+     "name": "Brentford",
+     "primary": "#E30613",
+     "secondary": "#FFFFFF",
+     "pattern": "stripes",
+     "level": 72,
+     "division": 1
+    },
+    {
+     "short": "BHA",
+     "name": "Brighton & Hove Albion",
+     "primary": "#0057B8",
+     "secondary": "#FFFFFF",
+     "pattern": "stripes",
+     "level": 74,
+     "division": 1
+    },
+    {
+     "short": "BUR",
+     "name": "Burnley",
+     "primary": "#6C1D45",
+     "secondary": "#99D6EA",
+     "pattern": "half",
+     "level": 68,
+     "division": 1
+    },
+    {
+     "short": "CHE",
+     "name": "Chelsea",
+     "primary": "#034694",
+     "secondary": "#FFFFFF",
+     "pattern": "solid",
+     "level": 79,
+     "division": 1
+    },
+    {
+     "short": "CRY",
+     "name": "Crystal Palace",
+     "primary": "#1B458F",
+     "secondary": "#C4122E",
+     "pattern": "stripes",
+     "level": 73,
+     "division": 1
+    },
+    {
+     "short": "EVE",
+     "name": "Everton",
+     "primary": "#003399",
+     "secondary": "#FFFFFF",
+     "pattern": "solid",
+     "level": 72,
+     "division": 1
+    },
+    {
+     "short": "FUL",
+     "name": "Fulham",
+     "primary": "#FFFFFF",
+     "secondary": "#000000",
+     "pattern": "band",
+     "level": 72,
+     "division": 1
+    },
+    {
+     "short": "LEE",
+     "name": "Leeds United",
+     "primary": "#FFFFFF",
+     "secondary": "#1D428A",
+     "pattern": "band",
+     "level": 70,
+     "division": 1
+    },
+    {
+     "short": "LIV",
+     "name": "Liverpool",
+     "primary": "#C8102E",
+     "secondary": "#FFFFFF",
+     "pattern": "solid",
+     "level": 82,
+     "division": 1
+    },
+    {
+     "short": "MCI",
+     "name": "Manchester City",
+     "primary": "#6CABDD",
+     "secondary": "#FFFFFF",
+     "pattern": "solid",
+     "level": 81,
+     "division": 1
+    },
+    {
+     "short": "MUN",
+     "name": "Manchester United",
+     "primary": "#DA291C",
+     "secondary": "#FBE122",
+     "pattern": "solid",
+     "level": 76,
+     "division": 1
+    },
+    {
+     "short": "NEW",
+     "name": "Newcastle United",
+     "primary": "#241F20",
+     "secondary": "#FFFFFF",
+     "pattern": "stripes",
+     "level": 77,
+     "division": 1
+    },
+    {
+     "short": "NFO",
+     "name": "Nottingham Forest",
+     "primary": "#DD0000",
+     "secondary": "#FFFFFF",
+     "pattern": "solid",
+     "level": 74,
+     "division": 1
+    },
+    {
+     "short": "SUN",
+     "name": "Sunderland",
+     "primary": "#EB172B",
+     "secondary": "#FFFFFF",
+     "pattern": "stripes",
+     "level": 69,
+     "division": 1
+    },
+    {
+     "short": "TOT",
+     "name": "Tottenham Hotspur",
+     "primary": "#FFFFFF",
+     "secondary": "#132257",
+     "pattern": "band",
+     "level": 76,
+     "division": 1
+    },
+    {
+     "short": "WHU",
+     "name": "West Ham United",
+     "primary": "#7A263A",
+     "secondary": "#1BB1E7",
+     "pattern": "half",
+     "level": 72,
+     "division": 1
+    },
+    {
+     "short": "WOL",
+     "name": "Wolverhampton Wanderers",
+     "primary": "#FDB913",
+     "secondary": "#231F20",
+     "pattern": "solid",
+     "level": 70,
+     "division": 1
+    },
+    {
+     "short": "BIR",
+     "name": "Birmingham City",
+     "primary": "#0000FF",
+     "secondary": "#FFFFFF",
+     "pattern": "solid",
+     "level": 70,
+     "division": 2
+    },
+    {
+     "short": "BLB",
+     "name": "Blackburn Rovers",
+     "primary": "#009EE0",
+     "secondary": "#FFFFFF",
+     "pattern": "half",
+     "level": 69,
+     "division": 2
+    },
+    {
+     "short": "BRC",
+     "name": "Bristol City",
+     "primary": "#E21B23",
+     "secondary": "#FFFFFF",
+     "pattern": "solid",
+     "level": 70,
+     "division": 2
+    },
+    {
+     "short": "CHA",
+     "name": "Charlton Athletic",
+     "primary": "#D4021D",
+     "secondary": "#FFFFFF",
+     "pattern": "solid",
+     "level": 67,
+     "division": 2
+    },
+    {
+     "short": "COV",
+     "name": "Coventry City",
+     "primary": "#6CADDF",
+     "secondary": "#FFFFFF",
+     "pattern": "solid",
+     "level": 72,
+     "division": 2
+    },
+    {
+     "short": "DER",
+     "name": "Derby County",
+     "primary": "#FFFFFF",
+     "secondary": "#000000",
+     "pattern": "band",
+     "level": 68,
+     "division": 2
+    },
+    {
+     "short": "HUL",
+     "name": "Hull City",
+     "primary": "#F5A12D",
+     "secondary": "#000000",
+     "pattern": "stripes",
+     "level": 69,
+     "division": 2
+    },
+    {
+     "short": "IPS",
+     "name": "Ipswich Town",
+     "primary": "#0044A9",
+     "secondary": "#FFFFFF",
+     "pattern": "solid",
+     "level": 73,
+     "division": 2
+    },
+    {
+     "short": "LEI",
+     "name": "Leicester City",
+     "primary": "#003090",
+     "secondary": "#FDBE11",
+     "pattern": "solid",
+     "level": 74,
+     "division": 2
+    },
+    {
+     "short": "MID",
+     "name": "Middlesbrough",
+     "primary": "#E11B22",
+     "secondary": "#FFFFFF",
+     "pattern": "band",
+     "level": 72,
+     "division": 2
+    },
+    {
+     "short": "MIL",
+     "name": "Millwall",
+     "primary": "#001D5E",
+     "secondary": "#FFFFFF",
+     "pattern": "solid",
+     "level": 70,
+     "division": 2
+    },
+    {
+     "short": "NOR",
+     "name": "Norwich City",
+     "primary": "#FFF200",
+     "secondary": "#00A650",
+     "pattern": "solid",
+     "level": 71,
+     "division": 2
+    },
+    {
+     "short": "OXU",
+     "name": "Oxford United",
+     "primary": "#FFD700",
+     "secondary": "#002147",
+     "pattern": "solid",
+     "level": 67,
+     "division": 2
+    },
+    {
+     "short": "POR",
+     "name": "Portsmouth",
+     "primary": "#001489",
+     "secondary": "#FFFFFF",
+     "pattern": "solid",
+     "level": 68,
+     "division": 2
+    },
+    {
+     "short": "PNE",
+     "name": "Preston North End",
+     "primary": "#FFFFFF",
+     "secondary": "#002147",
+     "pattern": "band",
+     "level": 69,
+     "division": 2
+    },
+    {
+     "short": "QPR",
+     "name": "Queens Park Rangers",
+     "primary": "#1D5BA4",
+     "secondary": "#FFFFFF",
+     "pattern": "band",
+     "level": 69,
+     "division": 2
+    },
+    {
+     "short": "SHU",
+     "name": "Sheffield United",
+     "primary": "#EE2737",
+     "secondary": "#FFFFFF",
+     "pattern": "stripes",
+     "level": 72,
+     "division": 2
+    },
+    {
+     "short": "SHW",
+     "name": "Sheffield Wednesday",
+     "primary": "#0E00F7",
+     "secondary": "#FFFFFF",
+     "pattern": "stripes",
+     "level": 66,
+     "division": 2
+    },
+    {
+     "short": "SOU",
+     "name": "Southampton",
+     "primary": "#D71920",
+     "secondary": "#FFFFFF",
+     "pattern": "stripes",
+     "level": 74,
+     "division": 2
+    },
+    {
+     "short": "STK",
+     "name": "Stoke City",
+     "primary": "#E03A3E",
+     "secondary": "#FFFFFF",
+     "pattern": "stripes",
+     "level": 70,
+     "division": 2
+    },
+    {
+     "short": "SWA",
+     "name": "Swansea City",
+     "primary": "#FFFFFF",
+     "secondary": "#000000",
+     "pattern": "solid",
+     "level": 69,
+     "division": 2
+    },
+    {
+     "short": "WAT",
+     "name": "Watford",
+     "primary": "#FBEE23",
+     "secondary": "#ED2127",
+     "pattern": "solid",
+     "level": 70,
+     "division": 2
+    },
+    {
+     "short": "WBA",
+     "name": "West Bromwich Albion",
+     "primary": "#122F67",
+     "secondary": "#FFFFFF",
+     "pattern": "stripes",
+     "level": 71,
+     "division": 2
+    },
+    {
+     "short": "WRE",
+     "name": "Wrexham",
+     "primary": "#D71920",
+     "secondary": "#FFFFFF",
+     "pattern": "solid",
+     "level": 69,
+     "division": 2
+    }
+   ],
+   "players": [
+    {
+     "club": "ARS",
+     "name": "David Raya",
+     "positions": [
+      "GK"
+     ],
+     "age": 31,
+     "flag": "🇪🇸",
+     "rating": 85,
+     "potential": null
+    },
+    {
+     "club": "ARS",
+     "name": "Kepa Arrizabalaga",
+     "positions": [
+      "GK"
+     ],
+     "age": 31,
+     "flag": "🇪🇸",
+     "rating": 78,
+     "potential": null
+    },
+    {
+     "club": "ARS",
+     "name": "William Saliba",
+     "positions": [
+      "CB"
+     ],
+     "age": 25,
+     "flag": "🇫🇷",
+     "rating": 87,
+     "potential": null
+    },
+    {
+     "club": "ARS",
+     "name": "Gabriel Magalhães",
+     "positions": [
+      "CB"
+     ],
+     "age": 28,
+     "flag": "🇧🇷",
+     "rating": 86,
+     "potential": null
+    },
+    {
+     "club": "ARS",
+     "name": "Ben White",
+     "positions": [
+      "RB"
+     ],
+     "age": 28,
+     "flag": "🇬🇧",
+     "rating": 80,
+     "potential": null
+    },
+    {
+     "club": "ARS",
+     "name": "Jurriën Timber",
+     "positions": [
+      "RB",
+      "CB"
+     ],
+     "age": 25,
+     "flag": "🇳🇱",
+     "rating": 82,
+     "potential": null
+    },
+    {
+     "club": "ARS",
+     "name": "Riccardo Calafiori",
+     "positions": [
+      "LB",
+      "CB"
+     ],
+     "age": 24,
+     "flag": "🇮🇹",
+     "rating": 80,
+     "potential": null
+    },
+    {
+     "club": "ARS",
+     "name": "Myles Lewis-Skelly",
+     "positions": [
+      "LB",
+      "CM"
+     ],
+     "age": 19,
+     "flag": "🇬🇧",
+     "rating": 76,
+     "potential": 86
+    },
+    {
+     "club": "ARS",
+     "name": "Cristhian Mosquera",
+     "positions": [
+      "CB"
+     ],
+     "age": 22,
+     "flag": "🇪🇸",
+     "rating": 77,
+     "potential": 84
+    },
+    {
+     "club": "ARS",
+     "name": "Martín Zubimendi",
+     "positions": [
+      "CDM"
+     ],
+     "age": 27,
+     "flag": "🇪🇸",
+     "rating": 85,
+     "potential": null
+    },
+    {
+     "club": "ARS",
+     "name": "Declan Rice",
+     "positions": [
+      "CM"
+     ],
+     "age": 27,
+     "flag": "🇬🇧",
+     "rating": 87,
+     "potential": null
+    },
+    {
+     "club": "ARS",
+     "name": "Martin Ødegaard",
+     "positions": [
+      "CAM"
+     ],
+     "age": 27,
+     "flag": "🇳🇴",
+     "rating": 85,
+     "potential": null
+    },
+    {
+     "club": "ARS",
+     "name": "Mikel Merino",
+     "positions": [
+      "CM"
+     ],
+     "age": 30,
+     "flag": "🇪🇸",
+     "rating": 81,
+     "potential": null
+    },
+    {
+     "club": "ARS",
+     "name": "Christian Nørgaard",
+     "positions": [
+      "CDM"
+     ],
+     "age": 32,
+     "flag": "🇩🇰",
+     "rating": 78,
+     "potential": null
+    },
+    {
+     "club": "ARS",
+     "name": "Eberechi Eze",
+     "positions": [
+      "CAM",
+      "LW"
+     ],
+     "age": 28,
+     "flag": "🇬🇧",
+     "rating": 83,
+     "potential": null
+    },
+    {
+     "club": "ARS",
+     "name": "Bukayo Saka",
+     "positions": [
+      "RW"
+     ],
+     "age": 25,
+     "flag": "🇬🇧",
+     "rating": 87,
+     "potential": null
+    },
+    {
+     "club": "ARS",
+     "name": "Noni Madueke",
+     "positions": [
+      "RW"
+     ],
+     "age": 24,
+     "flag": "🇬🇧",
+     "rating": 80,
+     "potential": null
+    },
+    {
+     "club": "ARS",
+     "name": "Gabriel Martinelli",
+     "positions": [
+      "LW"
+     ],
+     "age": 25,
+     "flag": "🇧🇷",
+     "rating": 81,
+     "potential": null
+    },
+    {
+     "club": "ARS",
+     "name": "Leandro Trossard",
+     "positions": [
+      "LW"
+     ],
+     "age": 31,
+     "flag": "🇧🇪",
+     "rating": 80,
+     "potential": null
+    },
+    {
+     "club": "ARS",
+     "name": "Viktor Gyökeres",
+     "positions": [
+      "ST"
+     ],
+     "age": 28,
+     "flag": "🇸🇪",
+     "rating": 84,
+     "potential": null
+    },
+    {
+     "club": "ARS",
+     "name": "Kai Havertz",
+     "positions": [
+      "ST",
+      "CAM"
+     ],
+     "age": 27,
+     "flag": "🇩🇪",
+     "rating": 82,
+     "potential": null
+    },
+    {
+     "club": "ARS",
+     "name": "Ethan Nwaneri",
+     "positions": [
+      "CAM"
+     ],
+     "age": 19,
+     "flag": "🇬🇧",
+     "rating": 76,
+     "potential": 87
+    },
+    {
+     "club": "LIV",
+     "name": "Alisson",
+     "positions": [
+      "GK"
+     ],
+     "age": 33,
+     "flag": "🇧🇷",
+     "rating": 87,
+     "potential": null
+    },
+    {
+     "club": "LIV",
+     "name": "Giorgi Mamardashvili",
+     "positions": [
+      "GK"
+     ],
+     "age": 25,
+     "flag": "🇬🇪",
+     "rating": 80,
+     "potential": null
+    },
+    {
+     "club": "LIV",
+     "name": "Virgil van Dijk",
+     "positions": [
+      "CB"
+     ],
+     "age": 35,
+     "flag": "🇳🇱",
+     "rating": 85,
+     "potential": null
+    },
+    {
+     "club": "LIV",
+     "name": "Ibrahima Konaté",
+     "positions": [
+      "CB"
+     ],
+     "age": 27,
+     "flag": "🇫🇷",
+     "rating": 84,
+     "potential": null
+    },
+    {
+     "club": "LIV",
+     "name": "Joe Gomez",
+     "positions": [
+      "CB"
+     ],
+     "age": 29,
+     "flag": "🇬🇧",
+     "rating": 77,
+     "potential": null
+    },
+    {
+     "club": "LIV",
+     "name": "Giovanni Leoni",
+     "positions": [
+      "CB"
+     ],
+     "age": 19,
+     "flag": "🇮🇹",
+     "rating": 72,
+     "potential": 85
+    },
+    {
+     "club": "LIV",
+     "name": "Milos Kerkez",
+     "positions": [
+      "LB"
+     ],
+     "age": 22,
+     "flag": "🇭🇺",
+     "rating": 80,
+     "potential": null
+    },
+    {
+     "club": "LIV",
+     "name": "Andy Robertson",
+     "positions": [
+      "LB"
+     ],
+     "age": 32,
+     "flag": "🇬🇧",
+     "rating": 79,
+     "potential": null
+    },
+    {
+     "club": "LIV",
+     "name": "Jeremie Frimpong",
+     "positions": [
+      "RB"
+     ],
+     "age": 25,
+     "flag": "🇳🇱",
+     "rating": 81,
+     "potential": null
+    },
+    {
+     "club": "LIV",
+     "name": "Conor Bradley",
+     "positions": [
+      "RB"
+     ],
+     "age": 23,
+     "flag": "🇬🇧",
+     "rating": 78,
+     "potential": null
+    },
+    {
+     "club": "LIV",
+     "name": "Ryan Gravenberch",
+     "positions": [
+      "CDM"
+     ],
+     "age": 24,
+     "flag": "🇳🇱",
+     "rating": 85,
+     "potential": null
+    },
+    {
+     "club": "LIV",
+     "name": "Alexis Mac Allister",
+     "positions": [
+      "CM"
+     ],
+     "age": 27,
+     "flag": "🇦🇷",
+     "rating": 86,
+     "potential": null
+    },
+    {
+     "club": "LIV",
+     "name": "Dominik Szoboszlai",
+     "positions": [
+      "CM"
+     ],
+     "age": 25,
+     "flag": "🇭🇺",
+     "rating": 84,
+     "potential": null
+    },
+    {
+     "club": "LIV",
+     "name": "Curtis Jones",
+     "positions": [
+      "CM"
+     ],
+     "age": 25,
+     "flag": "🇬🇧",
+     "rating": 79,
+     "potential": null
+    },
+    {
+     "club": "LIV",
+     "name": "Florian Wirtz",
+     "positions": [
+      "CAM"
+     ],
+     "age": 23,
+     "flag": "🇩🇪",
+     "rating": 87,
+     "potential": null
+    },
+    {
+     "club": "LIV",
+     "name": "Wataru Endo",
+     "positions": [
+      "CDM"
+     ],
+     "age": 33,
+     "flag": "🇯🇵",
+     "rating": 76,
+     "potential": null
+    },
+    {
+     "club": "LIV",
+     "name": "Mohamed Salah",
+     "positions": [
+      "RW"
+     ],
+     "age": 34,
+     "flag": "🇪🇬",
+     "rating": 85,
+     "potential": null
+    },
+    {
+     "club": "LIV",
+     "name": "Cody Gakpo",
+     "positions": [
+      "LW"
+     ],
+     "age": 27,
+     "flag": "🇳🇱",
+     "rating": 83,
+     "potential": null
+    },
+    {
+     "club": "LIV",
+     "name": "Federico Chiesa",
+     "positions": [
+      "RW"
+     ],
+     "age": 28,
+     "flag": "🇮🇹",
+     "rating": 76,
+     "potential": null
+    },
+    {
+     "club": "LIV",
+     "name": "Hugo Ekitiké",
+     "positions": [
+      "ST"
+     ],
+     "age": 24,
+     "flag": "🇫🇷",
+     "rating": 83,
+     "potential": null
+    },
+    {
+     "club": "LIV",
+     "name": "Alexander Isak",
+     "positions": [
+      "ST"
+     ],
+     "age": 26,
+     "flag": "🇸🇪",
+     "rating": 86,
+     "potential": null
+    },
+    {
+     "club": "LIV",
+     "name": "Rio Ngumoha",
+     "positions": [
+      "LW"
+     ],
+     "age": 17,
+     "flag": "🇬🇧",
+     "rating": 68,
+     "potential": 86
+    },
+    {
+     "club": "MCI",
+     "name": "Gianluigi Donnarumma",
+     "positions": [
+      "GK"
+     ],
+     "age": 27,
+     "flag": "🇮🇹",
+     "rating": 88,
+     "potential": null
+    },
+    {
+     "club": "MCI",
+     "name": "James Trafford",
+     "positions": [
+      "GK"
+     ],
+     "age": 24,
+     "flag": "🇬🇧",
+     "rating": 78,
+     "potential": null
+    },
+    {
+     "club": "MCI",
+     "name": "Rúben Dias",
+     "positions": [
+      "CB"
+     ],
+     "age": 29,
+     "flag": "🇵🇹",
+     "rating": 86,
+     "potential": null
+    },
+    {
+     "club": "MCI",
+     "name": "Joško Gvardiol",
+     "positions": [
+      "CB",
+      "LB"
+     ],
+     "age": 24,
+     "flag": "🇭🇷",
+     "rating": 85,
+     "potential": null
+    },
+    {
+     "club": "MCI",
+     "name": "Abdukodir Khusanov",
+     "positions": [
+      "CB"
+     ],
+     "age": 22,
+     "flag": "🇺🇿",
+     "rating": 77,
+     "potential": 84
+    },
+    {
+     "club": "MCI",
+     "name": "John Stones",
+     "positions": [
+      "CB"
+     ],
+     "age": 32,
+     "flag": "🇬🇧",
+     "rating": 80,
+     "potential": null
+    },
+    {
+     "club": "MCI",
+     "name": "Nathan Aké",
+     "positions": [
+      "CB"
+     ],
+     "age": 31,
+     "flag": "🇳🇱",
+     "rating": 79,
+     "potential": null
+    },
+    {
+     "club": "MCI",
+     "name": "Rayan Aït-Nouri",
+     "positions": [
+      "LB"
+     ],
+     "age": 25,
+     "flag": "🇩🇿",
+     "rating": 81,
+     "potential": null
+    },
+    {
+     "club": "MCI",
+     "name": "Matheus Nunes",
+     "positions": [
+      "RB",
+      "CM"
+     ],
+     "age": 28,
+     "flag": "🇵🇹",
+     "rating": 79,
+     "potential": null
+    },
+    {
+     "club": "MCI",
+     "name": "Rico Lewis",
+     "positions": [
+      "RB"
+     ],
+     "age": 21,
+     "flag": "🇬🇧",
+     "rating": 78,
+     "potential": null
+    },
+    {
+     "club": "MCI",
+     "name": "Rodri",
+     "positions": [
+      "CDM"
+     ],
+     "age": 30,
+     "flag": "🇪🇸",
+     "rating": 88,
+     "potential": null
+    },
+    {
+     "club": "MCI",
+     "name": "Tijjani Reijnders",
+     "positions": [
+      "CM"
+     ],
+     "age": 28,
+     "flag": "🇳🇱",
+     "rating": 84,
+     "potential": null
+    },
+    {
+     "club": "MCI",
+     "name": "Bernardo Silva",
+     "positions": [
+      "CM"
+     ],
+     "age": 32,
+     "flag": "🇵🇹",
+     "rating": 83,
+     "potential": null
+    },
+    {
+     "club": "MCI",
+     "name": "Mateo Kovačić",
+     "positions": [
+      "CM"
+     ],
+     "age": 32,
+     "flag": "🇭🇷",
+     "rating": 80,
+     "potential": null
+    },
+    {
+     "club": "MCI",
+     "name": "Nico González",
+     "positions": [
+      "CDM"
+     ],
+     "age": 24,
+     "flag": "🇪🇸",
+     "rating": 79,
+     "potential": null
+    },
+    {
+     "club": "MCI",
+     "name": "Phil Foden",
+     "positions": [
+      "CAM"
+     ],
+     "age": 26,
+     "flag": "🇬🇧",
+     "rating": 85,
+     "potential": null
+    },
+    {
+     "club": "MCI",
+     "name": "Rayan Cherki",
+     "positions": [
+      "CAM"
+     ],
+     "age": 23,
+     "flag": "🇫🇷",
+     "rating": 82,
+     "potential": null
+    },
+    {
+     "club": "MCI",
+     "name": "Jérémy Doku",
+     "positions": [
+      "LW"
+     ],
+     "age": 24,
+     "flag": "🇧🇪",
+     "rating": 82,
+     "potential": null
+    },
+    {
+     "club": "MCI",
+     "name": "Savinho",
+     "positions": [
+      "RW"
+     ],
+     "age": 22,
+     "flag": "🇧🇷",
+     "rating": 80,
+     "potential": null
+    },
+    {
+     "club": "MCI",
+     "name": "Oscar Bobb",
+     "positions": [
+      "RW"
+     ],
+     "age": 23,
+     "flag": "🇳🇴",
+     "rating": 75,
+     "potential": null
+    },
+    {
+     "club": "MCI",
+     "name": "Omar Marmoush",
+     "positions": [
+      "ST"
+     ],
+     "age": 27,
+     "flag": "🇪🇬",
+     "rating": 82,
+     "potential": null
+    },
+    {
+     "club": "MCI",
+     "name": "Erling Haaland",
+     "positions": [
+      "ST"
+     ],
+     "age": 26,
+     "flag": "🇳🇴",
+     "rating": 90,
+     "potential": null
+    },
+    {
+     "club": "CHE",
+     "name": "Robert Sánchez",
+     "positions": [
+      "GK"
+     ],
+     "age": 28,
+     "flag": "🇪🇸",
+     "rating": 79,
+     "potential": null
+    },
+    {
+     "club": "CHE",
+     "name": "Filip Jørgensen",
+     "positions": [
+      "GK"
+     ],
+     "age": 24,
+     "flag": "🇩🇰",
+     "rating": 75,
+     "potential": null
+    },
+    {
+     "club": "CHE",
+     "name": "Levi Colwill",
+     "positions": [
+      "CB"
+     ],
+     "age": 23,
+     "flag": "🇬🇧",
+     "rating": 81,
+     "potential": null
+    },
+    {
+     "club": "CHE",
+     "name": "Wesley Fofana",
+     "positions": [
+      "CB"
+     ],
+     "age": 25,
+     "flag": "🇫🇷",
+     "rating": 80,
+     "potential": null
+    },
+    {
+     "club": "CHE",
+     "name": "Trevoh Chalobah",
+     "positions": [
+      "CB"
+     ],
+     "age": 27,
+     "flag": "🇬🇧",
+     "rating": 79,
+     "potential": null
+    },
+    {
+     "club": "CHE",
+     "name": "Tosin Adarabioyo",
+     "positions": [
+      "CB"
+     ],
+     "age": 28,
+     "flag": "🇬🇧",
+     "rating": 77,
+     "potential": null
+    },
+    {
+     "club": "CHE",
+     "name": "Benoît Badiashile",
+     "positions": [
+      "CB"
+     ],
+     "age": 25,
+     "flag": "🇫🇷",
+     "rating": 77,
+     "potential": null
+    },
+    {
+     "club": "CHE",
+     "name": "Marc Cucurella",
+     "positions": [
+      "LB"
+     ],
+     "age": 28,
+     "flag": "🇪🇸",
+     "rating": 83,
+     "potential": null
+    },
+    {
+     "club": "CHE",
+     "name": "Reece James",
+     "positions": [
+      "RB"
+     ],
+     "age": 26,
+     "flag": "🇬🇧",
+     "rating": 83,
+     "potential": null
+    },
+    {
+     "club": "CHE",
+     "name": "Malo Gusto",
+     "positions": [
+      "RB"
+     ],
+     "age": 23,
+     "flag": "🇫🇷",
+     "rating": 80,
+     "potential": null
+    },
+    {
+     "club": "CHE",
+     "name": "Moisés Caicedo",
+     "positions": [
+      "CDM"
+     ],
+     "age": 24,
+     "flag": "🇪🇨",
+     "rating": 87,
+     "potential": null
+    },
+    {
+     "club": "CHE",
+     "name": "Enzo Fernández",
+     "positions": [
+      "CM"
+     ],
+     "age": 25,
+     "flag": "🇦🇷",
+     "rating": 85,
+     "potential": null
+    },
+    {
+     "club": "CHE",
+     "name": "Roméo Lavia",
+     "positions": [
+      "CDM"
+     ],
+     "age": 22,
+     "flag": "🇧🇪",
+     "rating": 77,
+     "potential": null
+    },
+    {
+     "club": "CHE",
+     "name": "Andrey Santos",
+     "positions": [
+      "CM"
+     ],
+     "age": 22,
+     "flag": "🇧🇷",
+     "rating": 77,
+     "potential": null
+    },
+    {
+     "club": "CHE",
+     "name": "Cole Palmer",
+     "positions": [
+      "CAM"
+     ],
+     "age": 24,
+     "flag": "🇬🇧",
+     "rating": 87,
+     "potential": null
+    },
+    {
+     "club": "CHE",
+     "name": "Estêvão",
+     "positions": [
+      "RW"
+     ],
+     "age": 19,
+     "flag": "🇧🇷",
+     "rating": 80,
+     "potential": 90
+    },
+    {
+     "club": "CHE",
+     "name": "Pedro Neto",
+     "positions": [
+      "RW"
+     ],
+     "age": 26,
+     "flag": "🇵🇹",
+     "rating": 82,
+     "potential": null
+    },
+    {
+     "club": "CHE",
+     "name": "Jamie Gittens",
+     "positions": [
+      "LW"
+     ],
+     "age": 22,
+     "flag": "🇬🇧",
+     "rating": 78,
+     "potential": null
+    },
+    {
+     "club": "CHE",
+     "name": "Alejandro Garnacho",
+     "positions": [
+      "LW"
+     ],
+     "age": 22,
+     "flag": "🇦🇷",
+     "rating": 80,
+     "potential": null
+    },
+    {
+     "club": "CHE",
+     "name": "João Pedro",
+     "positions": [
+      "ST"
+     ],
+     "age": 24,
+     "flag": "🇧🇷",
+     "rating": 83,
+     "potential": null
+    },
+    {
+     "club": "CHE",
+     "name": "Liam Delap",
+     "positions": [
+      "ST"
+     ],
+     "age": 23,
+     "flag": "🇬🇧",
+     "rating": 78,
+     "potential": null
+    },
+    {
+     "club": "NEW",
+     "name": "Nick Pope",
+     "positions": [
+      "GK"
+     ],
+     "age": 34,
+     "flag": "🇬🇧",
+     "rating": 80,
+     "potential": null
+    },
+    {
+     "club": "NEW",
+     "name": "Aaron Ramsdale",
+     "positions": [
+      "GK"
+     ],
+     "age": 28,
+     "flag": "🇬🇧",
+     "rating": 78,
+     "potential": null
+    },
+    {
+     "club": "NEW",
+     "name": "Sven Botman",
+     "positions": [
+      "CB"
+     ],
+     "age": 26,
+     "flag": "🇳🇱",
+     "rating": 81,
+     "potential": null
+    },
+    {
+     "club": "NEW",
+     "name": "Fabian Schär",
+     "positions": [
+      "CB"
+     ],
+     "age": 34,
+     "flag": "🇨🇭",
+     "rating": 79,
+     "potential": null
+    },
+    {
+     "club": "NEW",
+     "name": "Dan Burn",
+     "positions": [
+      "CB",
+      "LB"
+     ],
+     "age": 34,
+     "flag": "🇬🇧",
+     "rating": 79,
+     "potential": null
+    },
+    {
+     "club": "NEW",
+     "name": "Malick Thiaw",
+     "positions": [
+      "CB"
+     ],
+     "age": 25,
+     "flag": "🇩🇪",
+     "rating": 80,
+     "potential": null
+    },
+    {
+     "club": "NEW",
+     "name": "Lewis Hall",
+     "positions": [
+      "LB"
+     ],
+     "age": 21,
+     "flag": "🇬🇧",
+     "rating": 78,
+     "potential": null
+    },
+    {
+     "club": "NEW",
+     "name": "Tino Livramento",
+     "positions": [
+      "RB"
+     ],
+     "age": 23,
+     "flag": "🇬🇧",
+     "rating": 80,
+     "potential": null
+    },
+    {
+     "club": "NEW",
+     "name": "Kieran Trippier",
+     "positions": [
+      "RB"
+     ],
+     "age": 35,
+     "flag": "🇬🇧",
+     "rating": 77,
+     "potential": null
+    },
+    {
+     "club": "NEW",
+     "name": "Bruno Guimarães",
+     "positions": [
+      "CM"
+     ],
+     "age": 28,
+     "flag": "🇧🇷",
+     "rating": 86,
+     "potential": null
+    },
+    {
+     "club": "NEW",
+     "name": "Sandro Tonali",
+     "positions": [
+      "CDM"
+     ],
+     "age": 26,
+     "flag": "🇮🇹",
+     "rating": 84,
+     "potential": null
+    },
+    {
+     "club": "NEW",
+     "name": "Joelinton",
+     "positions": [
+      "CM"
+     ],
+     "age": 30,
+     "flag": "🇧🇷",
+     "rating": 81,
+     "potential": null
+    },
+    {
+     "club": "NEW",
+     "name": "Jacob Ramsey",
+     "positions": [
+      "CM"
+     ],
+     "age": 25,
+     "flag": "🇬🇧",
+     "rating": 77,
+     "potential": null
+    },
+    {
+     "club": "NEW",
+     "name": "Joe Willock",
+     "positions": [
+      "CM"
+     ],
+     "age": 27,
+     "flag": "🇬🇧",
+     "rating": 76,
+     "potential": null
+    },
+    {
+     "club": "NEW",
+     "name": "Anthony Gordon",
+     "positions": [
+      "LW"
+     ],
+     "age": 25,
+     "flag": "🇬🇧",
+     "rating": 83,
+     "potential": null
+    },
+    {
+     "club": "NEW",
+     "name": "Harvey Barnes",
+     "positions": [
+      "LW"
+     ],
+     "age": 28,
+     "flag": "🇬🇧",
+     "rating": 79,
+     "potential": null
+    },
+    {
+     "club": "NEW",
+     "name": "Anthony Elanga",
+     "positions": [
+      "RW"
+     ],
+     "age": 24,
+     "flag": "🇸🇪",
+     "rating": 80,
+     "potential": null
+    },
+    {
+     "club": "NEW",
+     "name": "Jacob Murphy",
+     "positions": [
+      "RW"
+     ],
+     "age": 31,
+     "flag": "🇬🇧",
+     "rating": 77,
+     "potential": null
+    },
+    {
+     "club": "NEW",
+     "name": "Nick Woltemade",
+     "positions": [
+      "ST"
+     ],
+     "age": 24,
+     "flag": "🇩🇪",
+     "rating": 81,
+     "potential": null
+    },
+    {
+     "club": "NEW",
+     "name": "Yoane Wissa",
+     "positions": [
+      "ST"
+     ],
+     "age": 29,
+     "flag": "🇨🇩",
+     "rating": 80,
+     "potential": null
+    },
+    {
+     "club": "NEW",
+     "name": "William Osula",
+     "positions": [
+      "ST"
+     ],
+     "age": 23,
+     "flag": "🇩🇰",
+     "rating": 72,
+     "potential": null
+    },
+    {
+     "club": "AVL",
+     "name": "Emiliano Martínez",
+     "positions": [
+      "GK"
+     ],
+     "age": 34,
+     "flag": "🇦🇷",
+     "rating": 85,
+     "potential": null
+    },
+    {
+     "club": "AVL",
+     "name": "Marco Bizot",
+     "positions": [
+      "GK"
+     ],
+     "age": 35,
+     "flag": "🇳🇱",
+     "rating": 74,
+     "potential": null
+    },
+    {
+     "club": "AVL",
+     "name": "Ezri Konsa",
+     "positions": [
+      "CB"
+     ],
+     "age": 29,
+     "flag": "🇬🇧",
+     "rating": 82,
+     "potential": null
+    },
+    {
+     "club": "AVL",
+     "name": "Pau Torres",
+     "positions": [
+      "CB"
+     ],
+     "age": 29,
+     "flag": "🇪🇸",
+     "rating": 82,
+     "potential": null
+    },
+    {
+     "club": "AVL",
+     "name": "Tyrone Mings",
+     "positions": [
+      "CB"
+     ],
+     "age": 33,
+     "flag": "🇬🇧",
+     "rating": 77,
+     "potential": null
+    },
+    {
+     "club": "AVL",
+     "name": "Lucas Digne",
+     "positions": [
+      "LB"
+     ],
+     "age": 33,
+     "flag": "🇫🇷",
+     "rating": 78,
+     "potential": null
+    },
+    {
+     "club": "AVL",
+     "name": "Ian Maatsen",
+     "positions": [
+      "LB"
+     ],
+     "age": 24,
+     "flag": "🇳🇱",
+     "rating": 79,
+     "potential": null
+    },
+    {
+     "club": "AVL",
+     "name": "Matty Cash",
+     "positions": [
+      "RB"
+     ],
+     "age": 29,
+     "flag": "🇵🇱",
+     "rating": 80,
+     "potential": null
+    },
+    {
+     "club": "AVL",
+     "name": "Boubacar Kamara",
+     "positions": [
+      "CDM"
+     ],
+     "age": 26,
+     "flag": "🇫🇷",
+     "rating": 83,
+     "potential": null
+    },
+    {
+     "club": "AVL",
+     "name": "Amadou Onana",
+     "positions": [
+      "CDM"
+     ],
+     "age": 25,
+     "flag": "🇧🇪",
+     "rating": 81,
+     "potential": null
+    },
+    {
+     "club": "AVL",
+     "name": "Youri Tielemans",
+     "positions": [
+      "CM"
+     ],
+     "age": 29,
+     "flag": "🇧🇪",
+     "rating": 82,
+     "potential": null
+    },
+    {
+     "club": "AVL",
+     "name": "John McGinn",
+     "positions": [
+      "CM"
+     ],
+     "age": 32,
+     "flag": "🇬🇧",
+     "rating": 81,
+     "potential": null
+    },
+    {
+     "club": "AVL",
+     "name": "Lamare Bogarde",
+     "positions": [
+      "CDM"
+     ],
+     "age": 22,
+     "flag": "🇳🇱",
+     "rating": 72,
+     "potential": null
+    },
+    {
+     "club": "AVL",
+     "name": "Morgan Rogers",
+     "positions": [
+      "CAM"
+     ],
+     "age": 24,
+     "flag": "🇬🇧",
+     "rating": 83,
+     "potential": null
+    },
+    {
+     "club": "AVL",
+     "name": "Emiliano Buendía",
+     "positions": [
+      "CAM"
+     ],
+     "age": 29,
+     "flag": "🇦🇷",
+     "rating": 78,
+     "potential": null
+    },
+    {
+     "club": "AVL",
+     "name": "Leon Bailey",
+     "positions": [
+      "RW"
+     ],
+     "age": 29,
+     "flag": "🇯🇲",
+     "rating": 78,
+     "potential": null
+    },
+    {
+     "club": "AVL",
+     "name": "Jadon Sancho",
+     "positions": [
+      "LW"
+     ],
+     "age": 26,
+     "flag": "🇬🇧",
+     "rating": 78,
+     "potential": null
+    },
+    {
+     "club": "AVL",
+     "name": "Ollie Watkins",
+     "positions": [
+      "ST"
+     ],
+     "age": 30,
+     "flag": "🇬🇧",
+     "rating": 83,
+     "potential": null
+    },
+    {
+     "club": "AVL",
+     "name": "Evann Guessand",
+     "positions": [
+      "ST"
+     ],
+     "age": 25,
+     "flag": "🇨🇮",
+     "rating": 77,
+     "potential": null
+    },
+    {
+     "club": "MUN",
+     "name": "Senne Lammens",
+     "positions": [
+      "GK"
+     ],
+     "age": 24,
+     "flag": "🇧🇪",
+     "rating": 78,
+     "potential": null
+    },
+    {
+     "club": "MUN",
+     "name": "Altay Bayındır",
+     "positions": [
+      "GK"
+     ],
+     "age": 28,
+     "flag": "🇹🇷",
+     "rating": 73,
+     "potential": null
+    },
+    {
+     "club": "MUN",
+     "name": "Matthijs de Ligt",
+     "positions": [
+      "CB"
+     ],
+     "age": 27,
+     "flag": "🇳🇱",
+     "rating": 82,
+     "potential": null
+    },
+    {
+     "club": "MUN",
+     "name": "Lisandro Martínez",
+     "positions": [
+      "CB"
+     ],
+     "age": 28,
+     "flag": "🇦🇷",
+     "rating": 83,
+     "potential": null
+    },
+    {
+     "club": "MUN",
+     "name": "Harry Maguire",
+     "positions": [
+      "CB"
+     ],
+     "age": 33,
+     "flag": "🇬🇧",
+     "rating": 78,
+     "potential": null
+    },
+    {
+     "club": "MUN",
+     "name": "Leny Yoro",
+     "positions": [
+      "CB"
+     ],
+     "age": 20,
+     "flag": "🇫🇷",
+     "rating": 79,
+     "potential": 87
+    },
+    {
+     "club": "MUN",
+     "name": "Ayden Heaven",
+     "positions": [
+      "CB"
+     ],
+     "age": 19,
+     "flag": "🇬🇧",
+     "rating": 72,
+     "potential": 83
+    },
+    {
+     "club": "MUN",
+     "name": "Luke Shaw",
+     "positions": [
+      "LB",
+      "CB"
+     ],
+     "age": 31,
+     "flag": "🇬🇧",
+     "rating": 78,
+     "potential": null
+    },
+    {
+     "club": "MUN",
+     "name": "Patrick Dorgu",
+     "positions": [
+      "LB"
+     ],
+     "age": 21,
+     "flag": "🇩🇰",
+     "rating": 77,
+     "potential": null
+    },
+    {
+     "club": "MUN",
+     "name": "Diogo Dalot",
+     "positions": [
+      "RB"
+     ],
+     "age": 27,
+     "flag": "🇵🇹",
+     "rating": 79,
+     "potential": null
+    },
+    {
+     "club": "MUN",
+     "name": "Noussair Mazraoui",
+     "positions": [
+      "RB"
+     ],
+     "age": 28,
+     "flag": "🇲🇦",
+     "rating": 79,
+     "potential": null
+    },
+    {
+     "club": "MUN",
+     "name": "Casemiro",
+     "positions": [
+      "CDM"
+     ],
+     "age": 34,
+     "flag": "🇧🇷",
+     "rating": 79,
+     "potential": null
+    },
+    {
+     "club": "MUN",
+     "name": "Manuel Ugarte",
+     "positions": [
+      "CDM"
+     ],
+     "age": 25,
+     "flag": "🇺🇾",
+     "rating": 78,
+     "potential": null
+    },
+    {
+     "club": "MUN",
+     "name": "Kobbie Mainoo",
+     "positions": [
+      "CM"
+     ],
+     "age": 21,
+     "flag": "🇬🇧",
+     "rating": 79,
+     "potential": null
+    },
+    {
+     "club": "MUN",
+     "name": "Bruno Fernandes",
+     "positions": [
+      "CAM"
+     ],
+     "age": 32,
+     "flag": "🇵🇹",
+     "rating": 85,
+     "potential": null
+    },
+    {
+     "club": "MUN",
+     "name": "Mason Mount",
+     "positions": [
+      "CAM"
+     ],
+     "age": 27,
+     "flag": "🇬🇧",
+     "rating": 77,
+     "potential": null
+    },
+    {
+     "club": "MUN",
+     "name": "Matheus Cunha",
+     "positions": [
+      "CAM",
+      "ST"
+     ],
+     "age": 27,
+     "flag": "🇧🇷",
+     "rating": 83,
+     "potential": null
+    },
+    {
+     "club": "MUN",
+     "name": "Amad Diallo",
+     "positions": [
+      "RW"
+     ],
+     "age": 24,
+     "flag": "🇨🇮",
+     "rating": 81,
+     "potential": null
+    },
+    {
+     "club": "MUN",
+     "name": "Bryan Mbeumo",
+     "positions": [
+      "RW"
+     ],
+     "age": 27,
+     "flag": "🇨🇲",
+     "rating": 83,
+     "potential": null
+    },
+    {
+     "club": "MUN",
+     "name": "Benjamin Šeško",
+     "positions": [
+      "ST"
+     ],
+     "age": 23,
+     "flag": "🇸🇮",
+     "rating": 80,
+     "potential": null
+    },
+    {
+     "club": "MUN",
+     "name": "Joshua Zirkzee",
+     "positions": [
+      "ST"
+     ],
+     "age": 25,
+     "flag": "🇳🇱",
+     "rating": 75,
+     "potential": null
+    },
+    {
+     "club": "TOT",
+     "name": "Guglielmo Vicario",
+     "positions": [
+      "GK"
+     ],
+     "age": 29,
+     "flag": "🇮🇹",
+     "rating": 82,
+     "potential": null
+    },
+    {
+     "club": "TOT",
+     "name": "Antonín Kinský",
+     "positions": [
+      "GK"
+     ],
+     "age": 23,
+     "flag": "🇨🇿",
+     "rating": 73,
+     "potential": null
+    },
+    {
+     "club": "TOT",
+     "name": "Cristian Romero",
+     "positions": [
+      "CB"
+     ],
+     "age": 28,
+     "flag": "🇦🇷",
+     "rating": 84,
+     "potential": null
+    },
+    {
+     "club": "TOT",
+     "name": "Micky van de Ven",
+     "positions": [
+      "CB"
+     ],
+     "age": 25,
+     "flag": "🇳🇱",
+     "rating": 83,
+     "potential": null
+    },
+    {
+     "club": "TOT",
+     "name": "Radu Drăgușin",
+     "positions": [
+      "CB"
+     ],
+     "age": 24,
+     "flag": "🇷🇴",
+     "rating": 76,
+     "potential": null
+    },
+    {
+     "club": "TOT",
+     "name": "Kevin Danso",
+     "positions": [
+      "CB"
+     ],
+     "age": 27,
+     "flag": "🇦🇹",
+     "rating": 77,
+     "potential": null
+    },
+    {
+     "club": "TOT",
+     "name": "Destiny Udogie",
+     "positions": [
+      "LB"
+     ],
+     "age": 23,
+     "flag": "🇮🇹",
+     "rating": 79,
+     "potential": null
+    },
+    {
+     "club": "TOT",
+     "name": "Djed Spence",
+     "positions": [
+      "LB",
+      "RB"
+     ],
+     "age": 26,
+     "flag": "🇬🇧",
+     "rating": 77,
+     "potential": null
+    },
+    {
+     "club": "TOT",
+     "name": "Pedro Porro",
+     "positions": [
+      "RB"
+     ],
+     "age": 27,
+     "flag": "🇪🇸",
+     "rating": 82,
+     "potential": null
+    },
+    {
+     "club": "TOT",
+     "name": "João Palhinha",
+     "positions": [
+      "CDM"
+     ],
+     "age": 31,
+     "flag": "🇵🇹",
+     "rating": 81,
+     "potential": null
+    },
+    {
+     "club": "TOT",
+     "name": "Rodrigo Bentancur",
+     "positions": [
+      "CM"
+     ],
+     "age": 29,
+     "flag": "🇺🇾",
+     "rating": 79,
+     "potential": null
+    },
+    {
+     "club": "TOT",
+     "name": "Pape Matar Sarr",
+     "positions": [
+      "CM"
+     ],
+     "age": 24,
+     "flag": "🇸🇳",
+     "rating": 79,
+     "potential": null
+    },
+    {
+     "club": "TOT",
+     "name": "Yves Bissouma",
+     "positions": [
+      "CDM"
+     ],
+     "age": 30,
+     "flag": "🇲🇱",
+     "rating": 76,
+     "potential": null
+    },
+    {
+     "club": "TOT",
+     "name": "Lucas Bergvall",
+     "positions": [
+      "CM"
+     ],
+     "age": 20,
+     "flag": "🇸🇪",
+     "rating": 77,
+     "potential": 86
+    },
+    {
+     "club": "TOT",
+     "name": "Archie Gray",
+     "positions": [
+      "CM"
+     ],
+     "age": 20,
+     "flag": "🇬🇧",
+     "rating": 75,
+     "potential": 85
+    },
+    {
+     "club": "TOT",
+     "name": "James Maddison",
+     "positions": [
+      "CAM"
+     ],
+     "age": 29,
+     "flag": "🇬🇧",
+     "rating": 82,
+     "potential": null
+    },
+    {
+     "club": "TOT",
+     "name": "Xavi Simons",
+     "positions": [
+      "CAM"
+     ],
+     "age": 23,
+     "flag": "🇳🇱",
+     "rating": 83,
+     "potential": null
+    },
+    {
+     "club": "TOT",
+     "name": "Mohammed Kudus",
+     "positions": [
+      "RW"
+     ],
+     "age": 26,
+     "flag": "🇬🇭",
+     "rating": 82,
+     "potential": null
+    },
+    {
+     "club": "TOT",
+     "name": "Dejan Kulusevski",
+     "positions": [
+      "RW"
+     ],
+     "age": 26,
+     "flag": "🇸🇪",
+     "rating": 81,
+     "potential": null
+    },
+    {
+     "club": "TOT",
+     "name": "Brennan Johnson",
+     "positions": [
+      "RW"
+     ],
+     "age": 25,
+     "flag": "🇬🇧",
+     "rating": 79,
+     "potential": null
+    },
+    {
+     "club": "TOT",
+     "name": "Wilson Odobert",
+     "positions": [
+      "LW"
+     ],
+     "age": 21,
+     "flag": "🇫🇷",
+     "rating": 75,
+     "potential": null
+    },
+    {
+     "club": "TOT",
+     "name": "Richarlison",
+     "positions": [
+      "ST"
+     ],
+     "age": 29,
+     "flag": "🇧🇷",
+     "rating": 77,
+     "potential": null
+    },
+    {
+     "club": "TOT",
+     "name": "Dominic Solanke",
+     "positions": [
+      "ST"
+     ],
+     "age": 28,
+     "flag": "🇬🇧",
+     "rating": 80,
+     "potential": null
+    },
+    {
+     "club": "NFO",
+     "name": "Matz Sels",
+     "positions": [
+      "GK"
+     ],
+     "age": 34,
+     "flag": "🇧🇪",
+     "rating": 81,
+     "potential": null
+    },
+    {
+     "club": "NFO",
+     "name": "John Victor",
+     "positions": [
+      "GK"
+     ],
+     "age": 30,
+     "flag": "🇧🇷",
+     "rating": 74,
+     "potential": null
+    },
+    {
+     "club": "NFO",
+     "name": "Murillo",
+     "positions": [
+      "CB"
+     ],
+     "age": 24,
+     "flag": "🇧🇷",
+     "rating": 82,
+     "potential": null
+    },
+    {
+     "club": "NFO",
+     "name": "Nikola Milenković",
+     "positions": [
+      "CB"
+     ],
+     "age": 28,
+     "flag": "🇷🇸",
+     "rating": 81,
+     "potential": null
+    },
+    {
+     "club": "NFO",
+     "name": "Morato",
+     "positions": [
+      "CB"
+     ],
+     "age": 25,
+     "flag": "🇧🇷",
+     "rating": 75,
+     "potential": null
+    },
+    {
+     "club": "NFO",
+     "name": "Neco Williams",
+     "positions": [
+      "LB",
+      "RB"
+     ],
+     "age": 25,
+     "flag": "🇬🇧",
+     "rating": 78,
+     "potential": null
+    },
+    {
+     "club": "NFO",
+     "name": "Ola Aina",
+     "positions": [
+      "RB"
+     ],
+     "age": 29,
+     "flag": "🇳🇬",
+     "rating": 79,
+     "potential": null
+    },
+    {
+     "club": "NFO",
+     "name": "Elliot Anderson",
+     "positions": [
+      "CM"
+     ],
+     "age": 23,
+     "flag": "🇬🇧",
+     "rating": 82,
+     "potential": null
+    },
+    {
+     "club": "NFO",
+     "name": "Ibrahim Sangaré",
+     "positions": [
+      "CDM"
+     ],
+     "age": 28,
+     "flag": "🇨🇮",
+     "rating": 78,
+     "potential": null
+    },
+    {
+     "club": "NFO",
+     "name": "Nicolás Domínguez",
+     "positions": [
+      "CM"
+     ],
+     "age": 28,
+     "flag": "🇦🇷",
+     "rating": 76,
+     "potential": null
+    },
+    {
+     "club": "NFO",
+     "name": "Douglas Luiz",
+     "positions": [
+      "CM"
+     ],
+     "age": 28,
+     "flag": "🇧🇷",
+     "rating": 78,
+     "potential": null
+    },
+    {
+     "club": "NFO",
+     "name": "Morgan Gibbs-White",
+     "positions": [
+      "CAM"
+     ],
+     "age": 26,
+     "flag": "🇬🇧",
+     "rating": 82,
+     "potential": null
+    },
+    {
+     "club": "NFO",
+     "name": "James McAtee",
+     "positions": [
+      "CAM"
+     ],
+     "age": 23,
+     "flag": "🇬🇧",
+     "rating": 75,
+     "potential": null
+    },
+    {
+     "club": "NFO",
+     "name": "Callum Hudson-Odoi",
+     "positions": [
+      "LW"
+     ],
+     "age": 25,
+     "flag": "🇬🇧",
+     "rating": 79,
+     "potential": null
+    },
+    {
+     "club": "NFO",
+     "name": "Dan Ndoye",
+     "positions": [
+      "RW"
+     ],
+     "age": 26,
+     "flag": "🇨🇭",
+     "rating": 79,
+     "potential": null
+    },
+    {
+     "club": "NFO",
+     "name": "Omari Hutchinson",
+     "positions": [
+      "RW"
+     ],
+     "age": 22,
+     "flag": "🇬🇧",
+     "rating": 77,
+     "potential": null
+    },
+    {
+     "club": "NFO",
+     "name": "Igor Jesus",
+     "positions": [
+      "ST"
+     ],
+     "age": 25,
+     "flag": "🇧🇷",
+     "rating": 77,
+     "potential": null
+    },
+    {
+     "club": "NFO",
+     "name": "Chris Wood",
+     "positions": [
+      "ST"
+     ],
+     "age": 34,
+     "flag": "🇳🇿",
+     "rating": 79,
+     "potential": null
+    },
+    {
+     "club": "NFO",
+     "name": "Arnaud Kalimuendo",
+     "positions": [
+      "ST"
+     ],
+     "age": 24,
+     "flag": "🇫🇷",
+     "rating": 76,
+     "potential": null
+    },
+    {
+     "club": "BHA",
+     "name": "Bart Verbruggen",
+     "positions": [
+      "GK"
+     ],
+     "age": 24,
+     "flag": "🇳🇱",
+     "rating": 80,
+     "potential": null
+    },
+    {
+     "club": "BHA",
+     "name": "Jason Steele",
+     "positions": [
+      "GK"
+     ],
+     "age": 36,
+     "flag": "🇬🇧",
+     "rating": 70,
+     "potential": null
+    },
+    {
+     "club": "BHA",
+     "name": "Jan Paul van Hecke",
+     "positions": [
+      "CB"
+     ],
+     "age": 26,
+     "flag": "🇳🇱",
+     "rating": 80,
+     "potential": null
+    },
+    {
+     "club": "BHA",
+     "name": "Lewis Dunk",
+     "positions": [
+      "CB"
+     ],
+     "age": 34,
+     "flag": "🇬🇧",
+     "rating": 78,
+     "potential": null
+    },
+    {
+     "club": "BHA",
+     "name": "Olivier Boscagli",
+     "positions": [
+      "CB"
+     ],
+     "age": 28,
+     "flag": "🇫🇷",
+     "rating": 76,
+     "potential": null
+    },
+    {
+     "club": "BHA",
+     "name": "Ferdi Kadıoğlu",
+     "positions": [
+      "LB"
+     ],
+     "age": 27,
+     "flag": "🇹🇷",
+     "rating": 79,
+     "potential": null
+    },
+    {
+     "club": "BHA",
+     "name": "Maxim De Cuyper",
+     "positions": [
+      "LB"
+     ],
+     "age": 25,
+     "flag": "🇧🇪",
+     "rating": 77,
+     "potential": null
+    },
+    {
+     "club": "BHA",
+     "name": "Joël Veltman",
+     "positions": [
+      "RB"
+     ],
+     "age": 34,
+     "flag": "🇳🇱",
+     "rating": 74,
+     "potential": null
+    },
+    {
+     "club": "BHA",
+     "name": "Mats Wieffer",
+     "positions": [
+      "RB",
+      "CDM"
+     ],
+     "age": 27,
+     "flag": "🇳🇱",
+     "rating": 77,
+     "potential": null
+    },
+    {
+     "club": "BHA",
+     "name": "Carlos Baleba",
+     "positions": [
+      "CDM"
+     ],
+     "age": 22,
+     "flag": "🇨🇲",
+     "rating": 81,
+     "potential": null
+    },
+    {
+     "club": "BHA",
+     "name": "Yasin Ayari",
+     "positions": [
+      "CM"
+     ],
+     "age": 23,
+     "flag": "🇸🇪",
+     "rating": 76,
+     "potential": null
+    },
+    {
+     "club": "BHA",
+     "name": "Jack Hinshelwood",
+     "positions": [
+      "CM"
+     ],
+     "age": 21,
+     "flag": "🇬🇧",
+     "rating": 75,
+     "potential": null
+    },
+    {
+     "club": "BHA",
+     "name": "Diego Gómez",
+     "positions": [
+      "CM"
+     ],
+     "age": 23,
+     "flag": "🇵🇾",
+     "rating": 77,
+     "potential": null
+    },
+    {
+     "club": "BHA",
+     "name": "James Milner",
+     "positions": [
+      "CM"
+     ],
+     "age": 40,
+     "flag": "🇬🇧",
+     "rating": 70,
+     "potential": null
+    },
+    {
+     "club": "BHA",
+     "name": "Georginio Rutter",
+     "positions": [
+      "CAM"
+     ],
+     "age": 24,
+     "flag": "🇫🇷",
+     "rating": 78,
+     "potential": null
+    },
+    {
+     "club": "BHA",
+     "name": "Kaoru Mitoma",
+     "positions": [
+      "LW"
+     ],
+     "age": 29,
+     "flag": "🇯🇵",
+     "rating": 81,
+     "potential": null
+    },
+    {
+     "club": "BHA",
+     "name": "Yankuba Minteh",
+     "positions": [
+      "RW"
+     ],
+     "age": 22,
+     "flag": "🇬🇲",
+     "rating": 78,
+     "potential": null
+    },
+    {
+     "club": "BHA",
+     "name": "Solly March",
+     "positions": [
+      "RW"
+     ],
+     "age": 32,
+     "flag": "🇬🇧",
+     "rating": 74,
+     "potential": null
+    },
+    {
+     "club": "BHA",
+     "name": "Danny Welbeck",
+     "positions": [
+      "ST"
+     ],
+     "age": 35,
+     "flag": "🇬🇧",
+     "rating": 76,
+     "potential": null
+    },
+    {
+     "club": "BHA",
+     "name": "Stefanos Tzimas",
+     "positions": [
+      "ST"
+     ],
+     "age": 20,
+     "flag": "🇬🇷",
+     "rating": 72,
+     "potential": null
+    },
+    {
+     "club": "BHA",
+     "name": "Charalampos Kostoulas",
+     "positions": [
+      "ST"
+     ],
+     "age": 19,
+     "flag": "🇬🇷",
+     "rating": 70,
+     "potential": null
+    },
+    {
+     "club": "CRY",
+     "name": "Dean Henderson",
+     "positions": [
+      "GK"
+     ],
+     "age": 29,
+     "flag": "🇬🇧",
+     "rating": 81,
+     "potential": null
+    },
+    {
+     "club": "CRY",
+     "name": "Walter Benítez",
+     "positions": [
+      "GK"
+     ],
+     "age": 33,
+     "flag": "🇦🇷",
+     "rating": 75,
+     "potential": null
+    },
+    {
+     "club": "CRY",
+     "name": "Marc Guéhi",
+     "positions": [
+      "CB"
+     ],
+     "age": 26,
+     "flag": "🇬🇧",
+     "rating": 83,
+     "potential": null
+    },
+    {
+     "club": "CRY",
+     "name": "Maxence Lacroix",
+     "positions": [
+      "CB"
+     ],
+     "age": 26,
+     "flag": "🇫🇷",
+     "rating": 80,
+     "potential": null
+    },
+    {
+     "club": "CRY",
+     "name": "Chris Richards",
+     "positions": [
+      "CB"
+     ],
+     "age": 26,
+     "flag": "🇺🇸",
+     "rating": 77,
+     "potential": null
+    },
+    {
+     "club": "CRY",
+     "name": "Jaydee Canvot",
+     "positions": [
+      "CB"
+     ],
+     "age": 19,
+     "flag": "🇫🇷",
+     "rating": 72,
+     "potential": null
+    },
+    {
+     "club": "CRY",
+     "name": "Tyrick Mitchell",
+     "positions": [
+      "LB"
+     ],
+     "age": 27,
+     "flag": "🇬🇧",
+     "rating": 77,
+     "potential": null
+    },
+    {
+     "club": "CRY",
+     "name": "Daniel Muñoz",
+     "positions": [
+      "RB"
+     ],
+     "age": 30,
+     "flag": "🇨🇴",
+     "rating": 80,
+     "potential": null
+    },
+    {
+     "club": "CRY",
+     "name": "Adam Wharton",
+     "positions": [
+      "CM"
+     ],
+     "age": 22,
+     "flag": "🇬🇧",
+     "rating": 80,
+     "potential": 86
+    },
+    {
+     "club": "CRY",
+     "name": "Jefferson Lerma",
+     "positions": [
+      "CDM"
+     ],
+     "age": 31,
+     "flag": "🇨🇴",
+     "rating": 77,
+     "potential": null
+    },
+    {
+     "club": "CRY",
+     "name": "Will Hughes",
+     "positions": [
+      "CM"
+     ],
+     "age": 31,
+     "flag": "🇬🇧",
+     "rating": 75,
+     "potential": null
+    },
+    {
+     "club": "CRY",
+     "name": "Justin Devenny",
+     "positions": [
+      "CM"
+     ],
+     "age": 22,
+     "flag": "🇬🇧",
+     "rating": 70,
+     "potential": null
+    },
+    {
+     "club": "CRY",
+     "name": "Daichi Kamada",
+     "positions": [
+      "CAM"
+     ],
+     "age": 30,
+     "flag": "🇯🇵",
+     "rating": 77,
+     "potential": null
+    },
+    {
+     "club": "CRY",
+     "name": "Ismaïla Sarr",
+     "positions": [
+      "RW"
+     ],
+     "age": 28,
+     "flag": "🇸🇳",
+     "rating": 80,
+     "potential": null
+    },
+    {
+     "club": "CRY",
+     "name": "Yeremy Pino",
+     "positions": [
+      "LW"
+     ],
+     "age": 23,
+     "flag": "🇪🇸",
+     "rating": 78,
+     "potential": null
+    },
+    {
+     "club": "CRY",
+     "name": "Jean-Philippe Mateta",
+     "positions": [
+      "ST"
+     ],
+     "age": 29,
+     "flag": "🇫🇷",
+     "rating": 80,
+     "potential": null
+    },
+    {
+     "club": "CRY",
+     "name": "Eddie Nketiah",
+     "positions": [
+      "ST"
+     ],
+     "age": 27,
+     "flag": "🇬🇧",
+     "rating": 75,
+     "potential": null
+    },
+    {
+     "club": "BOU",
+     "name": "Đorđe Petrović",
+     "positions": [
+      "GK"
+     ],
+     "age": 26,
+     "flag": "🇷🇸",
+     "rating": 80,
+     "potential": null
+    },
+    {
+     "club": "BOU",
+     "name": "Marcos Senesi",
+     "positions": [
+      "CB"
+     ],
+     "age": 29,
+     "flag": "🇦🇷",
+     "rating": 79,
+     "potential": null
+    },
+    {
+     "club": "BOU",
+     "name": "James Hill",
+     "positions": [
+      "CB"
+     ],
+     "age": 24,
+     "flag": "🇬🇧",
+     "rating": 74,
+     "potential": null
+    },
+    {
+     "club": "BOU",
+     "name": "Bafodé Diakité",
+     "positions": [
+      "CB"
+     ],
+     "age": 25,
+     "flag": "🇫🇷",
+     "rating": 77,
+     "potential": null
+    },
+    {
+     "club": "BOU",
+     "name": "Veljko Milosavljević",
+     "positions": [
+      "CB"
+     ],
+     "age": 19,
+     "flag": "🇷🇸",
+     "rating": 72,
+     "potential": null
+    },
+    {
+     "club": "BOU",
+     "name": "Adrien Truffert",
+     "positions": [
+      "LB"
+     ],
+     "age": 24,
+     "flag": "🇫🇷",
+     "rating": 77,
+     "potential": null
+    },
+    {
+     "club": "BOU",
+     "name": "Alex Jiménez",
+     "positions": [
+      "RB"
+     ],
+     "age": 21,
+     "flag": "🇪🇸",
+     "rating": 75,
+     "potential": null
+    },
+    {
+     "club": "BOU",
+     "name": "Adam Smith",
+     "positions": [
+      "RB"
+     ],
+     "age": 35,
+     "flag": "🇬🇧",
+     "rating": 73,
+     "potential": null
+    },
+    {
+     "club": "BOU",
+     "name": "Tyler Adams",
+     "positions": [
+      "CDM"
+     ],
+     "age": 27,
+     "flag": "🇺🇸",
+     "rating": 79,
+     "potential": null
+    },
+    {
+     "club": "BOU",
+     "name": "Lewis Cook",
+     "positions": [
+      "CM"
+     ],
+     "age": 29,
+     "flag": "🇬🇧",
+     "rating": 77,
+     "potential": null
+    },
+    {
+     "club": "BOU",
+     "name": "Alex Scott",
+     "positions": [
+      "CM"
+     ],
+     "age": 23,
+     "flag": "🇬🇧",
+     "rating": 77,
+     "potential": null
+    },
+    {
+     "club": "BOU",
+     "name": "Ryan Christie",
+     "positions": [
+      "CM"
+     ],
+     "age": 31,
+     "flag": "🇬🇧",
+     "rating": 76,
+     "potential": null
+    },
+    {
+     "club": "BOU",
+     "name": "Marcus Tavernier",
+     "positions": [
+      "LM"
+     ],
+     "age": 27,
+     "flag": "🇬🇧",
+     "rating": 78,
+     "potential": null
+    },
+    {
+     "club": "BOU",
+     "name": "Justin Kluivert",
+     "positions": [
+      "CAM"
+     ],
+     "age": 27,
+     "flag": "🇳🇱",
+     "rating": 79,
+     "potential": null
+    },
+    {
+     "club": "BOU",
+     "name": "David Brooks",
+     "positions": [
+      "RW"
+     ],
+     "age": 29,
+     "flag": "🇬🇧",
+     "rating": 76,
+     "potential": null
+    },
+    {
+     "club": "BOU",
+     "name": "Amine Adli",
+     "positions": [
+      "LW"
+     ],
+     "age": 26,
+     "flag": "🇲🇦",
+     "rating": 77,
+     "potential": null
+    },
+    {
+     "club": "BOU",
+     "name": "Evanilson",
+     "positions": [
+      "ST"
+     ],
+     "age": 27,
+     "flag": "🇧🇷",
+     "rating": 79,
+     "potential": null
+    },
+    {
+     "club": "BOU",
+     "name": "Eli Junior Kroupi",
+     "positions": [
+      "ST"
+     ],
+     "age": 20,
+     "flag": "🇫🇷",
+     "rating": 74,
+     "potential": null
+    },
+    {
+     "club": "BRE",
+     "name": "Caoimhín Kelleher",
+     "positions": [
+      "GK"
+     ],
+     "age": 28,
+     "flag": "🇮🇪",
+     "rating": 80,
+     "potential": null
+    },
+    {
+     "club": "BRE",
+     "name": "Hákon Valdimarsson",
+     "positions": [
+      "GK"
+     ],
+     "age": 25,
+     "flag": "🇮🇸",
+     "rating": 72,
+     "potential": null
+    },
+    {
+     "club": "BRE",
+     "name": "Nathan Collins",
+     "positions": [
+      "CB"
+     ],
+     "age": 25,
+     "flag": "🇮🇪",
+     "rating": 79,
+     "potential": null
+    },
+    {
+     "club": "BRE",
+     "name": "Kristoffer Ajer",
+     "positions": [
+      "CB"
+     ],
+     "age": 28,
+     "flag": "🇳🇴",
+     "rating": 77,
+     "potential": null
+    },
+    {
+     "club": "BRE",
+     "name": "Sepp van den Berg",
+     "positions": [
+      "CB"
+     ],
+     "age": 24,
+     "flag": "🇳🇱",
+     "rating": 77,
+     "potential": null
+    },
+    {
+     "club": "BRE",
+     "name": "Ethan Pinnock",
+     "positions": [
+      "CB"
+     ],
+     "age": 33,
+     "flag": "🇯🇲",
+     "rating": 76,
+     "potential": null
+    },
+    {
+     "club": "BRE",
+     "name": "Rico Henry",
+     "positions": [
+      "LB"
+     ],
+     "age": 29,
+     "flag": "🇬🇧",
+     "rating": 75,
+     "potential": null
+    },
+    {
+     "club": "BRE",
+     "name": "Aaron Hickey",
+     "positions": [
+      "RB"
+     ],
+     "age": 24,
+     "flag": "🇬🇧",
+     "rating": 75,
+     "potential": null
+    },
+    {
+     "club": "BRE",
+     "name": "Michael Kayode",
+     "positions": [
+      "RB"
+     ],
+     "age": 22,
+     "flag": "🇮🇹",
+     "rating": 75,
+     "potential": null
+    },
+    {
+     "club": "BRE",
+     "name": "Vitaly Janelt",
+     "positions": [
+      "CM"
+     ],
+     "age": 28,
+     "flag": "🇩🇪",
+     "rating": 76,
+     "potential": null
+    },
+    {
+     "club": "BRE",
+     "name": "Yehor Yarmoliuk",
+     "positions": [
+      "CM"
+     ],
+     "age": 22,
+     "flag": "🇺🇦",
+     "rating": 75,
+     "potential": null
+    },
+    {
+     "club": "BRE",
+     "name": "Jordan Henderson",
+     "positions": [
+      "CM"
+     ],
+     "age": 36,
+     "flag": "🇬🇧",
+     "rating": 76,
+     "potential": null
+    },
+    {
+     "club": "BRE",
+     "name": "Mikkel Damsgaard",
+     "positions": [
+      "CAM"
+     ],
+     "age": 26,
+     "flag": "🇩🇰",
+     "rating": 78,
+     "potential": null
+    },
+    {
+     "club": "BRE",
+     "name": "Fábio Carvalho",
+     "positions": [
+      "CAM"
+     ],
+     "age": 24,
+     "flag": "🇵🇹",
+     "rating": 75,
+     "potential": null
+    },
+    {
+     "club": "BRE",
+     "name": "Antoni Milambo",
+     "positions": [
+      "CAM"
+     ],
+     "age": 21,
+     "flag": "🇳🇱",
+     "rating": 73,
+     "potential": null
+    },
+    {
+     "club": "BRE",
+     "name": "Kevin Schade",
+     "positions": [
+      "LW"
+     ],
+     "age": 24,
+     "flag": "🇩🇪",
+     "rating": 78,
+     "potential": null
+    },
+    {
+     "club": "BRE",
+     "name": "Keane Lewis-Potter",
+     "positions": [
+      "LW"
+     ],
+     "age": 25,
+     "flag": "🇬🇧",
+     "rating": 75,
+     "potential": null
+    },
+    {
+     "club": "BRE",
+     "name": "Dango Ouattara",
+     "positions": [
+      "RW"
+     ],
+     "age": 24,
+     "flag": "🇧🇫",
+     "rating": 78,
+     "potential": null
+    },
+    {
+     "club": "BRE",
+     "name": "Igor Thiago",
+     "positions": [
+      "ST"
+     ],
+     "age": 25,
+     "flag": "🇧🇷",
+     "rating": 80,
+     "potential": null
+    },
+    {
+     "club": "EVE",
+     "name": "Jordan Pickford",
+     "positions": [
+      "GK"
+     ],
+     "age": 32,
+     "flag": "🇬🇧",
+     "rating": 83,
+     "potential": null
+    },
+    {
+     "club": "EVE",
+     "name": "Mark Travers",
+     "positions": [
+      "GK"
+     ],
+     "age": 27,
+     "flag": "🇮🇪",
+     "rating": 73,
+     "potential": null
+    },
+    {
+     "club": "EVE",
+     "name": "James Tarkowski",
+     "positions": [
+      "CB"
+     ],
+     "age": 33,
+     "flag": "🇬🇧",
+     "rating": 79,
+     "potential": null
+    },
+    {
+     "club": "EVE",
+     "name": "Jarrad Branthwaite",
+     "positions": [
+      "CB"
+     ],
+     "age": 24,
+     "flag": "🇬🇧",
+     "rating": 80,
+     "potential": null
+    },
+    {
+     "club": "EVE",
+     "name": "Michael Keane",
+     "positions": [
+      "CB"
+     ],
+     "age": 33,
+     "flag": "🇬🇧",
+     "rating": 75,
+     "potential": null
+    },
+    {
+     "club": "EVE",
+     "name": "Jake O'Brien",
+     "positions": [
+      "CB",
+      "RB"
+     ],
+     "age": 25,
+     "flag": "🇮🇪",
+     "rating": 76,
+     "potential": null
+    },
+    {
+     "club": "EVE",
+     "name": "Vitaliy Mykolenko",
+     "positions": [
+      "LB"
+     ],
+     "age": 27,
+     "flag": "🇺🇦",
+     "rating": 77,
+     "potential": null
+    },
+    {
+     "club": "EVE",
+     "name": "Nathan Patterson",
+     "positions": [
+      "RB"
+     ],
+     "age": 24,
+     "flag": "🇬🇧",
+     "rating": 74,
+     "potential": null
+    },
+    {
+     "club": "EVE",
+     "name": "Seamus Coleman",
+     "positions": [
+      "RB"
+     ],
+     "age": 37,
+     "flag": "🇮🇪",
+     "rating": 70,
+     "potential": null
+    },
+    {
+     "club": "EVE",
+     "name": "Idrissa Gueye",
+     "positions": [
+      "CDM"
+     ],
+     "age": 36,
+     "flag": "🇸🇳",
+     "rating": 76,
+     "potential": null
+    },
+    {
+     "club": "EVE",
+     "name": "James Garner",
+     "positions": [
+      "CM"
+     ],
+     "age": 25,
+     "flag": "🇬🇧",
+     "rating": 78,
+     "potential": null
+    },
+    {
+     "club": "EVE",
+     "name": "Tim Iroegbunam",
+     "positions": [
+      "CM"
+     ],
+     "age": 22,
+     "flag": "🇬🇧",
+     "rating": 72,
+     "potential": null
+    },
+    {
+     "club": "EVE",
+     "name": "Kiernan Dewsbury-Hall",
+     "positions": [
+      "CM"
+     ],
+     "age": 27,
+     "flag": "🇬🇧",
+     "rating": 78,
+     "potential": null
+    },
+    {
+     "club": "EVE",
+     "name": "Carlos Alcaraz",
+     "positions": [
+      "CAM"
+     ],
+     "age": 23,
+     "flag": "🇦🇷",
+     "rating": 74,
+     "potential": null
+    },
+    {
+     "club": "EVE",
+     "name": "Jack Grealish",
+     "positions": [
+      "LW"
+     ],
+     "age": 30,
+     "flag": "🇬🇧",
+     "rating": 80,
+     "potential": null
+    },
+    {
+     "club": "EVE",
+     "name": "Iliman Ndiaye",
+     "positions": [
+      "LW"
+     ],
+     "age": 26,
+     "flag": "🇸🇳",
+     "rating": 80,
+     "potential": null
+    },
+    {
+     "club": "EVE",
+     "name": "Dwight McNeil",
+     "positions": [
+      "LM"
+     ],
+     "age": 26,
+     "flag": "🇬🇧",
+     "rating": 77,
+     "potential": null
+    },
+    {
+     "club": "EVE",
+     "name": "Tyler Dibling",
+     "positions": [
+      "RW"
+     ],
+     "age": 20,
+     "flag": "🇬🇧",
+     "rating": 75,
+     "potential": 85
+    },
+    {
+     "club": "EVE",
+     "name": "Beto",
+     "positions": [
+      "ST"
+     ],
+     "age": 28,
+     "flag": "🇵🇹",
+     "rating": 75,
+     "potential": null
+    },
+    {
+     "club": "EVE",
+     "name": "Thierno Barry",
+     "positions": [
+      "ST"
+     ],
+     "age": 23,
+     "flag": "🇫🇷",
+     "rating": 77,
+     "potential": null
+    },
+    {
+     "club": "FUL",
+     "name": "Bernd Leno",
+     "positions": [
+      "GK"
+     ],
+     "age": 34,
+     "flag": "🇩🇪",
+     "rating": 81,
+     "potential": null
+    },
+    {
+     "club": "FUL",
+     "name": "Benjamin Lecomte",
+     "positions": [
+      "GK"
+     ],
+     "age": 35,
+     "flag": "🇫🇷",
+     "rating": 70,
+     "potential": null
+    },
+    {
+     "club": "FUL",
+     "name": "Joachim Andersen",
+     "positions": [
+      "CB"
+     ],
+     "age": 30,
+     "flag": "🇩🇰",
+     "rating": 80,
+     "potential": null
+    },
+    {
+     "club": "FUL",
+     "name": "Calvin Bassey",
+     "positions": [
+      "CB"
+     ],
+     "age": 26,
+     "flag": "🇳🇬",
+     "rating": 78,
+     "potential": null
+    },
+    {
+     "club": "FUL",
+     "name": "Issa Diop",
+     "positions": [
+      "CB"
+     ],
+     "age": 29,
+     "flag": "🇫🇷",
+     "rating": 75,
+     "potential": null
+    },
+    {
+     "club": "FUL",
+     "name": "Jorge Cuenca",
+     "positions": [
+      "CB"
+     ],
+     "age": 26,
+     "flag": "🇪🇸",
+     "rating": 74,
+     "potential": null
+    },
+    {
+     "club": "FUL",
+     "name": "Antonee Robinson",
+     "positions": [
+      "LB"
+     ],
+     "age": 29,
+     "flag": "🇺🇸",
+     "rating": 80,
+     "potential": null
+    },
+    {
+     "club": "FUL",
+     "name": "Ryan Sessegnon",
+     "positions": [
+      "LB"
+     ],
+     "age": 26,
+     "flag": "🇬🇧",
+     "rating": 75,
+     "potential": null
+    },
+    {
+     "club": "FUL",
+     "name": "Kenny Tete",
+     "positions": [
+      "RB"
+     ],
+     "age": 30,
+     "flag": "🇳🇱",
+     "rating": 76,
+     "potential": null
+    },
+    {
+     "club": "FUL",
+     "name": "Timothy Castagne",
+     "positions": [
+      "RB"
+     ],
+     "age": 30,
+     "flag": "🇧🇪",
+     "rating": 76,
+     "potential": null
+    },
+    {
+     "club": "FUL",
+     "name": "Sander Berge",
+     "positions": [
+      "CM"
+     ],
+     "age": 28,
+     "flag": "🇳🇴",
+     "rating": 78,
+     "potential": null
+    },
+    {
+     "club": "FUL",
+     "name": "Saša Lukić",
+     "positions": [
+      "CM"
+     ],
+     "age": 30,
+     "flag": "🇷🇸",
+     "rating": 76,
+     "potential": null
+    },
+    {
+     "club": "FUL",
+     "name": "Tom Cairney",
+     "positions": [
+      "CM"
+     ],
+     "age": 35,
+     "flag": "🇬🇧",
+     "rating": 74,
+     "potential": null
+    },
+    {
+     "club": "FUL",
+     "name": "Andreas Pereira",
+     "positions": [
+      "CAM"
+     ],
+     "age": 30,
+     "flag": "🇧🇷",
+     "rating": 78,
+     "potential": null
+    },
+    {
+     "club": "FUL",
+     "name": "Emile Smith Rowe",
+     "positions": [
+      "CAM"
+     ],
+     "age": 26,
+     "flag": "🇬🇧",
+     "rating": 78,
+     "potential": null
+    },
+    {
+     "club": "FUL",
+     "name": "Harry Wilson",
+     "positions": [
+      "RW"
+     ],
+     "age": 29,
+     "flag": "🇬🇧",
+     "rating": 78,
+     "potential": null
+    },
+    {
+     "club": "FUL",
+     "name": "Alex Iwobi",
+     "positions": [
+      "LW"
+     ],
+     "age": 30,
+     "flag": "🇳🇬",
+     "rating": 79,
+     "potential": null
+    },
+    {
+     "club": "FUL",
+     "name": "Samuel Chukwueze",
+     "positions": [
+      "RW"
+     ],
+     "age": 27,
+     "flag": "🇳🇬",
+     "rating": 77,
+     "potential": null
+    },
+    {
+     "club": "FUL",
+     "name": "Kevin Santos",
+     "positions": [
+      "LW"
+     ],
+     "age": 22,
+     "flag": "🇧🇷",
+     "rating": 75,
+     "potential": null
+    },
+    {
+     "club": "FUL",
+     "name": "Raúl Jiménez",
+     "positions": [
+      "ST"
+     ],
+     "age": 35,
+     "flag": "🇲🇽",
+     "rating": 77,
+     "potential": null
+    },
+    {
+     "club": "FUL",
+     "name": "Rodrigo Muniz",
+     "positions": [
+      "ST"
+     ],
+     "age": 25,
+     "flag": "🇧🇷",
+     "rating": 76,
+     "potential": null
+    },
+    {
+     "club": "WHU",
+     "name": "Alphonse Areola",
+     "positions": [
+      "GK"
+     ],
+     "age": 33,
+     "flag": "🇫🇷",
+     "rating": 78,
+     "potential": null
+    },
+    {
+     "club": "WHU",
+     "name": "Mads Hermansen",
+     "positions": [
+      "GK"
+     ],
+     "age": 26,
+     "flag": "🇩🇰",
+     "rating": 77,
+     "potential": null
+    },
+    {
+     "club": "WHU",
+     "name": "Max Kilman",
+     "positions": [
+      "CB"
+     ],
+     "age": 29,
+     "flag": "🇬🇧",
+     "rating": 77,
+     "potential": null
+    },
+    {
+     "club": "WHU",
+     "name": "Jean-Clair Todibo",
+     "positions": [
+      "CB"
+     ],
+     "age": 26,
+     "flag": "🇫🇷",
+     "rating": 77,
+     "potential": null
+    },
+    {
+     "club": "WHU",
+     "name": "Konstantinos Mavropanos",
+     "positions": [
+      "CB"
+     ],
+     "age": 28,
+     "flag": "🇬🇷",
+     "rating": 76,
+     "potential": null
+    },
+    {
+     "club": "WHU",
+     "name": "El Hadji Malick Diouf",
+     "positions": [
+      "LB"
+     ],
+     "age": 21,
+     "flag": "🇸🇳",
+     "rating": 75,
+     "potential": null
+    },
+    {
+     "club": "WHU",
+     "name": "Aaron Wan-Bissaka",
+     "positions": [
+      "RB"
+     ],
+     "age": 28,
+     "flag": "🇨🇩",
+     "rating": 77,
+     "potential": null
+    },
+    {
+     "club": "WHU",
+     "name": "Kyle Walker-Peters",
+     "positions": [
+      "RB"
+     ],
+     "age": 29,
+     "flag": "🇬🇧",
+     "rating": 76,
+     "potential": null
+    },
+    {
+     "club": "WHU",
+     "name": "Tomáš Souček",
+     "positions": [
+      "CM"
+     ],
+     "age": 31,
+     "flag": "🇨🇿",
+     "rating": 77,
+     "potential": null
+    },
+    {
+     "club": "WHU",
+     "name": "Guido Rodríguez",
+     "positions": [
+      "CDM"
+     ],
+     "age": 32,
+     "flag": "🇦🇷",
+     "rating": 76,
+     "potential": null
+    },
+    {
+     "club": "WHU",
+     "name": "Mateus Fernandes",
+     "positions": [
+      "CM"
+     ],
+     "age": 22,
+     "flag": "🇵🇹",
+     "rating": 76,
+     "potential": null
+    },
+    {
+     "club": "WHU",
+     "name": "Soungoutou Magassa",
+     "positions": [
+      "CDM"
+     ],
+     "age": 22,
+     "flag": "🇫🇷",
+     "rating": 73,
+     "potential": null
+    },
+    {
+     "club": "WHU",
+     "name": "Lucas Paquetá",
+     "positions": [
+      "CAM"
+     ],
+     "age": 29,
+     "flag": "🇧🇷",
+     "rating": 80,
+     "potential": null
+    },
+    {
+     "club": "WHU",
+     "name": "Jarrod Bowen",
+     "positions": [
+      "RW"
+     ],
+     "age": 29,
+     "flag": "🇬🇧",
+     "rating": 82,
+     "potential": null
+    },
+    {
+     "club": "WHU",
+     "name": "Crysencio Summerville",
+     "positions": [
+      "LW"
+     ],
+     "age": 24,
+     "flag": "🇳🇱",
+     "rating": 77,
+     "potential": null
+    },
+    {
+     "club": "WHU",
+     "name": "Callum Wilson",
+     "positions": [
+      "ST"
+     ],
+     "age": 34,
+     "flag": "🇬🇧",
+     "rating": 74,
+     "potential": null
+    },
+    {
+     "club": "WHU",
+     "name": "Niclas Füllkrug",
+     "positions": [
+      "ST"
+     ],
+     "age": 33,
+     "flag": "🇩🇪",
+     "rating": 76,
+     "potential": null
+    },
+    {
+     "club": "LEE",
+     "name": "Lucas Perri",
+     "positions": [
+      "GK"
+     ],
+     "age": 28,
+     "flag": "🇧🇷",
+     "rating": 77,
+     "potential": null
+    },
+    {
+     "club": "LEE",
+     "name": "Illan Meslier",
+     "positions": [
+      "GK"
+     ],
+     "age": 26,
+     "flag": "🇫🇷",
+     "rating": 74,
+     "potential": null
+    },
+    {
+     "club": "LEE",
+     "name": "Pascal Struijk",
+     "positions": [
+      "CB"
+     ],
+     "age": 27,
+     "flag": "🇳🇱",
+     "rating": 77,
+     "potential": null
+    },
+    {
+     "club": "LEE",
+     "name": "Joe Rodon",
+     "positions": [
+      "CB"
+     ],
+     "age": 28,
+     "flag": "🇬🇧",
+     "rating": 77,
+     "potential": null
+    },
+    {
+     "club": "LEE",
+     "name": "Jaka Bijol",
+     "positions": [
+      "CB"
+     ],
+     "age": 27,
+     "flag": "🇸🇮",
+     "rating": 78,
+     "potential": null
+    },
+    {
+     "club": "LEE",
+     "name": "Gabriel Gudmundsson",
+     "positions": [
+      "LB"
+     ],
+     "age": 27,
+     "flag": "🇸🇪",
+     "rating": 75,
+     "potential": null
+    },
+    {
+     "club": "LEE",
+     "name": "Jayden Bogle",
+     "positions": [
+      "RB"
+     ],
+     "age": 25,
+     "flag": "🇬🇧",
+     "rating": 75,
+     "potential": null
+    },
+    {
+     "club": "LEE",
+     "name": "James Justin",
+     "positions": [
+      "RB",
+      "LB"
+     ],
+     "age": 28,
+     "flag": "🇬🇧",
+     "rating": 75,
+     "potential": null
+    },
+    {
+     "club": "LEE",
+     "name": "Ethan Ampadu",
+     "positions": [
+      "CDM"
+     ],
+     "age": 26,
+     "flag": "🇬🇧",
+     "rating": 77,
+     "potential": null
+    },
+    {
+     "club": "LEE",
+     "name": "Anton Stach",
+     "positions": [
+      "CM"
+     ],
+     "age": 27,
+     "flag": "🇩🇪",
+     "rating": 77,
+     "potential": null
+    },
+    {
+     "club": "LEE",
+     "name": "Sean Longstaff",
+     "positions": [
+      "CM"
+     ],
+     "age": 28,
+     "flag": "🇬🇧",
+     "rating": 75,
+     "potential": null
+    },
+    {
+     "club": "LEE",
+     "name": "Ilia Gruev",
+     "positions": [
+      "CM"
+     ],
+     "age": 26,
+     "flag": "🇧🇬",
+     "rating": 74,
+     "potential": null
+    },
+    {
+     "club": "LEE",
+     "name": "Brenden Aaronson",
+     "positions": [
+      "CAM"
+     ],
+     "age": 25,
+     "flag": "🇺🇸",
+     "rating": 75,
+     "potential": null
+    },
+    {
+     "club": "LEE",
+     "name": "Noah Okafor",
+     "positions": [
+      "LW"
+     ],
+     "age": 26,
+     "flag": "🇨🇭",
+     "rating": 76,
+     "potential": null
+    },
+    {
+     "club": "LEE",
+     "name": "Daniel James",
+     "positions": [
+      "RW"
+     ],
+     "age": 28,
+     "flag": "🇬🇧",
+     "rating": 75,
+     "potential": null
+    },
+    {
+     "club": "LEE",
+     "name": "Wilfried Gnonto",
+     "positions": [
+      "RW"
+     ],
+     "age": 22,
+     "flag": "🇮🇹",
+     "rating": 75,
+     "potential": null
+    },
+    {
+     "club": "LEE",
+     "name": "Dominic Calvert-Lewin",
+     "positions": [
+      "ST"
+     ],
+     "age": 29,
+     "flag": "🇬🇧",
+     "rating": 77,
+     "potential": null
+    },
+    {
+     "club": "LEE",
+     "name": "Lukas Nmecha",
+     "positions": [
+      "ST"
+     ],
+     "age": 27,
+     "flag": "🇩🇪",
+     "rating": 74,
+     "potential": null
+    },
+    {
+     "club": "LEE",
+     "name": "Joël Piroe",
+     "positions": [
+      "ST"
+     ],
+     "age": 26,
+     "flag": "🇳🇱",
+     "rating": 74,
+     "potential": null
+    },
+    {
+     "club": "WOL",
+     "name": "José Sá",
+     "positions": [
+      "GK"
+     ],
+     "age": 33,
+     "flag": "🇵🇹",
+     "rating": 77,
+     "potential": null
+    },
+    {
+     "club": "WOL",
+     "name": "Sam Johnstone",
+     "positions": [
+      "GK"
+     ],
+     "age": 33,
+     "flag": "🇬🇧",
+     "rating": 74,
+     "potential": null
+    },
+    {
+     "club": "WOL",
+     "name": "Toti Gomes",
+     "positions": [
+      "CB"
+     ],
+     "age": 27,
+     "flag": "🇵🇹",
+     "rating": 76,
+     "potential": null
+    },
+    {
+     "club": "WOL",
+     "name": "Emmanuel Agbadou",
+     "positions": [
+      "CB"
+     ],
+     "age": 29,
+     "flag": "🇨🇮",
+     "rating": 76,
+     "potential": null
+    },
+    {
+     "club": "WOL",
+     "name": "Santiago Bueno",
+     "positions": [
+      "CB"
+     ],
+     "age": 27,
+     "flag": "🇺🇾",
+     "rating": 75,
+     "potential": null
+    },
+    {
+     "club": "WOL",
+     "name": "Ladislav Krejčí",
+     "positions": [
+      "CB"
+     ],
+     "age": 27,
+     "flag": "🇨🇿",
+     "rating": 76,
+     "potential": null
+    },
+    {
+     "club": "WOL",
+     "name": "Hugo Bueno",
+     "positions": [
+      "LB"
+     ],
+     "age": 23,
+     "flag": "🇪🇸",
+     "rating": 74,
+     "potential": null
+    },
+    {
+     "club": "WOL",
+     "name": "Matt Doherty",
+     "positions": [
+      "RB"
+     ],
+     "age": 34,
+     "flag": "🇮🇪",
+     "rating": 72,
+     "potential": null
+    },
+    {
+     "club": "WOL",
+     "name": "Jackson Tchatchoua",
+     "positions": [
+      "RB"
+     ],
+     "age": 24,
+     "flag": "🇨🇲",
+     "rating": 74,
+     "potential": null
+    },
+    {
+     "club": "WOL",
+     "name": "André",
+     "positions": [
+      "CDM"
+     ],
+     "age": 25,
+     "flag": "🇧🇷",
+     "rating": 78,
+     "potential": null
+    },
+    {
+     "club": "WOL",
+     "name": "João Gomes",
+     "positions": [
+      "CM"
+     ],
+     "age": 25,
+     "flag": "🇧🇷",
+     "rating": 80,
+     "potential": null
+    },
+    {
+     "club": "WOL",
+     "name": "Marshall Munetsi",
+     "positions": [
+      "CM"
+     ],
+     "age": 30,
+     "flag": "🇿🇼",
+     "rating": 74,
+     "potential": null
+    },
+    {
+     "club": "WOL",
+     "name": "Jean-Ricner Bellegarde",
+     "positions": [
+      "CAM"
+     ],
+     "age": 28,
+     "flag": "🇫🇷",
+     "rating": 75,
+     "potential": null
+    },
+    {
+     "club": "WOL",
+     "name": "Fer López",
+     "positions": [
+      "CAM"
+     ],
+     "age": 22,
+     "flag": "🇪🇸",
+     "rating": 73,
+     "potential": null
+    },
+    {
+     "club": "WOL",
+     "name": "Hwang Hee-chan",
+     "positions": [
+      "LW",
+      "ST"
+     ],
+     "age": 30,
+     "flag": "🇰🇷",
+     "rating": 75,
+     "potential": null
+    },
+    {
+     "club": "WOL",
+     "name": "Rodrigo Gomes",
+     "positions": [
+      "RW"
+     ],
+     "age": 23,
+     "flag": "🇵🇹",
+     "rating": 73,
+     "potential": null
+    },
+    {
+     "club": "WOL",
+     "name": "Jørgen Strand Larsen",
+     "positions": [
+      "ST"
+     ],
+     "age": 26,
+     "flag": "🇳🇴",
+     "rating": 78,
+     "potential": null
+    },
+    {
+     "club": "WOL",
+     "name": "Tolu Arokodare",
+     "positions": [
+      "ST"
+     ],
+     "age": 26,
+     "flag": "🇳🇬",
+     "rating": 74,
+     "potential": null
+    },
+    {
+     "club": "SUN",
+     "name": "Robin Roefs",
+     "positions": [
+      "GK"
+     ],
+     "age": 23,
+     "flag": "🇳🇱",
+     "rating": 76,
+     "potential": null
+    },
+    {
+     "club": "SUN",
+     "name": "Anthony Patterson",
+     "positions": [
+      "GK"
+     ],
+     "age": 26,
+     "flag": "🇬🇧",
+     "rating": 72,
+     "potential": null
+    },
+    {
+     "club": "SUN",
+     "name": "Dan Ballard",
+     "positions": [
+      "CB"
+     ],
+     "age": 27,
+     "flag": "🇬🇧",
+     "rating": 75,
+     "potential": null
+    },
+    {
+     "club": "SUN",
+     "name": "Omar Alderete",
+     "positions": [
+      "CB"
+     ],
+     "age": 29,
+     "flag": "🇵🇾",
+     "rating": 76,
+     "potential": null
+    },
+    {
+     "club": "SUN",
+     "name": "Nordi Mukiele",
+     "positions": [
+      "CB",
+      "RB"
+     ],
+     "age": 28,
+     "flag": "🇫🇷",
+     "rating": 77,
+     "potential": null
+    },
+    {
+     "club": "SUN",
+     "name": "Luke O'Nien",
+     "positions": [
+      "CB"
+     ],
+     "age": 31,
+     "flag": "🇬🇧",
+     "rating": 72,
+     "potential": null
+    },
+    {
+     "club": "SUN",
+     "name": "Reinildo Mandava",
+     "positions": [
+      "LB"
+     ],
+     "age": 32,
+     "flag": "🇲🇿",
+     "rating": 75,
+     "potential": null
+    },
+    {
+     "club": "SUN",
+     "name": "Trai Hume",
+     "positions": [
+      "RB"
+     ],
+     "age": 24,
+     "flag": "🇬🇧",
+     "rating": 73,
+     "potential": null
+    },
+    {
+     "club": "SUN",
+     "name": "Lutsharel Geertruida",
+     "positions": [
+      "RB"
+     ],
+     "age": 26,
+     "flag": "🇳🇱",
+     "rating": 76,
+     "potential": null
+    },
+    {
+     "club": "SUN",
+     "name": "Granit Xhaka",
+     "positions": [
+      "CM"
+     ],
+     "age": 33,
+     "flag": "🇨🇭",
+     "rating": 81,
+     "potential": null
+    },
+    {
+     "club": "SUN",
+     "name": "Noah Sadiki",
+     "positions": [
+      "CDM"
+     ],
+     "age": 21,
+     "flag": "🇨🇩",
+     "rating": 75,
+     "potential": null
+    },
+    {
+     "club": "SUN",
+     "name": "Habib Diarra",
+     "positions": [
+      "CM"
+     ],
+     "age": 22,
+     "flag": "🇸🇳",
+     "rating": 75,
+     "potential": null
+    },
+    {
+     "club": "SUN",
+     "name": "Chris Rigg",
+     "positions": [
+      "CM"
+     ],
+     "age": 19,
+     "flag": "🇬🇧",
+     "rating": 70,
+     "potential": null
+    },
+    {
+     "club": "SUN",
+     "name": "Enzo Le Fée",
+     "positions": [
+      "CAM"
+     ],
+     "age": 26,
+     "flag": "🇫🇷",
+     "rating": 77,
+     "potential": null
+    },
+    {
+     "club": "SUN",
+     "name": "Simon Adingra",
+     "positions": [
+      "LW"
+     ],
+     "age": 24,
+     "flag": "🇨🇮",
+     "rating": 76,
+     "potential": null
+    },
+    {
+     "club": "SUN",
+     "name": "Chemsdine Talbi",
+     "positions": [
+      "RW"
+     ],
+     "age": 21,
+     "flag": "🇲🇦",
+     "rating": 73,
+     "potential": null
+    },
+    {
+     "club": "SUN",
+     "name": "Bertrand Traoré",
+     "positions": [
+      "RW"
+     ],
+     "age": 31,
+     "flag": "🇧🇫",
+     "rating": 74,
+     "potential": null
+    },
+    {
+     "club": "SUN",
+     "name": "Wilson Isidor",
+     "positions": [
+      "ST"
+     ],
+     "age": 26,
+     "flag": "🇫🇷",
+     "rating": 76,
+     "potential": null
+    },
+    {
+     "club": "SUN",
+     "name": "Eliezer Mayenda",
+     "positions": [
+      "ST"
+     ],
+     "age": 21,
+     "flag": "🇪🇸",
+     "rating": 72,
+     "potential": null
+    },
+    {
+     "club": "SUN",
+     "name": "Brian Brobbey",
+     "positions": [
+      "ST"
+     ],
+     "age": 24,
+     "flag": "🇳🇱",
+     "rating": 76,
+     "potential": null
+    },
+    {
+     "club": "BUR",
+     "name": "Martin Dúbravka",
+     "positions": [
+      "GK"
+     ],
+     "age": 37,
+     "flag": "🇸🇰",
+     "rating": 75,
+     "potential": null
+    },
+    {
+     "club": "BUR",
+     "name": "Max Weiß",
+     "positions": [
+      "GK"
+     ],
+     "age": 22,
+     "flag": "🇩🇪",
+     "rating": 72,
+     "potential": null
+    },
+    {
+     "club": "BUR",
+     "name": "Maxime Estève",
+     "positions": [
+      "CB"
+     ],
+     "age": 24,
+     "flag": "🇫🇷",
+     "rating": 76,
+     "potential": null
+    },
+    {
+     "club": "BUR",
+     "name": "Axel Tuanzebe",
+     "positions": [
+      "CB"
+     ],
+     "age": 28,
+     "flag": "🇨🇩",
+     "rating": 73,
+     "potential": null
+    },
+    {
+     "club": "BUR",
+     "name": "Hjalmar Ekdal",
+     "positions": [
+      "CB"
+     ],
+     "age": 27,
+     "flag": "🇸🇪",
+     "rating": 73,
+     "potential": null
+    },
+    {
+     "club": "BUR",
+     "name": "Joe Worrall",
+     "positions": [
+      "CB"
+     ],
+     "age": 29,
+     "flag": "🇬🇧",
+     "rating": 72,
+     "potential": null
+    },
+    {
+     "club": "BUR",
+     "name": "Quilindschy Hartman",
+     "positions": [
+      "LB"
+     ],
+     "age": 24,
+     "flag": "🇳🇱",
+     "rating": 75,
+     "potential": null
+    },
+    {
+     "club": "BUR",
+     "name": "Kyle Walker",
+     "positions": [
+      "RB"
+     ],
+     "age": 36,
+     "flag": "🇬🇧",
+     "rating": 77,
+     "potential": null
+    },
+    {
+     "club": "BUR",
+     "name": "Connor Roberts",
+     "positions": [
+      "RB"
+     ],
+     "age": 30,
+     "flag": "🇬🇧",
+     "rating": 72,
+     "potential": null
+    },
+    {
+     "club": "BUR",
+     "name": "Josh Cullen",
+     "positions": [
+      "CDM"
+     ],
+     "age": 30,
+     "flag": "🇮🇪",
+     "rating": 74,
+     "potential": null
+    },
+    {
+     "club": "BUR",
+     "name": "Florentino Luís",
+     "positions": [
+      "CDM"
+     ],
+     "age": 26,
+     "flag": "🇵🇹",
+     "rating": 76,
+     "potential": null
+    },
+    {
+     "club": "BUR",
+     "name": "Lesley Ugochukwu",
+     "positions": [
+      "CM"
+     ],
+     "age": 22,
+     "flag": "🇫🇷",
+     "rating": 74,
+     "potential": null
+    },
+    {
+     "club": "BUR",
+     "name": "Josh Laurent",
+     "positions": [
+      "CM"
+     ],
+     "age": 31,
+     "flag": "🇬🇧",
+     "rating": 72,
+     "potential": null
+    },
+    {
+     "club": "BUR",
+     "name": "Hannibal Mejbri",
+     "positions": [
+      "CAM"
+     ],
+     "age": 23,
+     "flag": "🇹🇳",
+     "rating": 73,
+     "potential": null
+    },
+    {
+     "club": "BUR",
+     "name": "Jaidon Anthony",
+     "positions": [
+      "LW"
+     ],
+     "age": 26,
+     "flag": "🇬🇧",
+     "rating": 75,
+     "potential": null
+    },
+    {
+     "club": "BUR",
+     "name": "Loum Tchaouna",
+     "positions": [
+      "RW"
+     ],
+     "age": 22,
+     "flag": "🇫🇷",
+     "rating": 73,
+     "potential": null
+    },
+    {
+     "club": "BUR",
+     "name": "Jacob Bruun Larsen",
+     "positions": [
+      "LW"
+     ],
+     "age": 27,
+     "flag": "🇩🇰",
+     "rating": 72,
+     "potential": null
+    },
+    {
+     "club": "BUR",
+     "name": "Zian Flemming",
+     "positions": [
+      "ST",
+      "CAM"
+     ],
+     "age": 28,
+     "flag": "🇳🇱",
+     "rating": 74,
+     "potential": null
+    },
+    {
+     "club": "BUR",
+     "name": "Lyle Foster",
+     "positions": [
+      "ST"
+     ],
+     "age": 25,
+     "flag": "🇿🇦",
+     "rating": 74,
+     "potential": null
+    },
+    {
+     "club": "BUR",
+     "name": "Armando Broja",
+     "positions": [
+      "ST"
+     ],
+     "age": 24,
+     "flag": "🇦🇱",
+     "rating": 74,
+     "potential": null
+    }
+   ]
+  },
+  {
+   "id": "spanish",
+   "name": "Spanish",
+   "clubs": [
+    {
+     "short": "RMA",
+     "name": "Real Madrid",
+     "primary": "#FFFFFF",
+     "secondary": "#FEBE10",
+     "pattern": "solid",
+     "level": 86,
+     "division": 1
+    },
+    {
+     "short": "BAR",
+     "name": "FC Barcelona",
+     "primary": "#A50044",
+     "secondary": "#004D98",
+     "pattern": "stripes",
+     "level": 86,
+     "division": 1
+    },
+    {
+     "short": "ATM",
+     "name": "Atlético Madrid",
+     "primary": "#CB3524",
+     "secondary": "#FFFFFF",
+     "pattern": "stripes",
+     "level": 83,
+     "division": 1
+    },
+    {
+     "short": "ATH",
+     "name": "Athletic Club",
+     "primary": "#EE2523",
+     "secondary": "#FFFFFF",
+     "pattern": "stripes",
+     "level": 80,
+     "division": 1
+    },
+    {
+     "short": "VIL",
+     "name": "Villarreal",
+     "primary": "#FFE667",
+     "secondary": "#005187",
+     "pattern": "solid",
+     "level": 80,
+     "division": 1
+    },
+    {
+     "short": "BET",
+     "name": "Real Betis",
+     "primary": "#00954C",
+     "secondary": "#FFFFFF",
+     "pattern": "stripes",
+     "level": 79,
+     "division": 1
+    },
+    {
+     "short": "RSO",
+     "name": "Real Sociedad",
+     "primary": "#0067B1",
+     "secondary": "#FFFFFF",
+     "pattern": "stripes",
+     "level": 78,
+     "division": 1
+    },
+    {
+     "short": "SEV",
+     "name": "Sevilla",
+     "primary": "#FFFFFF",
+     "secondary": "#D9000D",
+     "pattern": "band",
+     "level": 76,
+     "division": 1
+    },
+    {
+     "short": "CEL",
+     "name": "Celta Vigo",
+     "primary": "#8AC3EE",
+     "secondary": "#FFFFFF",
+     "pattern": "solid",
+     "level": 76,
+     "division": 1
+    },
+    {
+     "short": "RAY",
+     "name": "Rayo Vallecano",
+     "primary": "#FFFFFF",
+     "secondary": "#E53027",
+     "pattern": "band",
+     "level": 75,
+     "division": 1
+    },
+    {
+     "short": "OSA",
+     "name": "Osasuna",
+     "primary": "#D91A21",
+     "secondary": "#0A346F",
+     "pattern": "solid",
+     "level": 75,
+     "division": 1
+    },
+    {
+     "short": "VCF",
+     "name": "Valencia",
+     "primary": "#FFFFFF",
+     "secondary": "#000000",
+     "pattern": "band",
+     "level": 75,
+     "division": 1
+    },
+    {
+     "short": "GIR",
+     "name": "Girona",
+     "primary": "#CD2534",
+     "secondary": "#FFFFFF",
+     "pattern": "stripes",
+     "level": 75,
+     "division": 1
+    },
+    {
+     "short": "MLL",
+     "name": "Real Mallorca",
+     "primary": "#E20613",
+     "secondary": "#000000",
+     "pattern": "solid",
+     "level": 74,
+     "division": 1
+    },
+    {
+     "short": "GET",
+     "name": "Getafe",
+     "primary": "#005999",
+     "secondary": "#FFFFFF",
+     "pattern": "solid",
+     "level": 74,
+     "division": 1
+    },
+    {
+     "short": "ESP",
+     "name": "Espanyol",
+     "primary": "#007FC8",
+     "secondary": "#FFFFFF",
+     "pattern": "stripes",
+     "level": 74,
+     "division": 1
+    },
+    {
+     "short": "ALA",
+     "name": "Alavés",
+     "primary": "#0761AF",
+     "secondary": "#FFFFFF",
+     "pattern": "stripes",
+     "level": 73,
+     "division": 1
+    },
+    {
+     "short": "LEV",
+     "name": "Levante",
+     "primary": "#B4053F",
+     "secondary": "#004F9F",
+     "pattern": "half",
+     "level": 72,
+     "division": 1
+    },
+    {
+     "short": "ELC",
+     "name": "Elche",
+     "primary": "#FFFFFF",
+     "secondary": "#05642C",
+     "pattern": "band",
+     "level": 72,
+     "division": 1
+    },
+    {
+     "short": "OVI",
+     "name": "Real Oviedo",
+     "primary": "#0055A5",
+     "secondary": "#FFFFFF",
+     "pattern": "solid",
+     "level": 71,
+     "division": 1
+    },
+    {
+     "short": "ALM",
+     "name": "Almería",
+     "primary": "#E30613",
+     "secondary": "#FFFFFF",
+     "pattern": "stripes",
+     "level": 71,
+     "division": 2
+    },
+    {
+     "short": "ALB",
+     "name": "Albacete",
+     "primary": "#FFFFFF",
+     "secondary": "#000000",
+     "pattern": "solid",
+     "level": 66,
+     "division": 2
+    },
+    {
+     "short": "AND",
+     "name": "Andorra",
+     "primary": "#005BAC",
+     "secondary": "#FFD100",
+     "pattern": "solid",
+     "level": 65,
+     "division": 2
+    },
+    {
+     "short": "BUR",
+     "name": "Burgos",
+     "primary": "#FFFFFF",
+     "secondary": "#000000",
+     "pattern": "band",
+     "level": 65,
+     "division": 2
+    },
+    {
+     "short": "CAD",
+     "name": "Cádiz",
+     "primary": "#FFDD00",
+     "secondary": "#0057B8",
+     "pattern": "solid",
+     "level": 69,
+     "division": 2
+    },
+    {
+     "short": "CAS",
+     "name": "Castellón",
+     "primary": "#000000",
+     "secondary": "#FFFFFF",
+     "pattern": "stripes",
+     "level": 66,
+     "division": 2
+    },
+    {
+     "short": "CEU",
+     "name": "Ceuta",
+     "primary": "#FFFFFF",
+     "secondary": "#000000",
+     "pattern": "solid",
+     "level": 64,
+     "division": 2
+    },
+    {
+     "short": "COR",
+     "name": "Córdoba",
+     "primary": "#00A650",
+     "secondary": "#FFFFFF",
+     "pattern": "stripes",
+     "level": 66,
+     "division": 2
+    },
+    {
+     "short": "CUL",
+     "name": "Cultural Leonesa",
+     "primary": "#FFFFFF",
+     "secondary": "#E30613",
+     "pattern": "solid",
+     "level": 64,
+     "division": 2
+    },
+    {
+     "short": "DEP",
+     "name": "Deportivo La Coruña",
+     "primary": "#0057B8",
+     "secondary": "#FFFFFF",
+     "pattern": "stripes",
+     "level": 68,
+     "division": 2
+    },
+    {
+     "short": "EIB",
+     "name": "Eibar",
+     "primary": "#0057B8",
+     "secondary": "#C8102E",
+     "pattern": "stripes",
+     "level": 68,
+     "division": 2
+    },
+    {
+     "short": "GRA",
+     "name": "Granada",
+     "primary": "#E30613",
+     "secondary": "#FFFFFF",
+     "pattern": "stripes",
+     "level": 69,
+     "division": 2
+    },
+    {
+     "short": "LPA",
+     "name": "Las Palmas",
+     "primary": "#FFDD00",
+     "secondary": "#0057B8",
+     "pattern": "solid",
+     "level": 70,
+     "division": 2
+    },
+    {
+     "short": "LGN",
+     "name": "Leganés",
+     "primary": "#0057B8",
+     "secondary": "#FFFFFF",
+     "pattern": "stripes",
+     "level": 69,
+     "division": 2
+    },
+    {
+     "short": "MAL",
+     "name": "Málaga",
+     "primary": "#0057B8",
+     "secondary": "#FFFFFF",
+     "pattern": "stripes",
+     "level": 68,
+     "division": 2
+    },
+    {
+     "short": "MIR",
+     "name": "Mirandés",
+     "primary": "#E30613",
+     "secondary": "#000000",
+     "pattern": "solid",
+     "level": 63,
+     "division": 2
+    },
+    {
+     "short": "RAC",
+     "name": "Racing Santander",
+     "primary": "#00A650",
+     "secondary": "#FFFFFF",
+     "pattern": "solid",
+     "level": 67,
+     "division": 2
+    },
+    {
+     "short": "RSB",
+     "name": "Real Sociedad B",
+     "primary": "#0067B1",
+     "secondary": "#FFFFFF",
+     "pattern": "stripes",
+     "level": 62,
+     "division": 2
+    },
+    {
+     "short": "VLL",
+     "name": "Real Valladolid",
+     "primary": "#5E2A84",
+     "secondary": "#FFFFFF",
+     "pattern": "solid",
+     "level": 70,
+     "division": 2
+    },
+    {
+     "short": "SPO",
+     "name": "Sporting Gijón",
+     "primary": "#E30613",
+     "secondary": "#FFFFFF",
+     "pattern": "stripes",
+     "level": 68,
+     "division": 2
+    },
+    {
+     "short": "ZAR",
+     "name": "Real Zaragoza",
+     "primary": "#FFFFFF",
+     "secondary": "#0057B8",
+     "pattern": "solid",
+     "level": 67,
+     "division": 2
+    },
+    {
+     "short": "HUE",
+     "name": "Huesca",
+     "primary": "#0057B8",
+     "secondary": "#C8102E",
+     "pattern": "stripes",
+     "level": 65,
+     "division": 2
+    }
+   ],
+   "players": [
+    {
+     "club": "RMA",
+     "name": "Thibaut Courtois",
+     "positions": [
+      "GK"
+     ],
+     "age": 34,
+     "flag": "🇧🇪",
+     "rating": 88,
+     "potential": null
+    },
+    {
+     "club": "RMA",
+     "name": "Andriy Lunin",
+     "positions": [
+      "GK"
+     ],
+     "age": 27,
+     "flag": "🇺🇦",
+     "rating": 78,
+     "potential": null
+    },
+    {
+     "club": "RMA",
+     "name": "Antonio Rüdiger",
+     "positions": [
+      "CB"
+     ],
+     "age": 33,
+     "flag": "🇩🇪",
+     "rating": 83,
+     "potential": null
+    },
+    {
+     "club": "RMA",
+     "name": "Éder Militão",
+     "positions": [
+      "CB"
+     ],
+     "age": 28,
+     "flag": "🇧🇷",
+     "rating": 83,
+     "potential": null
+    },
+    {
+     "club": "RMA",
+     "name": "Dean Huijsen",
+     "positions": [
+      "CB"
+     ],
+     "age": 21,
+     "flag": "🇪🇸",
+     "rating": 82,
+     "potential": 89
+    },
+    {
+     "club": "RMA",
+     "name": "Raúl Asencio",
+     "positions": [
+      "CB"
+     ],
+     "age": 23,
+     "flag": "🇪🇸",
+     "rating": 76,
+     "potential": null
+    },
+    {
+     "club": "RMA",
+     "name": "Trent Alexander-Arnold",
+     "positions": [
+      "RB"
+     ],
+     "age": 28,
+     "flag": "🇬🇧",
+     "rating": 84,
+     "potential": null
+    },
+    {
+     "club": "RMA",
+     "name": "Dani Carvajal",
+     "positions": [
+      "RB"
+     ],
+     "age": 34,
+     "flag": "🇪🇸",
+     "rating": 81,
+     "potential": null
+    },
+    {
+     "club": "RMA",
+     "name": "Ferland Mendy",
+     "positions": [
+      "LB"
+     ],
+     "age": 31,
+     "flag": "🇫🇷",
+     "rating": 79,
+     "potential": null
+    },
+    {
+     "club": "RMA",
+     "name": "Álvaro Carreras",
+     "positions": [
+      "LB"
+     ],
+     "age": 23,
+     "flag": "🇪🇸",
+     "rating": 79,
+     "potential": null
+    },
+    {
+     "club": "RMA",
+     "name": "Aurélien Tchouaméni",
+     "positions": [
+      "CDM"
+     ],
+     "age": 26,
+     "flag": "🇫🇷",
+     "rating": 85,
+     "potential": null
+    },
+    {
+     "club": "RMA",
+     "name": "Federico Valverde",
+     "positions": [
+      "CM"
+     ],
+     "age": 28,
+     "flag": "🇺🇾",
+     "rating": 87,
+     "potential": null
+    },
+    {
+     "club": "RMA",
+     "name": "Eduardo Camavinga",
+     "positions": [
+      "CM"
+     ],
+     "age": 23,
+     "flag": "🇫🇷",
+     "rating": 83,
+     "potential": null
+    },
+    {
+     "club": "RMA",
+     "name": "Dani Ceballos",
+     "positions": [
+      "CM"
+     ],
+     "age": 30,
+     "flag": "🇪🇸",
+     "rating": 78,
+     "potential": null
+    },
+    {
+     "club": "RMA",
+     "name": "Jude Bellingham",
+     "positions": [
+      "CAM"
+     ],
+     "age": 23,
+     "flag": "🇬🇧",
+     "rating": 89,
+     "potential": null
+    },
+    {
+     "club": "RMA",
+     "name": "Arda Güler",
+     "positions": [
+      "CAM"
+     ],
+     "age": 21,
+     "flag": "🇹🇷",
+     "rating": 82,
+     "potential": 89
+    },
+    {
+     "club": "RMA",
+     "name": "Brahim Díaz",
+     "positions": [
+      "CAM"
+     ],
+     "age": 27,
+     "flag": "🇲🇦",
+     "rating": 80,
+     "potential": null
+    },
+    {
+     "club": "RMA",
+     "name": "Vinícius Júnior",
+     "positions": [
+      "LW"
+     ],
+     "age": 26,
+     "flag": "🇧🇷",
+     "rating": 89,
+     "potential": null
+    },
+    {
+     "club": "RMA",
+     "name": "Rodrygo",
+     "positions": [
+      "RW"
+     ],
+     "age": 25,
+     "flag": "🇧🇷",
+     "rating": 84,
+     "potential": null
+    },
+    {
+     "club": "RMA",
+     "name": "Franco Mastantuono",
+     "positions": [
+      "RW"
+     ],
+     "age": 19,
+     "flag": "🇦🇷",
+     "rating": 76,
+     "potential": 88
+    },
+    {
+     "club": "RMA",
+     "name": "Kylian Mbappé",
+     "positions": [
+      "ST"
+     ],
+     "age": 27,
+     "flag": "🇫🇷",
+     "rating": 91,
+     "potential": null
+    },
+    {
+     "club": "RMA",
+     "name": "Gonzalo García",
+     "positions": [
+      "ST"
+     ],
+     "age": 22,
+     "flag": "🇪🇸",
+     "rating": 74,
+     "potential": null
+    },
+    {
+     "club": "BAR",
+     "name": "Joan García",
+     "positions": [
+      "GK"
+     ],
+     "age": 25,
+     "flag": "🇪🇸",
+     "rating": 83,
+     "potential": null
+    },
+    {
+     "club": "BAR",
+     "name": "Marc-André ter Stegen",
+     "positions": [
+      "GK"
+     ],
+     "age": 34,
+     "flag": "🇩🇪",
+     "rating": 82,
+     "potential": null
+    },
+    {
+     "club": "BAR",
+     "name": "Pau Cubarsí",
+     "positions": [
+      "CB"
+     ],
+     "age": 19,
+     "flag": "🇪🇸",
+     "rating": 83,
+     "potential": 90
+    },
+    {
+     "club": "BAR",
+     "name": "Ronald Araújo",
+     "positions": [
+      "CB"
+     ],
+     "age": 27,
+     "flag": "🇺🇾",
+     "rating": 82,
+     "potential": null
+    },
+    {
+     "club": "BAR",
+     "name": "Eric García",
+     "positions": [
+      "CB"
+     ],
+     "age": 25,
+     "flag": "🇪🇸",
+     "rating": 79,
+     "potential": null
+    },
+    {
+     "club": "BAR",
+     "name": "Andreas Christensen",
+     "positions": [
+      "CB"
+     ],
+     "age": 30,
+     "flag": "🇩🇰",
+     "rating": 78,
+     "potential": null
+    },
+    {
+     "club": "BAR",
+     "name": "Alejandro Balde",
+     "positions": [
+      "LB"
+     ],
+     "age": 22,
+     "flag": "🇪🇸",
+     "rating": 82,
+     "potential": null
+    },
+    {
+     "club": "BAR",
+     "name": "Gerard Martín",
+     "positions": [
+      "LB"
+     ],
+     "age": 24,
+     "flag": "🇪🇸",
+     "rating": 74,
+     "potential": null
+    },
+    {
+     "club": "BAR",
+     "name": "Jules Koundé",
+     "positions": [
+      "RB"
+     ],
+     "age": 27,
+     "flag": "🇫🇷",
+     "rating": 85,
+     "potential": null
+    },
+    {
+     "club": "BAR",
+     "name": "Frenkie de Jong",
+     "positions": [
+      "CM"
+     ],
+     "age": 29,
+     "flag": "🇳🇱",
+     "rating": 85,
+     "potential": null
+    },
+    {
+     "club": "BAR",
+     "name": "Pedri",
+     "positions": [
+      "CM"
+     ],
+     "age": 23,
+     "flag": "🇪🇸",
+     "rating": 89,
+     "potential": null
+    },
+    {
+     "club": "BAR",
+     "name": "Gavi",
+     "positions": [
+      "CM"
+     ],
+     "age": 22,
+     "flag": "🇪🇸",
+     "rating": 82,
+     "potential": null
+    },
+    {
+     "club": "BAR",
+     "name": "Marc Casadó",
+     "positions": [
+      "CDM"
+     ],
+     "age": 22,
+     "flag": "🇪🇸",
+     "rating": 77,
+     "potential": null
+    },
+    {
+     "club": "BAR",
+     "name": "Fermín López",
+     "positions": [
+      "CAM"
+     ],
+     "age": 23,
+     "flag": "🇪🇸",
+     "rating": 80,
+     "potential": null
+    },
+    {
+     "club": "BAR",
+     "name": "Dani Olmo",
+     "positions": [
+      "CAM"
+     ],
+     "age": 28,
+     "flag": "🇪🇸",
+     "rating": 83,
+     "potential": null
+    },
+    {
+     "club": "BAR",
+     "name": "Lamine Yamal",
+     "positions": [
+      "RW"
+     ],
+     "age": 19,
+     "flag": "🇪🇸",
+     "rating": 89,
+     "potential": 95
+    },
+    {
+     "club": "BAR",
+     "name": "Raphinha",
+     "positions": [
+      "LW"
+     ],
+     "age": 29,
+     "flag": "🇧🇷",
+     "rating": 87,
+     "potential": null
+    },
+    {
+     "club": "BAR",
+     "name": "Marcus Rashford",
+     "positions": [
+      "LW"
+     ],
+     "age": 28,
+     "flag": "🇬🇧",
+     "rating": 81,
+     "potential": null
+    },
+    {
+     "club": "BAR",
+     "name": "Ferran Torres",
+     "positions": [
+      "ST"
+     ],
+     "age": 26,
+     "flag": "🇪🇸",
+     "rating": 80,
+     "potential": null
+    },
+    {
+     "club": "BAR",
+     "name": "Robert Lewandowski",
+     "positions": [
+      "ST"
+     ],
+     "age": 38,
+     "flag": "🇵🇱",
+     "rating": 84,
+     "potential": null
+    },
+    {
+     "club": "ATM",
+     "name": "Jan Oblak",
+     "positions": [
+      "GK"
+     ],
+     "age": 33,
+     "flag": "🇸🇮",
+     "rating": 86,
+     "potential": null
+    },
+    {
+     "club": "ATM",
+     "name": "Juan Musso",
+     "positions": [
+      "GK"
+     ],
+     "age": 32,
+     "flag": "🇦🇷",
+     "rating": 77,
+     "potential": null
+    },
+    {
+     "club": "ATM",
+     "name": "José María Giménez",
+     "positions": [
+      "CB"
+     ],
+     "age": 31,
+     "flag": "🇺🇾",
+     "rating": 81,
+     "potential": null
+    },
+    {
+     "club": "ATM",
+     "name": "Robin Le Normand",
+     "positions": [
+      "CB"
+     ],
+     "age": 29,
+     "flag": "🇪🇸",
+     "rating": 81,
+     "potential": null
+    },
+    {
+     "club": "ATM",
+     "name": "Dávid Hancko",
+     "positions": [
+      "CB"
+     ],
+     "age": 28,
+     "flag": "🇸🇰",
+     "rating": 81,
+     "potential": null
+    },
+    {
+     "club": "ATM",
+     "name": "Clément Lenglet",
+     "positions": [
+      "CB"
+     ],
+     "age": 31,
+     "flag": "🇫🇷",
+     "rating": 77,
+     "potential": null
+    },
+    {
+     "club": "ATM",
+     "name": "Marc Pubill",
+     "positions": [
+      "RB"
+     ],
+     "age": 23,
+     "flag": "🇪🇸",
+     "rating": 76,
+     "potential": null
+    },
+    {
+     "club": "ATM",
+     "name": "Nahuel Molina",
+     "positions": [
+      "RB"
+     ],
+     "age": 28,
+     "flag": "🇦🇷",
+     "rating": 79,
+     "potential": null
+    },
+    {
+     "club": "ATM",
+     "name": "Matteo Ruggeri",
+     "positions": [
+      "LB"
+     ],
+     "age": 24,
+     "flag": "🇮🇹",
+     "rating": 77,
+     "potential": null
+    },
+    {
+     "club": "ATM",
+     "name": "Johnny Cardoso",
+     "positions": [
+      "CDM"
+     ],
+     "age": 24,
+     "flag": "🇺🇸",
+     "rating": 78,
+     "potential": null
+    },
+    {
+     "club": "ATM",
+     "name": "Pablo Barrios",
+     "positions": [
+      "CM"
+     ],
+     "age": 23,
+     "flag": "🇪🇸",
+     "rating": 81,
+     "potential": null
+    },
+    {
+     "club": "ATM",
+     "name": "Koke",
+     "positions": [
+      "CM"
+     ],
+     "age": 34,
+     "flag": "🇪🇸",
+     "rating": 79,
+     "potential": null
+    },
+    {
+     "club": "ATM",
+     "name": "Conor Gallagher",
+     "positions": [
+      "CM"
+     ],
+     "age": 26,
+     "flag": "🇬🇧",
+     "rating": 80,
+     "potential": null
+    },
+    {
+     "club": "ATM",
+     "name": "Álex Baena",
+     "positions": [
+      "CAM"
+     ],
+     "age": 25,
+     "flag": "🇪🇸",
+     "rating": 82,
+     "potential": null
+    },
+    {
+     "club": "ATM",
+     "name": "Thiago Almada",
+     "positions": [
+      "CAM"
+     ],
+     "age": 25,
+     "flag": "🇦🇷",
+     "rating": 80,
+     "potential": null
+    },
+    {
+     "club": "ATM",
+     "name": "Giuliano Simeone",
+     "positions": [
+      "RW"
+     ],
+     "age": 23,
+     "flag": "🇦🇷",
+     "rating": 78,
+     "potential": null
+    },
+    {
+     "club": "ATM",
+     "name": "Nicolás González",
+     "positions": [
+      "LW"
+     ],
+     "age": 28,
+     "flag": "🇦🇷",
+     "rating": 80,
+     "potential": null
+    },
+    {
+     "club": "ATM",
+     "name": "Antoine Griezmann",
+     "positions": [
+      "ST"
+     ],
+     "age": 35,
+     "flag": "🇫🇷",
+     "rating": 82,
+     "potential": null
+    },
+    {
+     "club": "ATM",
+     "name": "Julián Alvarez",
+     "positions": [
+      "ST"
+     ],
+     "age": 26,
+     "flag": "🇦🇷",
+     "rating": 86,
+     "potential": null
+    },
+    {
+     "club": "ATM",
+     "name": "Alexander Sørloth",
+     "positions": [
+      "ST"
+     ],
+     "age": 30,
+     "flag": "🇳🇴",
+     "rating": 81,
+     "potential": null
+    }
+   ]
+  },
+  {
+   "id": "german",
+   "name": "German",
+   "clubs": [
+    {
+     "short": "FCB",
+     "name": "Bayern Munich",
+     "primary": "#DC052D",
+     "secondary": "#FFFFFF",
+     "pattern": "solid",
+     "level": 85,
+     "division": 1
+    },
+    {
+     "short": "BVB",
+     "name": "Borussia Dortmund",
+     "primary": "#FDE100",
+     "secondary": "#000000",
+     "pattern": "band",
+     "level": 81,
+     "division": 1
+    },
+    {
+     "short": "LEV",
+     "name": "Bayer Leverkusen",
+     "primary": "#E32221",
+     "secondary": "#000000",
+     "pattern": "half",
+     "level": 80,
+     "division": 1
+    },
+    {
+     "short": "RBL",
+     "name": "RB Leipzig",
+     "primary": "#FFFFFF",
+     "secondary": "#DD0741",
+     "pattern": "band",
+     "level": 79,
+     "division": 1
+    },
+    {
+     "short": "SGE",
+     "name": "Eintracht Frankfurt",
+     "primary": "#E1000F",
+     "secondary": "#000000",
+     "pattern": "half",
+     "level": 78,
+     "division": 1
+    },
+    {
+     "short": "VFB",
+     "name": "VfB Stuttgart",
+     "primary": "#FFFFFF",
+     "secondary": "#E32219",
+     "pattern": "band",
+     "level": 78,
+     "division": 1
+    },
+    {
+     "short": "SCF",
+     "name": "SC Freiburg",
+     "primary": "#E2001A",
+     "secondary": "#000000",
+     "pattern": "solid",
+     "level": 76,
+     "division": 1
+    },
+    {
+     "short": "TSG",
+     "name": "TSG Hoffenheim",
+     "primary": "#1961B5",
+     "secondary": "#FFFFFF",
+     "pattern": "solid",
+     "level": 76,
+     "division": 1
+    },
+    {
+     "short": "WOB",
+     "name": "VfL Wolfsburg",
+     "primary": "#65B32E",
+     "secondary": "#FFFFFF",
+     "pattern": "solid",
+     "level": 75,
+     "division": 1
+    },
+    {
+     "short": "BMG",
+     "name": "Borussia Mönchengladbach",
+     "primary": "#FFFFFF",
+     "secondary": "#000000",
+     "pattern": "band",
+     "level": 75,
+     "division": 1
+    },
+    {
+     "short": "MAI",
+     "name": "Mainz 05",
+     "primary": "#C3141E",
+     "secondary": "#FFFFFF",
+     "pattern": "solid",
+     "level": 75,
+     "division": 1
+    },
+    {
+     "short": "SVW",
+     "name": "Werder Bremen",
+     "primary": "#1D9053",
+     "secondary": "#FFFFFF",
+     "pattern": "solid",
+     "level": 75,
+     "division": 1
+    },
+    {
+     "short": "FCA",
+     "name": "FC Augsburg",
+     "primary": "#BA3733",
+     "secondary": "#FFFFFF",
+     "pattern": "half",
+     "level": 74,
+     "division": 1
+    },
+    {
+     "short": "FCU",
+     "name": "Union Berlin",
+     "primary": "#EB1923",
+     "secondary": "#FFFFFF",
+     "pattern": "solid",
+     "level": 74,
+     "division": 1
+    },
+    {
+     "short": "KOE",
+     "name": "1. FC Köln",
+     "primary": "#FFFFFF",
+     "secondary": "#ED1C24",
+     "pattern": "band",
+     "level": 73,
+     "division": 1
+    },
+    {
+     "short": "HSV",
+     "name": "Hamburger SV",
+     "primary": "#FFFFFF",
+     "secondary": "#0A3F86",
+     "pattern": "band",
+     "level": 73,
+     "division": 1
+    },
+    {
+     "short": "FCH",
+     "name": "1. FC Heidenheim",
+     "primary": "#E30613",
+     "secondary": "#003B79",
+     "pattern": "half",
+     "level": 72,
+     "division": 1
+    },
+    {
+     "short": "STP",
+     "name": "FC St. Pauli",
+     "primary": "#624839",
+     "secondary": "#FFFFFF",
+     "pattern": "solid",
+     "level": 72,
+     "division": 1
+    },
+    {
+     "short": "HAN",
+     "name": "Hannover 96",
+     "primary": "#00923F",
+     "secondary": "#000000",
+     "pattern": "solid",
+     "level": 70,
+     "division": 2
+    },
+    {
+     "short": "DAR",
+     "name": "Darmstadt 98",
+     "primary": "#0057B8",
+     "secondary": "#FFFFFF",
+     "pattern": "solid",
+     "level": 69,
+     "division": 2
+    },
+    {
+     "short": "DUS",
+     "name": "Fortuna Düsseldorf",
+     "primary": "#E30613",
+     "secondary": "#FFFFFF",
+     "pattern": "solid",
+     "level": 69,
+     "division": 2
+    },
+    {
+     "short": "ELV",
+     "name": "SV Elversberg",
+     "primary": "#FFFFFF",
+     "secondary": "#000000",
+     "pattern": "solid",
+     "level": 67,
+     "division": 2
+    },
+    {
+     "short": "FUR",
+     "name": "Greuther Fürth",
+     "primary": "#00923F",
+     "secondary": "#FFFFFF",
+     "pattern": "solid",
+     "level": 67,
+     "division": 2
+    },
+    {
+     "short": "HER",
+     "name": "Hertha BSC",
+     "primary": "#005CA9",
+     "secondary": "#FFFFFF",
+     "pattern": "half",
+     "level": 69,
+     "division": 2
+    },
+    {
+     "short": "KAI",
+     "name": "1. FC Kaiserslautern",
+     "primary": "#E30613",
+     "secondary": "#FFFFFF",
+     "pattern": "solid",
+     "level": 69,
+     "division": 2
+    },
+    {
+     "short": "KAR",
+     "name": "Karlsruher SC",
+     "primary": "#0057B8",
+     "secondary": "#FFFFFF",
+     "pattern": "solid",
+     "level": 67,
+     "division": 2
+    },
+    {
+     "short": "MAG",
+     "name": "1. FC Magdeburg",
+     "primary": "#0057B8",
+     "secondary": "#FFFFFF",
+     "pattern": "solid",
+     "level": 66,
+     "division": 2
+    },
+    {
+     "short": "NUR",
+     "name": "1. FC Nürnberg",
+     "primary": "#E30613",
+     "secondary": "#000000",
+     "pattern": "solid",
+     "level": 68,
+     "division": 2
+    },
+    {
+     "short": "PAD",
+     "name": "SC Paderborn",
+     "primary": "#0057B8",
+     "secondary": "#000000",
+     "pattern": "solid",
+     "level": 67,
+     "division": 2
+    },
+    {
+     "short": "MUN",
+     "name": "Preußen Münster",
+     "primary": "#00923F",
+     "secondary": "#000000",
+     "pattern": "solid",
+     "level": 64,
+     "division": 2
+    },
+    {
+     "short": "SCH",
+     "name": "Schalke 04",
+     "primary": "#004D9D",
+     "secondary": "#FFFFFF",
+     "pattern": "solid",
+     "level": 70,
+     "division": 2
+    },
+    {
+     "short": "BRA",
+     "name": "Eintracht Braunschweig",
+     "primary": "#FFDD00",
+     "secondary": "#005CA9",
+     "pattern": "solid",
+     "level": 66,
+     "division": 2
+    },
+    {
+     "short": "KIE",
+     "name": "Holstein Kiel",
+     "primary": "#005CA9",
+     "secondary": "#E30613",
+     "pattern": "stripes",
+     "level": 66,
+     "division": 2
+    },
+    {
+     "short": "BIE",
+     "name": "Arminia Bielefeld",
+     "primary": "#005CA9",
+     "secondary": "#000000",
+     "pattern": "stripes",
+     "level": 67,
+     "division": 2
+    },
+    {
+     "short": "DRE",
+     "name": "Dynamo Dresden",
+     "primary": "#FFDD00",
+     "secondary": "#000000",
+     "pattern": "solid",
+     "level": 67,
+     "division": 2
+    },
+    {
+     "short": "BOC",
+     "name": "VfL Bochum",
+     "primary": "#005CA9",
+     "secondary": "#FFFFFF",
+     "pattern": "solid",
+     "level": 67,
+     "division": 2
+    }
+   ],
+   "players": [
+    {
+     "club": "FCB",
+     "name": "Manuel Neuer",
+     "positions": [
+      "GK"
+     ],
+     "age": 40,
+     "flag": "🇩🇪",
+     "rating": 84,
+     "potential": null
+    },
+    {
+     "club": "FCB",
+     "name": "Jonas Urbig",
+     "positions": [
+      "GK"
+     ],
+     "age": 23,
+     "flag": "🇩🇪",
+     "rating": 75,
+     "potential": null
+    },
+    {
+     "club": "FCB",
+     "name": "Dayot Upamecano",
+     "positions": [
+      "CB"
+     ],
+     "age": 28,
+     "flag": "🇫🇷",
+     "rating": 84,
+     "potential": null
+    },
+    {
+     "club": "FCB",
+     "name": "Jonathan Tah",
+     "positions": [
+      "CB"
+     ],
+     "age": 30,
+     "flag": "🇩🇪",
+     "rating": 84,
+     "potential": null
+    },
+    {
+     "club": "FCB",
+     "name": "Kim Min-jae",
+     "positions": [
+      "CB"
+     ],
+     "age": 29,
+     "flag": "🇰🇷",
+     "rating": 81,
+     "potential": null
+    },
+    {
+     "club": "FCB",
+     "name": "Hiroki Ito",
+     "positions": [
+      "CB"
+     ],
+     "age": 27,
+     "flag": "🇯🇵",
+     "rating": 78,
+     "potential": null
+    },
+    {
+     "club": "FCB",
+     "name": "Alphonso Davies",
+     "positions": [
+      "LB"
+     ],
+     "age": 25,
+     "flag": "🇨🇦",
+     "rating": 83,
+     "potential": null
+    },
+    {
+     "club": "FCB",
+     "name": "Josip Stanišić",
+     "positions": [
+      "RB"
+     ],
+     "age": 26,
+     "flag": "🇭🇷",
+     "rating": 79,
+     "potential": null
+    },
+    {
+     "club": "FCB",
+     "name": "Konrad Laimer",
+     "positions": [
+      "RB",
+      "CM"
+     ],
+     "age": 29,
+     "flag": "🇦🇹",
+     "rating": 80,
+     "potential": null
+    },
+    {
+     "club": "FCB",
+     "name": "Joshua Kimmich",
+     "positions": [
+      "CDM"
+     ],
+     "age": 31,
+     "flag": "🇩🇪",
+     "rating": 87,
+     "potential": null
+    },
+    {
+     "club": "FCB",
+     "name": "Aleksandar Pavlović",
+     "positions": [
+      "CM"
+     ],
+     "age": 22,
+     "flag": "🇩🇪",
+     "rating": 81,
+     "potential": null
+    },
+    {
+     "club": "FCB",
+     "name": "Leon Goretzka",
+     "positions": [
+      "CM"
+     ],
+     "age": 31,
+     "flag": "🇩🇪",
+     "rating": 80,
+     "potential": null
+    },
+    {
+     "club": "FCB",
+     "name": "Jamal Musiala",
+     "positions": [
+      "CAM"
+     ],
+     "age": 23,
+     "flag": "🇩🇪",
+     "rating": 88,
+     "potential": null
+    },
+    {
+     "club": "FCB",
+     "name": "Lennart Karl",
+     "positions": [
+      "CAM"
+     ],
+     "age": 18,
+     "flag": "🇩🇪",
+     "rating": 72,
+     "potential": 87
+    },
+    {
+     "club": "FCB",
+     "name": "Michael Olise",
+     "positions": [
+      "RW"
+     ],
+     "age": 24,
+     "flag": "🇫🇷",
+     "rating": 86,
+     "potential": null
+    },
+    {
+     "club": "FCB",
+     "name": "Luis Díaz",
+     "positions": [
+      "LW"
+     ],
+     "age": 29,
+     "flag": "🇨🇴",
+     "rating": 85,
+     "potential": null
+    },
+    {
+     "club": "FCB",
+     "name": "Serge Gnabry",
+     "positions": [
+      "RW"
+     ],
+     "age": 31,
+     "flag": "🇩🇪",
+     "rating": 80,
+     "potential": null
+    },
+    {
+     "club": "FCB",
+     "name": "Nicolas Jackson",
+     "positions": [
+      "ST"
+     ],
+     "age": 25,
+     "flag": "🇸🇳",
+     "rating": 80,
+     "potential": null
+    },
+    {
+     "club": "FCB",
+     "name": "Harry Kane",
+     "positions": [
+      "ST"
+     ],
+     "age": 33,
+     "flag": "🇬🇧",
+     "rating": 89,
+     "potential": null
+    },
+    {
+     "club": "BVB",
+     "name": "Gregor Kobel",
+     "positions": [
+      "GK"
+     ],
+     "age": 28,
+     "flag": "🇨🇭",
+     "rating": 85,
+     "potential": null
+    },
+    {
+     "club": "BVB",
+     "name": "Alexander Meyer",
+     "positions": [
+      "GK"
+     ],
+     "age": 35,
+     "flag": "🇩🇪",
+     "rating": 72,
+     "potential": null
+    },
+    {
+     "club": "BVB",
+     "name": "Nico Schlotterbeck",
+     "positions": [
+      "CB"
+     ],
+     "age": 26,
+     "flag": "🇩🇪",
+     "rating": 83,
+     "potential": null
+    },
+    {
+     "club": "BVB",
+     "name": "Waldemar Anton",
+     "positions": [
+      "CB"
+     ],
+     "age": 30,
+     "flag": "🇩🇪",
+     "rating": 79,
+     "potential": null
+    },
+    {
+     "club": "BVB",
+     "name": "Niklas Süle",
+     "positions": [
+      "CB"
+     ],
+     "age": 31,
+     "flag": "🇩🇪",
+     "rating": 78,
+     "potential": null
+    },
+    {
+     "club": "BVB",
+     "name": "Ramy Bensebaini",
+     "positions": [
+      "LB"
+     ],
+     "age": 31,
+     "flag": "🇩🇿",
+     "rating": 77,
+     "potential": null
+    },
+    {
+     "club": "BVB",
+     "name": "Daniel Svensson",
+     "positions": [
+      "LB"
+     ],
+     "age": 24,
+     "flag": "🇸🇪",
+     "rating": 77,
+     "potential": null
+    },
+    {
+     "club": "BVB",
+     "name": "Julian Ryerson",
+     "positions": [
+      "RB"
+     ],
+     "age": 28,
+     "flag": "🇳🇴",
+     "rating": 78,
+     "potential": null
+    },
+    {
+     "club": "BVB",
+     "name": "Yan Couto",
+     "positions": [
+      "RB"
+     ],
+     "age": 24,
+     "flag": "🇧🇷",
+     "rating": 77,
+     "potential": null
+    },
+    {
+     "club": "BVB",
+     "name": "Emre Can",
+     "positions": [
+      "CDM"
+     ],
+     "age": 32,
+     "flag": "🇩🇪",
+     "rating": 78,
+     "potential": null
+    },
+    {
+     "club": "BVB",
+     "name": "Felix Nmecha",
+     "positions": [
+      "CM"
+     ],
+     "age": 25,
+     "flag": "🇩🇪",
+     "rating": 80,
+     "potential": null
+    },
+    {
+     "club": "BVB",
+     "name": "Marcel Sabitzer",
+     "positions": [
+      "CM"
+     ],
+     "age": 32,
+     "flag": "🇦🇹",
+     "rating": 79,
+     "potential": null
+    },
+    {
+     "club": "BVB",
+     "name": "Jobe Bellingham",
+     "positions": [
+      "CM"
+     ],
+     "age": 21,
+     "flag": "🇬🇧",
+     "rating": 78,
+     "potential": 86
+    },
+    {
+     "club": "BVB",
+     "name": "Carney Chukwuemeka",
+     "positions": [
+      "CM"
+     ],
+     "age": 22,
+     "flag": "🇦🇹",
+     "rating": 75,
+     "potential": null
+    },
+    {
+     "club": "BVB",
+     "name": "Julian Brandt",
+     "positions": [
+      "CAM"
+     ],
+     "age": 30,
+     "flag": "🇩🇪",
+     "rating": 81,
+     "potential": null
+    },
+    {
+     "club": "BVB",
+     "name": "Karim Adeyemi",
+     "positions": [
+      "LW"
+     ],
+     "age": 24,
+     "flag": "🇩🇪",
+     "rating": 80,
+     "potential": null
+    },
+    {
+     "club": "BVB",
+     "name": "Maximilian Beier",
+     "positions": [
+      "ST"
+     ],
+     "age": 24,
+     "flag": "🇩🇪",
+     "rating": 79,
+     "potential": null
+    },
+    {
+     "club": "BVB",
+     "name": "Serhou Guirassy",
+     "positions": [
+      "ST"
+     ],
+     "age": 30,
+     "flag": "🇬🇳",
+     "rating": 85,
+     "potential": null
+    },
+    {
+     "club": "LEV",
+     "name": "Mark Flekken",
+     "positions": [
+      "GK"
+     ],
+     "age": 33,
+     "flag": "🇳🇱",
+     "rating": 79,
+     "potential": null
+    },
+    {
+     "club": "LEV",
+     "name": "Edmond Tapsoba",
+     "positions": [
+      "CB"
+     ],
+     "age": 27,
+     "flag": "🇧🇫",
+     "rating": 81,
+     "potential": null
+    },
+    {
+     "club": "LEV",
+     "name": "Jarell Quansah",
+     "positions": [
+      "CB"
+     ],
+     "age": 23,
+     "flag": "🇬🇧",
+     "rating": 78,
+     "potential": null
+    },
+    {
+     "club": "LEV",
+     "name": "Loïc Badé",
+     "positions": [
+      "CB"
+     ],
+     "age": 26,
+     "flag": "🇫🇷",
+     "rating": 78,
+     "potential": null
+    },
+    {
+     "club": "LEV",
+     "name": "Alejandro Grimaldo",
+     "positions": [
+      "LB"
+     ],
+     "age": 31,
+     "flag": "🇪🇸",
+     "rating": 82,
+     "potential": null
+    },
+    {
+     "club": "LEV",
+     "name": "Arthur",
+     "positions": [
+      "RB"
+     ],
+     "age": 23,
+     "flag": "🇧🇷",
+     "rating": 74,
+     "potential": null
+    },
+    {
+     "club": "LEV",
+     "name": "Lucas Vázquez",
+     "positions": [
+      "RB"
+     ],
+     "age": 35,
+     "flag": "🇪🇸",
+     "rating": 76,
+     "potential": null
+    },
+    {
+     "club": "LEV",
+     "name": "Exequiel Palacios",
+     "positions": [
+      "CM"
+     ],
+     "age": 28,
+     "flag": "🇦🇷",
+     "rating": 81,
+     "potential": null
+    },
+    {
+     "club": "LEV",
+     "name": "Robert Andrich",
+     "positions": [
+      "CDM"
+     ],
+     "age": 32,
+     "flag": "🇩🇪",
+     "rating": 79,
+     "potential": null
+    },
+    {
+     "club": "LEV",
+     "name": "Aleix García",
+     "positions": [
+      "CM"
+     ],
+     "age": 29,
+     "flag": "🇪🇸",
+     "rating": 80,
+     "potential": null
+    },
+    {
+     "club": "LEV",
+     "name": "Malik Tillman",
+     "positions": [
+      "CAM"
+     ],
+     "age": 24,
+     "flag": "🇺🇸",
+     "rating": 80,
+     "potential": null
+    },
+    {
+     "club": "LEV",
+     "name": "Ibrahim Maza",
+     "positions": [
+      "CAM"
+     ],
+     "age": 20,
+     "flag": "🇩🇿",
+     "rating": 75,
+     "potential": 85
+    },
+    {
+     "club": "LEV",
+     "name": "Eliesse Ben Seghir",
+     "positions": [
+      "CAM"
+     ],
+     "age": 21,
+     "flag": "🇲🇦",
+     "rating": 77,
+     "potential": null
+    },
+    {
+     "club": "LEV",
+     "name": "Ernest Poku",
+     "positions": [
+      "RW"
+     ],
+     "age": 22,
+     "flag": "🇳🇱",
+     "rating": 76,
+     "potential": null
+    },
+    {
+     "club": "LEV",
+     "name": "Martin Terrier",
+     "positions": [
+      "LW"
+     ],
+     "age": 29,
+     "flag": "🇫🇷",
+     "rating": 78,
+     "potential": null
+    },
+    {
+     "club": "LEV",
+     "name": "Patrik Schick",
+     "positions": [
+      "ST"
+     ],
+     "age": 30,
+     "flag": "🇨🇿",
+     "rating": 81,
+     "potential": null
+    },
+    {
+     "club": "LEV",
+     "name": "Christian Kofane",
+     "positions": [
+      "ST"
+     ],
+     "age": 20,
+     "flag": "🇨🇲",
+     "rating": 74,
+     "potential": 84
+    }
+   ]
+  },
+  {
+   "id": "italian",
+   "name": "Italian",
+   "clubs": [
+    {
+     "short": "INT",
+     "name": "Inter",
+     "primary": "#0068A8",
+     "secondary": "#000000",
+     "pattern": "stripes",
+     "level": 84,
+     "division": 1
+    },
+    {
+     "short": "NAP",
+     "name": "Napoli",
+     "primary": "#12A0D7",
+     "secondary": "#FFFFFF",
+     "pattern": "solid",
+     "level": 83,
+     "division": 1
+    },
+    {
+     "short": "JUV",
+     "name": "Juventus",
+     "primary": "#FFFFFF",
+     "secondary": "#000000",
+     "pattern": "stripes",
+     "level": 82,
+     "division": 1
+    },
+    {
+     "short": "MIL",
+     "name": "AC Milan",
+     "primary": "#FB090B",
+     "secondary": "#000000",
+     "pattern": "stripes",
+     "level": 81,
+     "division": 1
+    },
+    {
+     "short": "ATA",
+     "name": "Atalanta",
+     "primary": "#1E71B8",
+     "secondary": "#000000",
+     "pattern": "stripes",
+     "level": 81,
+     "division": 1
+    },
+    {
+     "short": "ROM",
+     "name": "Roma",
+     "primary": "#8E1F2F",
+     "secondary": "#F0BC42",
+     "pattern": "solid",
+     "level": 80,
+     "division": 1
+    },
+    {
+     "short": "BOL",
+     "name": "Bologna",
+     "primary": "#1A2F48",
+     "secondary": "#A21C26",
+     "pattern": "half",
+     "level": 79,
+     "division": 1
+    },
+    {
+     "short": "FIO",
+     "name": "Fiorentina",
+     "primary": "#482E92",
+     "secondary": "#FFFFFF",
+     "pattern": "solid",
+     "level": 78,
+     "division": 1
+    },
+    {
+     "short": "LAZ",
+     "name": "Lazio",
+     "primary": "#87D8F7",
+     "secondary": "#FFFFFF",
+     "pattern": "solid",
+     "level": 78,
+     "division": 1
+    },
+    {
+     "short": "COM",
+     "name": "Como",
+     "primary": "#003DA5",
+     "secondary": "#FFFFFF",
+     "pattern": "solid",
+     "level": 78,
+     "division": 1
+    },
+    {
+     "short": "TOR",
+     "name": "Torino",
+     "primary": "#8A1E03",
+     "secondary": "#FFFFFF",
+     "pattern": "solid",
+     "level": 75,
+     "division": 1
+    },
+    {
+     "short": "UDI",
+     "name": "Udinese",
+     "primary": "#FFFFFF",
+     "secondary": "#000000",
+     "pattern": "stripes",
+     "level": 74,
+     "division": 1
+    },
+    {
+     "short": "GEN",
+     "name": "Genoa",
+     "primary": "#A6192E",
+     "secondary": "#002F6C",
+     "pattern": "half",
+     "level": 74,
+     "division": 1
+    },
+    {
+     "short": "CAG",
+     "name": "Cagliari",
+     "primary": "#A6192E",
+     "secondary": "#002F6C",
+     "pattern": "half",
+     "level": 73,
+     "division": 1
+    },
+    {
+     "short": "PAR",
+     "name": "Parma",
+     "primary": "#FFFFFF",
+     "secondary": "#FFD700",
+     "pattern": "band",
+     "level": 73,
+     "division": 1
+    },
+    {
+     "short": "SAS",
+     "name": "Sassuolo",
+     "primary": "#00A752",
+     "secondary": "#000000",
+     "pattern": "stripes",
+     "level": 73,
+     "division": 1
+    },
+    {
+     "short": "VER",
+     "name": "Hellas Verona",
+     "primary": "#FFE000",
+     "secondary": "#003399",
+     "pattern": "solid",
+     "level": 72,
+     "division": 1
+    },
+    {
+     "short": "LEC",
+     "name": "Lecce",
+     "primary": "#FFE300",
+     "secondary": "#E30613",
+     "pattern": "stripes",
+     "level": 72,
+     "division": 1
+    },
+    {
+     "short": "PIS",
+     "name": "Pisa",
+     "primary": "#00205B",
+     "secondary": "#000000",
+     "pattern": "stripes",
+     "level": 71,
+     "division": 1
+    },
+    {
+     "short": "CRE",
+     "name": "Cremonese",
+     "primary": "#E30613",
+     "secondary": "#9E9E9E",
+     "pattern": "stripes",
+     "level": 71,
+     "division": 1
+    },
+    {
+     "short": "VEN",
+     "name": "Venezia",
+     "primary": "#F26B21",
+     "secondary": "#00663B",
+     "pattern": "band",
+     "level": 70,
+     "division": 2
+    },
+    {
+     "short": "FRO",
+     "name": "Frosinone",
+     "primary": "#FFDD00",
+     "secondary": "#005CA9",
+     "pattern": "solid",
+     "level": 69,
+     "division": 2
+    },
+    {
+     "short": "MON",
+     "name": "Monza",
+     "primary": "#E30613",
+     "secondary": "#FFFFFF",
+     "pattern": "stripes",
+     "level": 70,
+     "division": 2
+    },
+    {
+     "short": "PAL",
+     "name": "Palermo",
+     "primary": "#F7A8B8",
+     "secondary": "#000000",
+     "pattern": "half",
+     "level": 70,
+     "division": 2
+    },
+    {
+     "short": "MOD",
+     "name": "Modena",
+     "primary": "#FFDD00",
+     "secondary": "#005CA9",
+     "pattern": "stripes",
+     "level": 66,
+     "division": 2
+    },
+    {
+     "short": "CAT",
+     "name": "Catanzaro",
+     "primary": "#E30613",
+     "secondary": "#FFDD00",
+     "pattern": "stripes",
+     "level": 67,
+     "division": 2
+    },
+    {
+     "short": "JST",
+     "name": "Juve Stabia",
+     "primary": "#FFDD00",
+     "secondary": "#0057B8",
+     "pattern": "solid",
+     "level": 64,
+     "division": 2
+    },
+    {
+     "short": "CES",
+     "name": "Cesena",
+     "primary": "#FFFFFF",
+     "secondary": "#000000",
+     "pattern": "band",
+     "level": 65,
+     "division": 2
+    },
+    {
+     "short": "AVE",
+     "name": "Avellino",
+     "primary": "#00A650",
+     "secondary": "#FFFFFF",
+     "pattern": "solid",
+     "level": 65,
+     "division": 2
+    },
+    {
+     "short": "PAD",
+     "name": "Padova",
+     "primary": "#FFFFFF",
+     "secondary": "#E30613",
+     "pattern": "band",
+     "level": 65,
+     "division": 2
+    },
+    {
+     "short": "CAR",
+     "name": "Carrarese",
+     "primary": "#FFDD00",
+     "secondary": "#0057B8",
+     "pattern": "stripes",
+     "level": 63,
+     "division": 2
+    },
+    {
+     "short": "SAM",
+     "name": "Sampdoria",
+     "primary": "#0057B8",
+     "secondary": "#FFFFFF",
+     "pattern": "band",
+     "level": 68,
+     "division": 2
+    },
+    {
+     "short": "MAN",
+     "name": "Mantova",
+     "primary": "#E30613",
+     "secondary": "#FFFFFF",
+     "pattern": "solid",
+     "level": 63,
+     "division": 2
+    },
+    {
+     "short": "EMP",
+     "name": "Empoli",
+     "primary": "#0057B8",
+     "secondary": "#FFFFFF",
+     "pattern": "solid",
+     "level": 68,
+     "division": 2
+    },
+    {
+     "short": "BAR",
+     "name": "Bari",
+     "primary": "#FFFFFF",
+     "secondary": "#E30613",
+     "pattern": "solid",
+     "level": 67,
+     "division": 2
+    },
+    {
+     "short": "SPE",
+     "name": "Spezia",
+     "primary": "#FFFFFF",
+     "secondary": "#000000",
+     "pattern": "band",
+     "level": 66,
+     "division": 2
+    },
+    {
+     "short": "REG",
+     "name": "Reggiana",
+     "primary": "#9E1B32",
+     "secondary": "#FFFFFF",
+     "pattern": "solid",
+     "level": 64,
+     "division": 2
+    },
+    {
+     "short": "SUD",
+     "name": "Südtirol",
+     "primary": "#FFFFFF",
+     "secondary": "#E30613",
+     "pattern": "solid",
+     "level": 63,
+     "division": 2
+    },
+    {
+     "short": "PES",
+     "name": "Pescara",
+     "primary": "#FFFFFF",
+     "secondary": "#0057B8",
+     "pattern": "stripes",
+     "level": 64,
+     "division": 2
+    },
+    {
+     "short": "ENT",
+     "name": "Virtus Entella",
+     "primary": "#FFFFFF",
+     "secondary": "#0057B8",
+     "pattern": "solid",
+     "level": 62,
+     "division": 2
+    }
+   ],
+   "players": [
+    {
+     "club": "INT",
+     "name": "Yann Sommer",
+     "positions": [
+      "GK"
+     ],
+     "age": 37,
+     "flag": "🇨🇭",
+     "rating": 83,
+     "potential": null
+    },
+    {
+     "club": "INT",
+     "name": "Josep Martínez",
+     "positions": [
+      "GK"
+     ],
+     "age": 28,
+     "flag": "🇪🇸",
+     "rating": 77,
+     "potential": null
+    },
+    {
+     "club": "INT",
+     "name": "Alessandro Bastoni",
+     "positions": [
+      "CB"
+     ],
+     "age": 27,
+     "flag": "🇮🇹",
+     "rating": 86,
+     "potential": null
+    },
+    {
+     "club": "INT",
+     "name": "Manuel Akanji",
+     "positions": [
+      "CB"
+     ],
+     "age": 31,
+     "flag": "🇨🇭",
+     "rating": 82,
+     "potential": null
+    },
+    {
+     "club": "INT",
+     "name": "Yann Bisseck",
+     "positions": [
+      "CB"
+     ],
+     "age": 25,
+     "flag": "🇩🇪",
+     "rating": 80,
+     "potential": null
+    },
+    {
+     "club": "INT",
+     "name": "Stefan de Vrij",
+     "positions": [
+      "CB"
+     ],
+     "age": 34,
+     "flag": "🇳🇱",
+     "rating": 79,
+     "potential": null
+    },
+    {
+     "club": "INT",
+     "name": "Francesco Acerbi",
+     "positions": [
+      "CB"
+     ],
+     "age": 38,
+     "flag": "🇮🇹",
+     "rating": 78,
+     "potential": null
+    },
+    {
+     "club": "INT",
+     "name": "Federico Dimarco",
+     "positions": [
+      "LB"
+     ],
+     "age": 28,
+     "flag": "🇮🇹",
+     "rating": 84,
+     "potential": null
+    },
+    {
+     "club": "INT",
+     "name": "Denzel Dumfries",
+     "positions": [
+      "RB"
+     ],
+     "age": 30,
+     "flag": "🇳🇱",
+     "rating": 82,
+     "potential": null
+    },
+    {
+     "club": "INT",
+     "name": "Hakan Çalhanoğlu",
+     "positions": [
+      "CDM"
+     ],
+     "age": 32,
+     "flag": "🇹🇷",
+     "rating": 84,
+     "potential": null
+    },
+    {
+     "club": "INT",
+     "name": "Nicolò Barella",
+     "positions": [
+      "CM"
+     ],
+     "age": 29,
+     "flag": "🇮🇹",
+     "rating": 86,
+     "potential": null
+    },
+    {
+     "club": "INT",
+     "name": "Henrikh Mkhitaryan",
+     "positions": [
+      "CM"
+     ],
+     "age": 37,
+     "flag": "🇦🇲",
+     "rating": 79,
+     "potential": null
+    },
+    {
+     "club": "INT",
+     "name": "Davide Frattesi",
+     "positions": [
+      "CM"
+     ],
+     "age": 26,
+     "flag": "🇮🇹",
+     "rating": 80,
+     "potential": null
+    },
+    {
+     "club": "INT",
+     "name": "Piotr Zieliński",
+     "positions": [
+      "CM"
+     ],
+     "age": 32,
+     "flag": "🇵🇱",
+     "rating": 79,
+     "potential": null
+    },
+    {
+     "club": "INT",
+     "name": "Petar Sučić",
+     "positions": [
+      "CM"
+     ],
+     "age": 22,
+     "flag": "🇭🇷",
+     "rating": 76,
+     "potential": null
+    },
+    {
+     "club": "INT",
+     "name": "Lautaro Martínez",
+     "positions": [
+      "ST"
+     ],
+     "age": 29,
+     "flag": "🇦🇷",
+     "rating": 87,
+     "potential": null
+    },
+    {
+     "club": "INT",
+     "name": "Marcus Thuram",
+     "positions": [
+      "ST"
+     ],
+     "age": 29,
+     "flag": "🇫🇷",
+     "rating": 84,
+     "potential": null
+    },
+    {
+     "club": "INT",
+     "name": "Ange-Yoan Bonny",
+     "positions": [
+      "ST"
+     ],
+     "age": 22,
+     "flag": "🇫🇷",
+     "rating": 76,
+     "potential": null
+    },
+    {
+     "club": "INT",
+     "name": "Pio Esposito",
+     "positions": [
+      "ST"
+     ],
+     "age": 21,
+     "flag": "🇮🇹",
+     "rating": 73,
+     "potential": 84
+    },
+    {
+     "club": "NAP",
+     "name": "Alex Meret",
+     "positions": [
+      "GK"
+     ],
+     "age": 29,
+     "flag": "🇮🇹",
+     "rating": 80,
+     "potential": null
+    },
+    {
+     "club": "NAP",
+     "name": "Vanja Milinković-Savić",
+     "positions": [
+      "GK"
+     ],
+     "age": 29,
+     "flag": "🇷🇸",
+     "rating": 78,
+     "potential": null
+    },
+    {
+     "club": "NAP",
+     "name": "Amir Rrahmani",
+     "positions": [
+      "CB"
+     ],
+     "age": 32,
+     "flag": "🇽🇰",
+     "rating": 81,
+     "potential": null
+    },
+    {
+     "club": "NAP",
+     "name": "Alessandro Buongiorno",
+     "positions": [
+      "CB"
+     ],
+     "age": 27,
+     "flag": "🇮🇹",
+     "rating": 82,
+     "potential": null
+    },
+    {
+     "club": "NAP",
+     "name": "Sam Beukema",
+     "positions": [
+      "CB"
+     ],
+     "age": 27,
+     "flag": "🇳🇱",
+     "rating": 79,
+     "potential": null
+    },
+    {
+     "club": "NAP",
+     "name": "Giovanni Di Lorenzo",
+     "positions": [
+      "RB"
+     ],
+     "age": 33,
+     "flag": "🇮🇹",
+     "rating": 81,
+     "potential": null
+    },
+    {
+     "club": "NAP",
+     "name": "Mathías Olivera",
+     "positions": [
+      "LB"
+     ],
+     "age": 29,
+     "flag": "🇺🇾",
+     "rating": 78,
+     "potential": null
+    },
+    {
+     "club": "NAP",
+     "name": "Leonardo Spinazzola",
+     "positions": [
+      "LB"
+     ],
+     "age": 33,
+     "flag": "🇮🇹",
+     "rating": 76,
+     "potential": null
+    },
+    {
+     "club": "NAP",
+     "name": "Stanislav Lobotka",
+     "positions": [
+      "CDM"
+     ],
+     "age": 31,
+     "flag": "🇸🇰",
+     "rating": 83,
+     "potential": null
+    },
+    {
+     "club": "NAP",
+     "name": "Frank Anguissa",
+     "positions": [
+      "CM"
+     ],
+     "age": 30,
+     "flag": "🇨🇲",
+     "rating": 82,
+     "potential": null
+    },
+    {
+     "club": "NAP",
+     "name": "Scott McTominay",
+     "positions": [
+      "CM"
+     ],
+     "age": 29,
+     "flag": "🇬🇧",
+     "rating": 85,
+     "potential": null
+    },
+    {
+     "club": "NAP",
+     "name": "Billy Gilmour",
+     "positions": [
+      "CM"
+     ],
+     "age": 25,
+     "flag": "🇬🇧",
+     "rating": 78,
+     "potential": null
+    },
+    {
+     "club": "NAP",
+     "name": "Kevin De Bruyne",
+     "positions": [
+      "CAM"
+     ],
+     "age": 35,
+     "flag": "🇧🇪",
+     "rating": 85,
+     "potential": null
+    },
+    {
+     "club": "NAP",
+     "name": "Matteo Politano",
+     "positions": [
+      "RW"
+     ],
+     "age": 33,
+     "flag": "🇮🇹",
+     "rating": 79,
+     "potential": null
+    },
+    {
+     "club": "NAP",
+     "name": "David Neres",
+     "positions": [
+      "RW"
+     ],
+     "age": 29,
+     "flag": "🇧🇷",
+     "rating": 80,
+     "potential": null
+    },
+    {
+     "club": "NAP",
+     "name": "Noa Lang",
+     "positions": [
+      "LW"
+     ],
+     "age": 27,
+     "flag": "🇳🇱",
+     "rating": 79,
+     "potential": null
+    },
+    {
+     "club": "NAP",
+     "name": "Romelu Lukaku",
+     "positions": [
+      "ST"
+     ],
+     "age": 33,
+     "flag": "🇧🇪",
+     "rating": 81,
+     "potential": null
+    },
+    {
+     "club": "NAP",
+     "name": "Rasmus Højlund",
+     "positions": [
+      "ST"
+     ],
+     "age": 23,
+     "flag": "🇩🇰",
+     "rating": 80,
+     "potential": null
+    },
+    {
+     "club": "JUV",
+     "name": "Michele Di Gregorio",
+     "positions": [
+      "GK"
+     ],
+     "age": 29,
+     "flag": "🇮🇹",
+     "rating": 81,
+     "potential": null
+    },
+    {
+     "club": "JUV",
+     "name": "Mattia Perin",
+     "positions": [
+      "GK"
+     ],
+     "age": 33,
+     "flag": "🇮🇹",
+     "rating": 76,
+     "potential": null
+    },
+    {
+     "club": "JUV",
+     "name": "Gleison Bremer",
+     "positions": [
+      "CB"
+     ],
+     "age": 29,
+     "flag": "🇧🇷",
+     "rating": 84,
+     "potential": null
+    },
+    {
+     "club": "JUV",
+     "name": "Federico Gatti",
+     "positions": [
+      "CB"
+     ],
+     "age": 28,
+     "flag": "🇮🇹",
+     "rating": 79,
+     "potential": null
+    },
+    {
+     "club": "JUV",
+     "name": "Pierre Kalulu",
+     "positions": [
+      "CB"
+     ],
+     "age": 26,
+     "flag": "🇫🇷",
+     "rating": 79,
+     "potential": null
+    },
+    {
+     "club": "JUV",
+     "name": "Lloyd Kelly",
+     "positions": [
+      "CB"
+     ],
+     "age": 28,
+     "flag": "🇬🇧",
+     "rating": 77,
+     "potential": null
+    },
+    {
+     "club": "JUV",
+     "name": "Andrea Cambiaso",
+     "positions": [
+      "LB"
+     ],
+     "age": 26,
+     "flag": "🇮🇹",
+     "rating": 81,
+     "potential": null
+    },
+    {
+     "club": "JUV",
+     "name": "Juan Cabal",
+     "positions": [
+      "LB"
+     ],
+     "age": 25,
+     "flag": "🇨🇴",
+     "rating": 75,
+     "potential": null
+    },
+    {
+     "club": "JUV",
+     "name": "Manuel Locatelli",
+     "positions": [
+      "CDM"
+     ],
+     "age": 28,
+     "flag": "🇮🇹",
+     "rating": 81,
+     "potential": null
+    },
+    {
+     "club": "JUV",
+     "name": "Khéphren Thuram",
+     "positions": [
+      "CM"
+     ],
+     "age": 25,
+     "flag": "🇫🇷",
+     "rating": 80,
+     "potential": null
+    },
+    {
+     "club": "JUV",
+     "name": "Teun Koopmeiners",
+     "positions": [
+      "CM"
+     ],
+     "age": 28,
+     "flag": "🇳🇱",
+     "rating": 80,
+     "potential": null
+    },
+    {
+     "club": "JUV",
+     "name": "Weston McKennie",
+     "positions": [
+      "CM"
+     ],
+     "age": 28,
+     "flag": "🇺🇸",
+     "rating": 78,
+     "potential": null
+    },
+    {
+     "club": "JUV",
+     "name": "Kenan Yıldız",
+     "positions": [
+      "LW"
+     ],
+     "age": 21,
+     "flag": "🇹🇷",
+     "rating": 82,
+     "potential": 89
+    },
+    {
+     "club": "JUV",
+     "name": "Francisco Conceição",
+     "positions": [
+      "RW"
+     ],
+     "age": 23,
+     "flag": "🇵🇹",
+     "rating": 80,
+     "potential": null
+    },
+    {
+     "club": "JUV",
+     "name": "Edon Zhegrova",
+     "positions": [
+      "RW"
+     ],
+     "age": 27,
+     "flag": "🇽🇰",
+     "rating": 79,
+     "potential": null
+    },
+    {
+     "club": "JUV",
+     "name": "Dušan Vlahović",
+     "positions": [
+      "ST"
+     ],
+     "age": 26,
+     "flag": "🇷🇸",
+     "rating": 81,
+     "potential": null
+    },
+    {
+     "club": "JUV",
+     "name": "Jonathan David",
+     "positions": [
+      "ST"
+     ],
+     "age": 26,
+     "flag": "🇨🇦",
+     "rating": 81,
+     "potential": null
+    },
+    {
+     "club": "JUV",
+     "name": "Loïs Openda",
+     "positions": [
+      "ST"
+     ],
+     "age": 26,
+     "flag": "🇧🇪",
+     "rating": 80,
+     "potential": null
+    },
+    {
+     "club": "MIL",
+     "name": "Mike Maignan",
+     "positions": [
+      "GK"
+     ],
+     "age": 31,
+     "flag": "🇫🇷",
+     "rating": 86,
+     "potential": null
+    },
+    {
+     "club": "MIL",
+     "name": "Pietro Terracciano",
+     "positions": [
+      "GK"
+     ],
+     "age": 36,
+     "flag": "🇮🇹",
+     "rating": 72,
+     "potential": null
+    },
+    {
+     "club": "MIL",
+     "name": "Fikayo Tomori",
+     "positions": [
+      "CB"
+     ],
+     "age": 28,
+     "flag": "🇬🇧",
+     "rating": 80,
+     "potential": null
+    },
+    {
+     "club": "MIL",
+     "name": "Strahinja Pavlović",
+     "positions": [
+      "CB"
+     ],
+     "age": 25,
+     "flag": "🇷🇸",
+     "rating": 79,
+     "potential": null
+    },
+    {
+     "club": "MIL",
+     "name": "Koni De Winter",
+     "positions": [
+      "CB"
+     ],
+     "age": 24,
+     "flag": "🇧🇪",
+     "rating": 77,
+     "potential": null
+    },
+    {
+     "club": "MIL",
+     "name": "Matteo Gabbia",
+     "positions": [
+      "CB"
+     ],
+     "age": 26,
+     "flag": "🇮🇹",
+     "rating": 77,
+     "potential": null
+    },
+    {
+     "club": "MIL",
+     "name": "Pervis Estupiñán",
+     "positions": [
+      "LB"
+     ],
+     "age": 28,
+     "flag": "🇪🇨",
+     "rating": 79,
+     "potential": null
+    },
+    {
+     "club": "MIL",
+     "name": "Alexis Saelemaekers",
+     "positions": [
+      "RB"
+     ],
+     "age": 27,
+     "flag": "🇧🇪",
+     "rating": 79,
+     "potential": null
+    },
+    {
+     "club": "MIL",
+     "name": "Davide Bartesaghi",
+     "positions": [
+      "LB"
+     ],
+     "age": 20,
+     "flag": "🇮🇹",
+     "rating": 72,
+     "potential": null
+    },
+    {
+     "club": "MIL",
+     "name": "Luka Modrić",
+     "positions": [
+      "CM"
+     ],
+     "age": 41,
+     "flag": "🇭🇷",
+     "rating": 81,
+     "potential": null
+    },
+    {
+     "club": "MIL",
+     "name": "Youssouf Fofana",
+     "positions": [
+      "CDM"
+     ],
+     "age": 27,
+     "flag": "🇫🇷",
+     "rating": 80,
+     "potential": null
+    },
+    {
+     "club": "MIL",
+     "name": "Adrien Rabiot",
+     "positions": [
+      "CM"
+     ],
+     "age": 31,
+     "flag": "🇫🇷",
+     "rating": 82,
+     "potential": null
+    },
+    {
+     "club": "MIL",
+     "name": "Ruben Loftus-Cheek",
+     "positions": [
+      "CM"
+     ],
+     "age": 30,
+     "flag": "🇬🇧",
+     "rating": 78,
+     "potential": null
+    },
+    {
+     "club": "MIL",
+     "name": "Samuele Ricci",
+     "positions": [
+      "CM"
+     ],
+     "age": 25,
+     "flag": "🇮🇹",
+     "rating": 78,
+     "potential": null
+    },
+    {
+     "club": "MIL",
+     "name": "Ardon Jashari",
+     "positions": [
+      "CM"
+     ],
+     "age": 24,
+     "flag": "🇨🇭",
+     "rating": 78,
+     "potential": null
+    },
+    {
+     "club": "MIL",
+     "name": "Christian Pulisic",
+     "positions": [
+      "RW"
+     ],
+     "age": 28,
+     "flag": "🇺🇸",
+     "rating": 83,
+     "potential": null
+    },
+    {
+     "club": "MIL",
+     "name": "Rafael Leão",
+     "positions": [
+      "LW"
+     ],
+     "age": 27,
+     "flag": "🇵🇹",
+     "rating": 85,
+     "potential": null
+    },
+    {
+     "club": "MIL",
+     "name": "Christopher Nkunku",
+     "positions": [
+      "ST"
+     ],
+     "age": 29,
+     "flag": "🇫🇷",
+     "rating": 80,
+     "potential": null
+    },
+    {
+     "club": "MIL",
+     "name": "Santiago Giménez",
+     "positions": [
+      "ST"
+     ],
+     "age": 25,
+     "flag": "🇲🇽",
+     "rating": 78,
+     "potential": null
+    }
+   ]
+  },
+  {
+   "id": "french",
+   "name": "French",
+   "clubs": [
+    {
+     "short": "PSG",
+     "name": "Paris Saint-Germain",
+     "primary": "#004170",
+     "secondary": "#DA291C",
+     "pattern": "band",
+     "level": 85,
+     "division": 1
+    },
+    {
+     "short": "OLM",
+     "name": "Olympique de Marseille",
+     "primary": "#FFFFFF",
+     "secondary": "#2FAEE0",
+     "pattern": "band",
+     "level": 80,
+     "division": 1
+    },
+    {
+     "short": "ASM",
+     "name": "AS Monaco",
+     "primary": "#E7182D",
+     "secondary": "#FFFFFF",
+     "pattern": "half",
+     "level": 79,
+     "division": 1
+    },
+    {
+     "short": "LIL",
+     "name": "Lille OSC",
+     "primary": "#E01E13",
+     "secondary": "#20325F",
+     "pattern": "solid",
+     "level": 78,
+     "division": 1
+    },
+    {
+     "short": "OLY",
+     "name": "Olympique Lyonnais",
+     "primary": "#FFFFFF",
+     "secondary": "#DA001A",
+     "pattern": "band",
+     "level": 78,
+     "division": 1
+    },
+    {
+     "short": "OGC",
+     "name": "OGC Nice",
+     "primary": "#E4002B",
+     "secondary": "#000000",
+     "pattern": "stripes",
+     "level": 77,
+     "division": 1
+    },
+    {
+     "short": "RCS",
+     "name": "RC Strasbourg",
+     "primary": "#009FE3",
+     "secondary": "#FFFFFF",
+     "pattern": "solid",
+     "level": 77,
+     "division": 1
+    },
+    {
+     "short": "RCL",
+     "name": "RC Lens",
+     "primary": "#FFD700",
+     "secondary": "#E30613",
+     "pattern": "half",
+     "level": 77,
+     "division": 1
+    },
+    {
+     "short": "SRF",
+     "name": "Stade Rennais",
+     "primary": "#E13327",
+     "secondary": "#000000",
+     "pattern": "half",
+     "level": 76,
+     "division": 1
+    },
+    {
+     "short": "BRE",
+     "name": "Stade Brestois",
+     "primary": "#E30613",
+     "secondary": "#FFFFFF",
+     "pattern": "solid",
+     "level": 74,
+     "division": 1
+    },
+    {
+     "short": "TFC",
+     "name": "Toulouse FC",
+     "primary": "#5D3A8E",
+     "secondary": "#FFFFFF",
+     "pattern": "solid",
+     "level": 74,
+     "division": 1
+    },
+    {
+     "short": "AJA",
+     "name": "AJ Auxerre",
+     "primary": "#FFFFFF",
+     "secondary": "#004B9B",
+     "pattern": "band",
+     "level": 72,
+     "division": 1
+    },
+    {
+     "short": "FCN",
+     "name": "FC Nantes",
+     "primary": "#FCD405",
+     "secondary": "#009549",
+     "pattern": "solid",
+     "level": 72,
+     "division": 1
+    },
+    {
+     "short": "PFC",
+     "name": "Paris FC",
+     "primary": "#1B2A4A",
+     "secondary": "#FFFFFF",
+     "pattern": "solid",
+     "level": 71,
+     "division": 1
+    },
+    {
+     "short": "SCO",
+     "name": "Angers SCO",
+     "primary": "#FFFFFF",
+     "secondary": "#000000",
+     "pattern": "stripes",
+     "level": 70,
+     "division": 1
+    },
+    {
+     "short": "HAC",
+     "name": "Le Havre AC",
+     "primary": "#1A9FD9",
+     "secondary": "#003366",
+     "pattern": "half",
+     "level": 70,
+     "division": 1
+    },
+    {
+     "short": "FCL",
+     "name": "FC Lorient",
+     "primary": "#F58025",
+     "secondary": "#000000",
+     "pattern": "solid",
+     "level": 70,
+     "division": 1
+    },
+    {
+     "short": "FCM",
+     "name": "FC Metz",
+     "primary": "#7A1D35",
+     "secondary": "#FFFFFF",
+     "pattern": "solid",
+     "level": 69,
+     "division": 1
+    },
+    {
+     "short": "STE",
+     "name": "Saint-Étienne",
+     "primary": "#00923F",
+     "secondary": "#FFFFFF",
+     "pattern": "solid",
+     "level": 69,
+     "division": 2
+    },
+    {
+     "short": "REI",
+     "name": "Stade de Reims",
+     "primary": "#E30613",
+     "secondary": "#FFFFFF",
+     "pattern": "solid",
+     "level": 69,
+     "division": 2
+    },
+    {
+     "short": "MTP",
+     "name": "Montpellier",
+     "primary": "#005CA9",
+     "secondary": "#F58025",
+     "pattern": "solid",
+     "level": 68,
+     "division": 2
+    },
+    {
+     "short": "TRO",
+     "name": "Troyes",
+     "primary": "#005CA9",
+     "secondary": "#FFFFFF",
+     "pattern": "solid",
+     "level": 66,
+     "division": 2
+    },
+    {
+     "short": "GUI",
+     "name": "Guingamp",
+     "primary": "#E30613",
+     "secondary": "#000000",
+     "pattern": "solid",
+     "level": 65,
+     "division": 2
+    },
+    {
+     "short": "RED",
+     "name": "Red Star",
+     "primary": "#00A650",
+     "secondary": "#FFFFFF",
+     "pattern": "half",
+     "level": 63,
+     "division": 2
+    },
+    {
+     "short": "ROD",
+     "name": "Rodez",
+     "primary": "#E30613",
+     "secondary": "#FFDD00",
+     "pattern": "solid",
+     "level": 62,
+     "division": 2
+    },
+    {
+     "short": "PAU",
+     "name": "Pau FC",
+     "primary": "#FFDD00",
+     "secondary": "#005CA9",
+     "pattern": "solid",
+     "level": 62,
+     "division": 2
+    },
+    {
+     "short": "NAN",
+     "name": "Nancy",
+     "primary": "#FFFFFF",
+     "secondary": "#E30613",
+     "pattern": "solid",
+     "level": 65,
+     "division": 2
+    },
+    {
+     "short": "ANN",
+     "name": "Annecy",
+     "primary": "#E30613",
+     "secondary": "#FFFFFF",
+     "pattern": "solid",
+     "level": 62,
+     "division": 2
+    },
+    {
+     "short": "GRE",
+     "name": "Grenoble",
+     "primary": "#005CA9",
+     "secondary": "#FFFFFF",
+     "pattern": "solid",
+     "level": 62,
+     "division": 2
+    },
+    {
+     "short": "AMI",
+     "name": "Amiens",
+     "primary": "#FFFFFF",
+     "secondary": "#00923F",
+     "pattern": "solid",
+     "level": 64,
+     "division": 2
+    },
+    {
+     "short": "LAV",
+     "name": "Laval",
+     "primary": "#F58025",
+     "secondary": "#000000",
+     "pattern": "solid",
+     "level": 62,
+     "division": 2
+    },
+    {
+     "short": "CLE",
+     "name": "Clermont Foot",
+     "primary": "#E30613",
+     "secondary": "#005CA9",
+     "pattern": "solid",
+     "level": 64,
+     "division": 2
+    },
+    {
+     "short": "DUN",
+     "name": "Dunkerque",
+     "primary": "#005CA9",
+     "secondary": "#E30613",
+     "pattern": "solid",
+     "level": 62,
+     "division": 2
+    },
+    {
+     "short": "BAS",
+     "name": "Bastia",
+     "primary": "#005CA9",
+     "secondary": "#FFFFFF",
+     "pattern": "solid",
+     "level": 64,
+     "division": 2
+    },
+    {
+     "short": "LEM",
+     "name": "Le Mans",
+     "primary": "#FFDD00",
+     "secondary": "#E30613",
+     "pattern": "solid",
+     "level": 62,
+     "division": 2
+    },
+    {
+     "short": "BOU",
+     "name": "Boulogne",
+     "primary": "#E30613",
+     "secondary": "#FFFFFF",
+     "pattern": "solid",
+     "level": 60,
+     "division": 2
+    }
+   ],
+   "players": [
+    {
+     "club": "PSG",
+     "name": "Lucas Chevalier",
+     "positions": [
+      "GK"
+     ],
+     "age": 25,
+     "flag": "🇫🇷",
+     "rating": 83,
+     "potential": null
+    },
+    {
+     "club": "PSG",
+     "name": "Matvey Safonov",
+     "positions": [
+      "GK"
+     ],
+     "age": 27,
+     "flag": "🇷🇺",
+     "rating": 77,
+     "potential": null
+    },
+    {
+     "club": "PSG",
+     "name": "Marquinhos",
+     "positions": [
+      "CB"
+     ],
+     "age": 32,
+     "flag": "🇧🇷",
+     "rating": 85,
+     "potential": null
+    },
+    {
+     "club": "PSG",
+     "name": "Willian Pacho",
+     "positions": [
+      "CB"
+     ],
+     "age": 25,
+     "flag": "🇪🇨",
+     "rating": 83,
+     "potential": null
+    },
+    {
+     "club": "PSG",
+     "name": "Illia Zabarnyi",
+     "positions": [
+      "CB"
+     ],
+     "age": 24,
+     "flag": "🇺🇦",
+     "rating": 80,
+     "potential": null
+    },
+    {
+     "club": "PSG",
+     "name": "Lucas Beraldo",
+     "positions": [
+      "CB"
+     ],
+     "age": 23,
+     "flag": "🇧🇷",
+     "rating": 77,
+     "potential": null
+    },
+    {
+     "club": "PSG",
+     "name": "Nuno Mendes",
+     "positions": [
+      "LB"
+     ],
+     "age": 24,
+     "flag": "🇵🇹",
+     "rating": 86,
+     "potential": null
+    },
+    {
+     "club": "PSG",
+     "name": "Lucas Hernández",
+     "positions": [
+      "LB"
+     ],
+     "age": 30,
+     "flag": "🇫🇷",
+     "rating": 79,
+     "potential": null
+    },
+    {
+     "club": "PSG",
+     "name": "Achraf Hakimi",
+     "positions": [
+      "RB"
+     ],
+     "age": 28,
+     "flag": "🇲🇦",
+     "rating": 87,
+     "potential": null
+    },
+    {
+     "club": "PSG",
+     "name": "Vitinha",
+     "positions": [
+      "CM"
+     ],
+     "age": 26,
+     "flag": "🇵🇹",
+     "rating": 88,
+     "potential": null
+    },
+    {
+     "club": "PSG",
+     "name": "João Neves",
+     "positions": [
+      "CM"
+     ],
+     "age": 22,
+     "flag": "🇵🇹",
+     "rating": 86,
+     "potential": 90
+    },
+    {
+     "club": "PSG",
+     "name": "Fabián Ruiz",
+     "positions": [
+      "CM"
+     ],
+     "age": 30,
+     "flag": "🇪🇸",
+     "rating": 83,
+     "potential": null
+    },
+    {
+     "club": "PSG",
+     "name": "Warren Zaïre-Emery",
+     "positions": [
+      "CM"
+     ],
+     "age": 20,
+     "flag": "🇫🇷",
+     "rating": 80,
+     "potential": 88
+    },
+    {
+     "club": "PSG",
+     "name": "Lee Kang-in",
+     "positions": [
+      "CAM"
+     ],
+     "age": 25,
+     "flag": "🇰🇷",
+     "rating": 79,
+     "potential": null
+    },
+    {
+     "club": "PSG",
+     "name": "Ousmane Dembélé",
+     "positions": [
+      "RW"
+     ],
+     "age": 29,
+     "flag": "🇫🇷",
+     "rating": 89,
+     "potential": null
+    },
+    {
+     "club": "PSG",
+     "name": "Désiré Doué",
+     "positions": [
+      "RW"
+     ],
+     "age": 21,
+     "flag": "🇫🇷",
+     "rating": 84,
+     "potential": 90
+    },
+    {
+     "club": "PSG",
+     "name": "Khvicha Kvaratskhelia",
+     "positions": [
+      "LW"
+     ],
+     "age": 25,
+     "flag": "🇬🇪",
+     "rating": 87,
+     "potential": null
+    },
+    {
+     "club": "PSG",
+     "name": "Bradley Barcola",
+     "positions": [
+      "LW"
+     ],
+     "age": 24,
+     "flag": "🇫🇷",
+     "rating": 82,
+     "potential": null
+    },
+    {
+     "club": "PSG",
+     "name": "Gonçalo Ramos",
+     "positions": [
+      "ST"
+     ],
+     "age": 25,
+     "flag": "🇵🇹",
+     "rating": 80,
+     "potential": null
+    },
+    {
+     "club": "OLM",
+     "name": "Gerónimo Rulli",
+     "positions": [
+      "GK"
+     ],
+     "age": 34,
+     "flag": "🇦🇷",
+     "rating": 81,
+     "potential": null
+    },
+    {
+     "club": "OLM",
+     "name": "Leonardo Balerdi",
+     "positions": [
+      "CB"
+     ],
+     "age": 27,
+     "flag": "🇦🇷",
+     "rating": 80,
+     "potential": null
+    },
+    {
+     "club": "OLM",
+     "name": "Nayef Aguerd",
+     "positions": [
+      "CB"
+     ],
+     "age": 30,
+     "flag": "🇲🇦",
+     "rating": 79,
+     "potential": null
+    },
+    {
+     "club": "OLM",
+     "name": "Benjamin Pavard",
+     "positions": [
+      "CB",
+      "RB"
+     ],
+     "age": 30,
+     "flag": "🇫🇷",
+     "rating": 80,
+     "potential": null
+    },
+    {
+     "club": "OLM",
+     "name": "CJ Egan-Riley",
+     "positions": [
+      "CB"
+     ],
+     "age": 23,
+     "flag": "🇬🇧",
+     "rating": 74,
+     "potential": null
+    },
+    {
+     "club": "OLM",
+     "name": "Emerson Palmieri",
+     "positions": [
+      "LB"
+     ],
+     "age": 32,
+     "flag": "🇮🇹",
+     "rating": 76,
+     "potential": null
+    },
+    {
+     "club": "OLM",
+     "name": "Facundo Medina",
+     "positions": [
+      "LB"
+     ],
+     "age": 27,
+     "flag": "🇦🇷",
+     "rating": 77,
+     "potential": null
+    },
+    {
+     "club": "OLM",
+     "name": "Pierre-Emile Højbjerg",
+     "positions": [
+      "CDM"
+     ],
+     "age": 31,
+     "flag": "🇩🇰",
+     "rating": 81,
+     "potential": null
+    },
+    {
+     "club": "OLM",
+     "name": "Geoffrey Kondogbia",
+     "positions": [
+      "CDM"
+     ],
+     "age": 33,
+     "flag": "🇨🇫",
+     "rating": 76,
+     "potential": null
+    },
+    {
+     "club": "OLM",
+     "name": "Arthur Vermeeren",
+     "positions": [
+      "CM"
+     ],
+     "age": 21,
+     "flag": "🇧🇪",
+     "rating": 76,
+     "potential": null
+    },
+    {
+     "club": "OLM",
+     "name": "Angel Gomes",
+     "positions": [
+      "CAM"
+     ],
+     "age": 26,
+     "flag": "🇬🇧",
+     "rating": 77,
+     "potential": null
+    },
+    {
+     "club": "OLM",
+     "name": "Hamed Junior Traorè",
+     "positions": [
+      "CAM"
+     ],
+     "age": 26,
+     "flag": "🇨🇮",
+     "rating": 76,
+     "potential": null
+    },
+    {
+     "club": "OLM",
+     "name": "Mason Greenwood",
+     "positions": [
+      "RW"
+     ],
+     "age": 25,
+     "flag": "🇬🇧",
+     "rating": 84,
+     "potential": null
+    },
+    {
+     "club": "OLM",
+     "name": "Igor Paixão",
+     "positions": [
+      "LW"
+     ],
+     "age": 26,
+     "flag": "🇧🇷",
+     "rating": 79,
+     "potential": null
+    },
+    {
+     "club": "OLM",
+     "name": "Amine Gouiri",
+     "positions": [
+      "ST"
+     ],
+     "age": 26,
+     "flag": "🇩🇿",
+     "rating": 80,
+     "potential": null
+    },
+    {
+     "club": "OLM",
+     "name": "Pierre-Emerick Aubameyang",
+     "positions": [
+      "ST"
+     ],
+     "age": 37,
+     "flag": "🇬🇦",
+     "rating": 79,
+     "potential": null
+    }
+   ]
+  },
+  {
+   "id": "dutch",
+   "name": "Dutch",
+   "clubs": [
+    {
+     "short": "PSV",
+     "name": "PSV",
+     "primary": "#ED1C24",
+     "secondary": "#FFFFFF",
+     "pattern": "stripes",
+     "level": 79,
+     "division": 1
+    },
+    {
+     "short": "FEY",
+     "name": "Feyenoord",
+     "primary": "#E30613",
+     "secondary": "#FFFFFF",
+     "pattern": "half",
+     "level": 78,
+     "division": 1
+    },
+    {
+     "short": "AJA",
+     "name": "Ajax",
+     "primary": "#FFFFFF",
+     "secondary": "#D2122E",
+     "pattern": "band",
+     "level": 78,
+     "division": 1
+    },
+    {
+     "short": "AZA",
+     "name": "AZ Alkmaar",
+     "primary": "#E30613",
+     "secondary": "#FFFFFF",
+     "pattern": "solid",
+     "level": 76,
+     "division": 1
+    },
+    {
+     "short": "TWE",
+     "name": "FC Twente",
+     "primary": "#E30613",
+     "secondary": "#FFFFFF",
+     "pattern": "solid",
+     "level": 74,
+     "division": 1
+    },
+    {
+     "short": "UTR",
+     "name": "FC Utrecht",
+     "primary": "#ED1C24",
+     "secondary": "#FFFFFF",
+     "pattern": "half",
+     "level": 74,
+     "division": 1
+    },
+    {
+     "short": "NEC",
+     "name": "NEC Nijmegen",
+     "primary": "#E30613",
+     "secondary": "#00843D",
+     "pattern": "stripes",
+     "level": 72,
+     "division": 1
+    },
+    {
+     "short": "GAE",
+     "name": "Go Ahead Eagles",
+     "primary": "#E30613",
+     "secondary": "#FFDD00",
+     "pattern": "band",
+     "level": 71,
+     "division": 1
+    },
+    {
+     "short": "HEE",
+     "name": "sc Heerenveen",
+     "primary": "#004B98",
+     "secondary": "#FFFFFF",
+     "pattern": "stripes",
+     "level": 70,
+     "division": 1
+    },
+    {
+     "short": "PEC",
+     "name": "PEC Zwolle",
+     "primary": "#004B98",
+     "secondary": "#FFFFFF",
+     "pattern": "solid",
+     "level": 69,
+     "division": 1
+    },
+    {
+     "short": "FOR",
+     "name": "Fortuna Sittard",
+     "primary": "#FFDD00",
+     "secondary": "#00843D",
+     "pattern": "solid",
+     "level": 69,
+     "division": 1
+    },
+    {
+     "short": "SPA",
+     "name": "Sparta Rotterdam",
+     "primary": "#FFFFFF",
+     "secondary": "#E30613",
+     "pattern": "stripes",
+     "level": 69,
+     "division": 1
+    },
+    {
+     "short": "GRO",
+     "name": "FC Groningen",
+     "primary": "#00843D",
+     "secondary": "#FFFFFF",
+     "pattern": "solid",
+     "level": 69,
+     "division": 1
+    },
+    {
+     "short": "HER",
+     "name": "Heracles Almelo",
+     "primary": "#FFFFFF",
+     "secondary": "#000000",
+     "pattern": "stripes",
+     "level": 68,
+     "division": 1
+    },
+    {
+     "short": "NAC",
+     "name": "NAC Breda",
+     "primary": "#FFDD00",
+     "secondary": "#000000",
+     "pattern": "solid",
+     "level": 68,
+     "division": 1
+    },
+    {
+     "short": "EXC",
+     "name": "Excelsior",
+     "primary": "#E30613",
+     "secondary": "#000000",
+     "pattern": "stripes",
+     "level": 67,
+     "division": 1
+    },
+    {
+     "short": "TEL",
+     "name": "Telstar",
+     "primary": "#FFFFFF",
+     "secondary": "#E30613",
+     "pattern": "band",
+     "level": 66,
+     "division": 1
+    },
+    {
+     "short": "VOL",
+     "name": "FC Volendam",
+     "primary": "#F58025",
+     "secondary": "#000000",
+     "pattern": "solid",
+     "level": 66,
+     "division": 1
+    },
+    {
+     "short": "ADO",
+     "name": "ADO Den Haag",
+     "primary": "#00923F",
+     "secondary": "#FFDD00",
+     "pattern": "solid",
+     "level": 63,
+     "division": 2
+    },
+    {
+     "short": "ALM",
+     "name": "Almere City",
+     "primary": "#E30613",
+     "secondary": "#000000",
+     "pattern": "solid",
+     "level": 62,
+     "division": 2
+    },
+    {
+     "short": "CAM",
+     "name": "Cambuur",
+     "primary": "#FFDD00",
+     "secondary": "#005CA9",
+     "pattern": "solid",
+     "level": 63,
+     "division": 2
+    },
+    {
+     "short": "GRA",
+     "name": "De Graafschap",
+     "primary": "#FFFFFF",
+     "secondary": "#005CA9",
+     "pattern": "stripes",
+     "level": 63,
+     "division": 2
+    },
+    {
+     "short": "DEN",
+     "name": "FC Den Bosch",
+     "primary": "#005CA9",
+     "secondary": "#FFFFFF",
+     "pattern": "stripes",
+     "level": 60,
+     "division": 2
+    },
+    {
+     "short": "DOR",
+     "name": "FC Dordrecht",
+     "primary": "#E30613",
+     "secondary": "#FFFFFF",
+     "pattern": "stripes",
+     "level": 60,
+     "division": 2
+    },
+    {
+     "short": "EIN",
+     "name": "FC Eindhoven",
+     "primary": "#005CA9",
+     "secondary": "#FFFFFF",
+     "pattern": "solid",
+     "level": 61,
+     "division": 2
+    },
+    {
+     "short": "EMM",
+     "name": "FC Emmen",
+     "primary": "#E30613",
+     "secondary": "#000000",
+     "pattern": "solid",
+     "level": 61,
+     "division": 2
+    },
+    {
+     "short": "HEL",
+     "name": "Helmond Sport",
+     "primary": "#E30613",
+     "secondary": "#000000",
+     "pattern": "solid",
+     "level": 59,
+     "division": 2
+    },
+    {
+     "short": "MVV",
+     "name": "MVV Maastricht",
+     "primary": "#E30613",
+     "secondary": "#FFDD00",
+     "pattern": "solid",
+     "level": 60,
+     "division": 2
+    },
+    {
+     "short": "ROD",
+     "name": "Roda JC",
+     "primary": "#FFDD00",
+     "secondary": "#000000",
+     "pattern": "stripes",
+     "level": 64,
+     "division": 2
+    },
+    {
+     "short": "RKC",
+     "name": "RKC Waalwijk",
+     "primary": "#FFDD00",
+     "secondary": "#005CA9",
+     "pattern": "solid",
+     "level": 63,
+     "division": 2
+    },
+    {
+     "short": "WIL",
+     "name": "Willem II",
+     "primary": "#E30613",
+     "secondary": "#FFFFFF",
+     "pattern": "stripes",
+     "level": 66,
+     "division": 2
+    },
+    {
+     "short": "VVV",
+     "name": "VVV-Venlo",
+     "primary": "#FFDD00",
+     "secondary": "#000000",
+     "pattern": "solid",
+     "level": 61,
+     "division": 2
+    },
+    {
+     "short": "JAJ",
+     "name": "Jong Ajax",
+     "primary": "#FFFFFF",
+     "secondary": "#E30613",
+     "pattern": "band",
+     "level": 60,
+     "division": 2
+    },
+    {
+     "short": "JPS",
+     "name": "Jong PSV",
+     "primary": "#E30613",
+     "secondary": "#FFFFFF",
+     "pattern": "stripes",
+     "level": 59,
+     "division": 2
+    },
+    {
+     "short": "JAZ",
+     "name": "Jong AZ",
+     "primary": "#E30613",
+     "secondary": "#FFFFFF",
+     "pattern": "solid",
+     "level": 59,
+     "division": 2
+    },
+    {
+     "short": "JUT",
+     "name": "Jong Utrecht",
+     "primary": "#E30613",
+     "secondary": "#FFFFFF",
+     "pattern": "half",
+     "level": 58,
+     "division": 2
+    }
+   ],
+   "players": [
+    {
+     "club": "PSV",
+     "name": "Matej Kovář",
+     "positions": [
+      "GK"
+     ],
+     "age": 26,
+     "flag": "🇨🇿",
+     "rating": 77,
+     "potential": null
+    },
+    {
+     "club": "PSV",
+     "name": "Armel Bella-Kotchap",
+     "positions": [
+      "CB"
+     ],
+     "age": 24,
+     "flag": "🇩🇪",
+     "rating": 76,
+     "potential": null
+    },
+    {
+     "club": "PSV",
+     "name": "Ryan Flamingo",
+     "positions": [
+      "CB"
+     ],
+     "age": 23,
+     "flag": "🇳🇱",
+     "rating": 76,
+     "potential": null
+    },
+    {
+     "club": "PSV",
+     "name": "Sergiño Dest",
+     "positions": [
+      "RB"
+     ],
+     "age": 25,
+     "flag": "🇺🇸",
+     "rating": 78,
+     "potential": null
+    },
+    {
+     "club": "PSV",
+     "name": "Anass Salah-Eddine",
+     "positions": [
+      "LB"
+     ],
+     "age": 24,
+     "flag": "🇳🇱",
+     "rating": 75,
+     "potential": null
+    },
+    {
+     "club": "PSV",
+     "name": "Mauro Júnior",
+     "positions": [
+      "LB",
+      "CM"
+     ],
+     "age": 27,
+     "flag": "🇧🇷",
+     "rating": 76,
+     "potential": null
+    },
+    {
+     "club": "PSV",
+     "name": "Jerdy Schouten",
+     "positions": [
+      "CDM"
+     ],
+     "age": 29,
+     "flag": "🇳🇱",
+     "rating": 79,
+     "potential": null
+    },
+    {
+     "club": "PSV",
+     "name": "Joey Veerman",
+     "positions": [
+      "CM"
+     ],
+     "age": 27,
+     "flag": "🇳🇱",
+     "rating": 79,
+     "potential": null
+    },
+    {
+     "club": "PSV",
+     "name": "Guus Til",
+     "positions": [
+      "CAM"
+     ],
+     "age": 28,
+     "flag": "🇳🇱",
+     "rating": 77,
+     "potential": null
+    },
+    {
+     "club": "PSV",
+     "name": "Ismael Saibari",
+     "positions": [
+      "CAM"
+     ],
+     "age": 25,
+     "flag": "🇲🇦",
+     "rating": 80,
+     "potential": null
+    },
+    {
+     "club": "PSV",
+     "name": "Paul Wanner",
+     "positions": [
+      "CAM"
+     ],
+     "age": 20,
+     "flag": "🇩🇪",
+     "rating": 74,
+     "potential": null
+    },
+    {
+     "club": "PSV",
+     "name": "Ivan Perišić",
+     "positions": [
+      "LW"
+     ],
+     "age": 37,
+     "flag": "🇭🇷",
+     "rating": 77,
+     "potential": null
+    },
+    {
+     "club": "PSV",
+     "name": "Couhaib Driouech",
+     "positions": [
+      "RW"
+     ],
+     "age": 24,
+     "flag": "🇳🇱",
+     "rating": 76,
+     "potential": null
+    },
+    {
+     "club": "PSV",
+     "name": "Dennis Man",
+     "positions": [
+      "RW"
+     ],
+     "age": 27,
+     "flag": "🇷🇴",
+     "rating": 76,
+     "potential": null
+    },
+    {
+     "club": "PSV",
+     "name": "Ricardo Pepi",
+     "positions": [
+      "ST"
+     ],
+     "age": 23,
+     "flag": "🇺🇸",
+     "rating": 77,
+     "potential": null
+    },
+    {
+     "club": "AJA",
+     "name": "Vítězslav Jaroš",
+     "positions": [
+      "GK"
+     ],
+     "age": 24,
+     "flag": "🇨🇿",
+     "rating": 75,
+     "potential": null
+    },
+    {
+     "club": "AJA",
+     "name": "Remko Pasveer",
+     "positions": [
+      "GK"
+     ],
+     "age": 42,
+     "flag": "🇳🇱",
+     "rating": 72,
+     "potential": null
+    },
+    {
+     "club": "AJA",
+     "name": "Josip Šutalo",
+     "positions": [
+      "CB"
+     ],
+     "age": 26,
+     "flag": "🇭🇷",
+     "rating": 77,
+     "potential": null
+    },
+    {
+     "club": "AJA",
+     "name": "Youri Baas",
+     "positions": [
+      "CB"
+     ],
+     "age": 22,
+     "flag": "🇳🇱",
+     "rating": 75,
+     "potential": null
+    },
+    {
+     "club": "AJA",
+     "name": "Owen Wijndal",
+     "positions": [
+      "LB"
+     ],
+     "age": 26,
+     "flag": "🇳🇱",
+     "rating": 74,
+     "potential": null
+    },
+    {
+     "club": "AJA",
+     "name": "Anton Gaaei",
+     "positions": [
+      "RB"
+     ],
+     "age": 23,
+     "flag": "🇩🇰",
+     "rating": 74,
+     "potential": null
+    },
+    {
+     "club": "AJA",
+     "name": "Lucas Rosa",
+     "positions": [
+      "RB"
+     ],
+     "age": 25,
+     "flag": "🇧🇷",
+     "rating": 73,
+     "potential": null
+    },
+    {
+     "club": "AJA",
+     "name": "Kenneth Taylor",
+     "positions": [
+      "CM"
+     ],
+     "age": 24,
+     "flag": "🇳🇱",
+     "rating": 78,
+     "potential": null
+    },
+    {
+     "club": "AJA",
+     "name": "Youri Regeer",
+     "positions": [
+      "CM"
+     ],
+     "age": 22,
+     "flag": "🇳🇱",
+     "rating": 74,
+     "potential": null
+    },
+    {
+     "club": "AJA",
+     "name": "Davy Klaassen",
+     "positions": [
+      "CM"
+     ],
+     "age": 33,
+     "flag": "🇳🇱",
+     "rating": 75,
+     "potential": null
+    },
+    {
+     "club": "AJA",
+     "name": "Branco van den Boomen",
+     "positions": [
+      "CM"
+     ],
+     "age": 30,
+     "flag": "🇳🇱",
+     "rating": 75,
+     "potential": null
+    },
+    {
+     "club": "AJA",
+     "name": "Oscar Gloukh",
+     "positions": [
+      "CAM"
+     ],
+     "age": 22,
+     "flag": "🇮🇱",
+     "rating": 77,
+     "potential": null
+    },
+    {
+     "club": "AJA",
+     "name": "Mika Godts",
+     "positions": [
+      "LW"
+     ],
+     "age": 20,
+     "flag": "🇧🇪",
+     "rating": 76,
+     "potential": 84
+    },
+    {
+     "club": "AJA",
+     "name": "Steven Berghuis",
+     "positions": [
+      "RW"
+     ],
+     "age": 34,
+     "flag": "🇳🇱",
+     "rating": 75,
+     "potential": null
+    },
+    {
+     "club": "AJA",
+     "name": "Kasper Dolberg",
+     "positions": [
+      "ST"
+     ],
+     "age": 28,
+     "flag": "🇩🇰",
+     "rating": 77,
+     "potential": null
+    },
+    {
+     "club": "AJA",
+     "name": "Wout Weghorst",
+     "positions": [
+      "ST"
+     ],
+     "age": 34,
+     "flag": "🇳🇱",
+     "rating": 75,
+     "potential": null
+    },
+    {
+     "club": "FEY",
+     "name": "Timon Wellenreuther",
+     "positions": [
+      "GK"
+     ],
+     "age": 30,
+     "flag": "🇩🇪",
+     "rating": 77,
+     "potential": null
+    },
+    {
+     "club": "FEY",
+     "name": "Gernot Trauner",
+     "positions": [
+      "CB"
+     ],
+     "age": 34,
+     "flag": "🇦🇹",
+     "rating": 77,
+     "potential": null
+    },
+    {
+     "club": "FEY",
+     "name": "Tsuyoshi Watanabe",
+     "positions": [
+      "CB"
+     ],
+     "age": 29,
+     "flag": "🇯🇵",
+     "rating": 75,
+     "potential": null
+    },
+    {
+     "club": "FEY",
+     "name": "Thomas Beelen",
+     "positions": [
+      "CB"
+     ],
+     "age": 24,
+     "flag": "🇳🇱",
+     "rating": 74,
+     "potential": null
+    },
+    {
+     "club": "FEY",
+     "name": "Gijs Smal",
+     "positions": [
+      "LB"
+     ],
+     "age": 29,
+     "flag": "🇳🇱",
+     "rating": 74,
+     "potential": null
+    },
+    {
+     "club": "FEY",
+     "name": "Jordan Bos",
+     "positions": [
+      "LB"
+     ],
+     "age": 24,
+     "flag": "🇦🇺",
+     "rating": 75,
+     "potential": null
+    },
+    {
+     "club": "FEY",
+     "name": "Givairo Read",
+     "positions": [
+      "RB"
+     ],
+     "age": 20,
+     "flag": "🇳🇱",
+     "rating": 74,
+     "potential": null
+    },
+    {
+     "club": "FEY",
+     "name": "Hwang In-beom",
+     "positions": [
+      "CM"
+     ],
+     "age": 30,
+     "flag": "🇰🇷",
+     "rating": 79,
+     "potential": null
+    },
+    {
+     "club": "FEY",
+     "name": "Quinten Timber",
+     "positions": [
+      "CM"
+     ],
+     "age": 25,
+     "flag": "🇳🇱",
+     "rating": 78,
+     "potential": null
+    },
+    {
+     "club": "FEY",
+     "name": "Sem Steijn",
+     "positions": [
+      "CAM"
+     ],
+     "age": 24,
+     "flag": "🇳🇱",
+     "rating": 77,
+     "potential": null
+    },
+    {
+     "club": "FEY",
+     "name": "Calvin Stengs",
+     "positions": [
+      "CAM"
+     ],
+     "age": 27,
+     "flag": "🇳🇱",
+     "rating": 77,
+     "potential": null
+    },
+    {
+     "club": "FEY",
+     "name": "Anis Hadj Moussa",
+     "positions": [
+      "RW"
+     ],
+     "age": 24,
+     "flag": "🇩🇿",
+     "rating": 77,
+     "potential": null
+    },
+    {
+     "club": "FEY",
+     "name": "Gonçalo Borges",
+     "positions": [
+      "RW"
+     ],
+     "age": 24,
+     "flag": "🇵🇹",
+     "rating": 74,
+     "potential": null
+    },
+    {
+     "club": "FEY",
+     "name": "Leo Sauer",
+     "positions": [
+      "LW"
+     ],
+     "age": 18,
+     "flag": "🇸🇰",
+     "rating": 72,
+     "potential": 84
+    },
+    {
+     "club": "FEY",
+     "name": "Ayase Ueda",
+     "positions": [
+      "ST"
+     ],
+     "age": 28,
+     "flag": "🇯🇵",
+     "rating": 77,
+     "potential": null
+    }
+   ]
+  }
+ ]
+}

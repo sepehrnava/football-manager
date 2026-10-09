@@ -1,0 +1,39 @@
+# Clubs (2025/26 season). short: 3 letters, unique within the country. pattern: solid, stripes, half or band.
+# strength: typical rating of the starters (55-90). division: 1 = top division.
+short,name,primary,secondary,pattern,strength,division
+FCB,Bayern Munich,#DC052D,#FFFFFF,solid,85,1
+BVB,Borussia Dortmund,#FDE100,#000000,band,81,1
+LEV,Bayer Leverkusen,#E32221,#000000,half,80,1
+RBL,RB Leipzig,#FFFFFF,#DD0741,band,79,1
+SGE,Eintracht Frankfurt,#E1000F,#000000,half,78,1
+VFB,VfB Stuttgart,#FFFFFF,#E32219,band,78,1
+SCF,SC Freiburg,#E2001A,#000000,solid,76,1
+TSG,TSG Hoffenheim,#1961B5,#FFFFFF,solid,76,1
+WOB,VfL Wolfsburg,#65B32E,#FFFFFF,solid,75,1
+BMG,Borussia Mönchengladbach,#FFFFFF,#000000,band,75,1
+MAI,Mainz 05,#C3141E,#FFFFFF,solid,75,1
+SVW,Werder Bremen,#1D9053,#FFFFFF,solid,75,1
+FCA,FC Augsburg,#BA3733,#FFFFFF,half,74,1
+FCU,Union Berlin,#EB1923,#FFFFFF,solid,74,1
+KOE,1. FC Köln,#FFFFFF,#ED1C24,band,73,1
+HSV,Hamburger SV,#FFFFFF,#0A3F86,band,73,1
+FCH,1. FC Heidenheim,#E30613,#003B79,half,72,1
+STP,FC St. Pauli,#624839,#FFFFFF,solid,72,1
+HAN,Hannover 96,#00923F,#000000,solid,70,2
+DAR,Darmstadt 98,#0057B8,#FFFFFF,solid,69,2
+DUS,Fortuna Düsseldorf,#E30613,#FFFFFF,solid,69,2
+ELV,SV Elversberg,#FFFFFF,#000000,solid,67,2
+FUR,Greuther Fürth,#00923F,#FFFFFF,solid,67,2
+HER,Hertha BSC,#005CA9,#FFFFFF,half,69,2
+KAI,1. FC Kaiserslautern,#E30613,#FFFFFF,solid,69,2
+KAR,Karlsruher SC,#0057B8,#FFFFFF,solid,67,2
+MAG,1. FC Magdeburg,#0057B8,#FFFFFF,solid,66,2
+NUR,1. FC Nürnberg,#E30613,#000000,solid,68,2
+PAD,SC Paderborn,#0057B8,#000000,solid,67,2
+MUN,Preußen Münster,#00923F,#000000,solid,64,2
+SCH,Schalke 04,#004D9D,#FFFFFF,solid,70,2
+BRA,Eintracht Braunschweig,#FFDD00,#005CA9,solid,66,2
+KIE,Holstein Kiel,#005CA9,#E30613,stripes,66,2
+BIE,Arminia Bielefeld,#005CA9,#000000,stripes,67,2
+DRE,Dynamo Dresden,#FFDD00,#000000,solid,67,2
+BOC,VfL Bochum,#005CA9,#FFFFFF,solid,67,2

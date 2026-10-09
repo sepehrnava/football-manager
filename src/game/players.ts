@@ -1,5 +1,5 @@
 import { LINE_OF, MARKET, PENALTY, RELATED, RETIRE_ALWAYS_AT, RETIRE_CHANCE } from './constants';
-import { econRating } from './leagues';
+import { econRating, LEAGUE } from './leagues';
 import { NATIONS } from './names';
 import type { Rng } from './rng';
 import type { Line, Player, Position } from './types';
@@ -87,6 +87,17 @@ export interface PlayerSpec {
   clubId?: string | null;
 }
 
+/** Names of real players in the league data: generated players never get these. */
+const REAL_NAMES = new Set(LEAGUE.players.map((p) => p.name.toLowerCase()));
+
+function generatedName(rng: Rng, nation: (typeof NATIONS)[number]) {
+  for (let i = 0; i < 10; i++) {
+    const name = `${rng.pick(nation.first)} ${rng.pick(nation.last)}`;
+    if (!REAL_NAMES.has(name.toLowerCase())) return name;
+  }
+  return `${rng.pick(nation.first)} ${rng.pick(nation.last)} Jr.`;
+}
+
 export function makePlayer(rng: Rng, id: string, spec: PlayerSpec): Player {
   const nation = rng.pick(NATIONS);
   const positions: Position[] = [spec.position];
@@ -96,7 +107,7 @@ export function makePlayer(rng: Rng, id: string, spec: PlayerSpec): Player {
   const headroom = spec.age <= 21 ? 18 : spec.age <= 24 ? 10 : spec.age <= 27 ? 4 : 0;
   return {
     id,
-    name: `${rng.pick(nation.first)} ${rng.pick(nation.last)}`,
+    name: generatedName(rng, nation),
     flag: nation.flag,
     age: spec.age,
     positions,

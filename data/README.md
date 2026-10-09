@@ -3,6 +3,11 @@
 The game's league comes from two spreadsheets per league. Edit them in Excel, Numbers or
 Google Sheets (export as CSV), then rebuild the league file the game loads.
 
+## Countries
+
+`data/<country>/` exists for english, spanish, german, italian, french and dutch. The converter
+builds all of them into `src/data/leagues.json`. Clubs have a `division` column (1 = top).
+
 ## Files
 
 - `english/clubs.csv`: one row per club: short code, name, kit colours, crest pattern, strength.
@@ -20,7 +25,8 @@ and line number, and nothing is written until they are fixed. Reload the app aft
 
 ## Current data
 
-`players.csv` holds about 20 players per club (400 total), based on 2025/26 squads, with
+`players.csv` (English) holds about 20 players per club (400 total); the other countries have
+the top 2-4 clubs filled so far, based on 2025/26 squads, with
 ratings that are the game's own estimates. Transfers after mid-2026 are not included: check
 each club before publishing and adjust names, clubs or ratings freely.
 

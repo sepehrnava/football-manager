@@ -1,0 +1,39 @@
+# Clubs (2025/26 season). short: 3 letters, unique within the country. pattern: solid, stripes, half or band.
+# strength: typical rating of the starters (55-90). division: 1 = top division.
+short,name,primary,secondary,pattern,strength,division
+PSV,PSV,#ED1C24,#FFFFFF,stripes,79,1
+FEY,Feyenoord,#E30613,#FFFFFF,half,78,1
+AJA,Ajax,#FFFFFF,#D2122E,band,78,1
+AZA,AZ Alkmaar,#E30613,#FFFFFF,solid,76,1
+TWE,FC Twente,#E30613,#FFFFFF,solid,74,1
+UTR,FC Utrecht,#ED1C24,#FFFFFF,half,74,1
+NEC,NEC Nijmegen,#E30613,#00843D,stripes,72,1
+GAE,Go Ahead Eagles,#E30613,#FFDD00,band,71,1
+HEE,sc Heerenveen,#004B98,#FFFFFF,stripes,70,1
+PEC,PEC Zwolle,#004B98,#FFFFFF,solid,69,1
+FOR,Fortuna Sittard,#FFDD00,#00843D,solid,69,1
+SPA,Sparta Rotterdam,#FFFFFF,#E30613,stripes,69,1
+GRO,FC Groningen,#00843D,#FFFFFF,solid,69,1
+HER,Heracles Almelo,#FFFFFF,#000000,stripes,68,1
+NAC,NAC Breda,#FFDD00,#000000,solid,68,1
+EXC,Excelsior,#E30613,#000000,stripes,67,1
+TEL,Telstar,#FFFFFF,#E30613,band,66,1
+VOL,FC Volendam,#F58025,#000000,solid,66,1
+ADO,ADO Den Haag,#00923F,#FFDD00,solid,63,2
+ALM,Almere City,#E30613,#000000,solid,62,2
+CAM,Cambuur,#FFDD00,#005CA9,solid,63,2
+GRA,De Graafschap,#FFFFFF,#005CA9,stripes,63,2
+DEN,FC Den Bosch,#005CA9,#FFFFFF,stripes,60,2
+DOR,FC Dordrecht,#E30613,#FFFFFF,stripes,60,2
+EIN,FC Eindhoven,#005CA9,#FFFFFF,solid,61,2
+EMM,FC Emmen,#E30613,#000000,solid,61,2
+HEL,Helmond Sport,#E30613,#000000,solid,59,2
+MVV,MVV Maastricht,#E30613,#FFDD00,solid,60,2
+ROD,Roda JC,#FFDD00,#000000,stripes,64,2
+RKC,RKC Waalwijk,#FFDD00,#005CA9,solid,63,2
+WIL,Willem II,#E30613,#FFFFFF,stripes,66,2
+VVV,VVV-Venlo,#FFDD00,#000000,solid,61,2
+JAJ,Jong Ajax,#FFFFFF,#E30613,band,60,2
+JPS,Jong PSV,#E30613,#FFFFFF,stripes,59,2
+JAZ,Jong AZ,#E30613,#FFFFFF,solid,59,2
+JUT,Jong Utrecht,#E30613,#FFFFFF,half,58,2

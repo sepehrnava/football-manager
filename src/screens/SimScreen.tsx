@@ -2,8 +2,8 @@ import { useEffect, useState } from 'react';
 import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { clubById, seasonRounds, USER_ID } from '../game/game';
-import { leagueTable } from '../game/league';
+import { clubById, compTable, seasonRounds, USER_ID, userComp } from '../game/game';
+import { zoneOf } from '../game/leagues';
 import { playerValue, surname } from '../game/players';
 import type { Fixture } from '../game/types';
 import { useCareer } from '../state/GameContext';
@@ -58,7 +58,8 @@ export function SimScreen({ until: initialUntil, onClose }: { until?: number; on
   const roundFixtures = state.fixtures.filter((f) => f.round === lastRound);
   const mine = roundFixtures.find((f) => f.homeId === USER_ID || f.awayId === USER_ID);
   const others = roundFixtures.filter((f) => f !== mine);
-  const table = leagueTable(state.clubs, state.fixtures);
+  const table = compTable(state);
+  const comp = userComp(state);
 
   const stopText =
     state.phase === 'window'
@@ -118,7 +119,15 @@ export function SimScreen({ until: initialUntil, onClose }: { until?: number; on
               const me = r.clubId === USER_ID;
               return (
                 <View key={r.clubId} style={[s.tr, me && s.me]}>
-                  <Text style={s.pos}>{i + 1}</Text>
+                  <Text
+                    style={[
+                      s.pos,
+                      zoneOf(i, table.length, comp) === 'up' && { color: colors.green },
+                      zoneOf(i, table.length, comp) === 'down' && { color: colors.red },
+                    ]}
+                  >
+                    {i + 1}
+                  </Text>
                   <ClubCrest club={c} size={16} />
                   <Text style={[s.tname, me && s.bold]} numberOfLines={1}>
                     {c.name}

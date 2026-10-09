@@ -1,0 +1,39 @@
+# Clubs (2025/26 season). short: 3 letters, unique within the country. pattern: solid, stripes, half or band.
+# strength: typical rating of the starters (55-90). division: 1 = top division.
+short,name,primary,secondary,pattern,strength,division
+PSG,Paris Saint-Germain,#004170,#DA291C,band,85,1
+OLM,Olympique de Marseille,#FFFFFF,#2FAEE0,band,80,1
+ASM,AS Monaco,#E7182D,#FFFFFF,half,79,1
+LIL,Lille OSC,#E01E13,#20325F,solid,78,1
+OLY,Olympique Lyonnais,#FFFFFF,#DA001A,band,78,1
+OGC,OGC Nice,#E4002B,#000000,stripes,77,1
+RCS,RC Strasbourg,#009FE3,#FFFFFF,solid,77,1
+RCL,RC Lens,#FFD700,#E30613,half,77,1
+SRF,Stade Rennais,#E13327,#000000,half,76,1
+BRE,Stade Brestois,#E30613,#FFFFFF,solid,74,1
+TFC,Toulouse FC,#5D3A8E,#FFFFFF,solid,74,1
+AJA,AJ Auxerre,#FFFFFF,#004B9B,band,72,1
+FCN,FC Nantes,#FCD405,#009549,solid,72,1
+PFC,Paris FC,#1B2A4A,#FFFFFF,solid,71,1
+SCO,Angers SCO,#FFFFFF,#000000,stripes,70,1
+HAC,Le Havre AC,#1A9FD9,#003366,half,70,1
+FCL,FC Lorient,#F58025,#000000,solid,70,1
+FCM,FC Metz,#7A1D35,#FFFFFF,solid,69,1
+STE,Saint-Étienne,#00923F,#FFFFFF,solid,69,2
+REI,Stade de Reims,#E30613,#FFFFFF,solid,69,2
+MTP,Montpellier,#005CA9,#F58025,solid,68,2
+TRO,Troyes,#005CA9,#FFFFFF,solid,66,2
+GUI,Guingamp,#E30613,#000000,solid,65,2
+RED,Red Star,#00A650,#FFFFFF,half,63,2
+ROD,Rodez,#E30613,#FFDD00,solid,62,2
+PAU,Pau FC,#FFDD00,#005CA9,solid,62,2
+NAN,Nancy,#FFFFFF,#E30613,solid,65,2
+ANN,Annecy,#E30613,#FFFFFF,solid,62,2
+GRE,Grenoble,#005CA9,#FFFFFF,solid,62,2
+AMI,Amiens,#FFFFFF,#00923F,solid,64,2
+LAV,Laval,#F58025,#000000,solid,62,2
+CLE,Clermont Foot,#E30613,#005CA9,solid,64,2
+DUN,Dunkerque,#005CA9,#E30613,solid,62,2
+BAS,Bastia,#005CA9,#FFFFFF,solid,64,2
+LEM,Le Mans,#FFDD00,#E30613,solid,62,2
+BOU,Boulogne,#E30613,#FFFFFF,solid,60,2

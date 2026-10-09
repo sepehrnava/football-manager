@@ -1,22 +1,50 @@
+import { useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 
-import { clubById, USER_ID } from '../game/game';
-import { leagueTable } from '../game/league';
+import { clubById, compTable, USER_ID, userComp } from '../game/game';
+import { compKey, compName, COMPS, divisionsIn, flagOf, PROMOTION_SPOTS, zoneOf, type Comp } from '../game/leagues';
 import type { Fixture } from '../game/types';
 import { useCareer } from '../state/GameContext';
-import { Card, ClubCrest, SectionTitle } from '../ui/components';
+import { Card, ClubCrest, Pill, SectionTitle } from '../ui/components';
+import { CupCard } from './CupCard';
 import { colors, seasonLabel } from '../ui/theme';
 
 export function LeagueScreen() {
   const { state } = useCareer();
-  const table = leagueTable(state.clubs, state.fixtures);
+  const myComp = userComp(state);
+  const [comp, setComp] = useState<Comp>(myComp);
+  const table = compTable(state, comp);
+  const isMine = compKey(comp) === compKey(myComp);
+  const deepest = divisionsIn(comp.country);
   const mine = state.fixtures.filter((f) => f.homeId === USER_ID || f.awayId === USER_ID);
   const scorers = state.squad.filter((p) => p.goals > 0).sort((a, b) => b.goals - a.goals).slice(0, 5);
 
   return (
     <ScrollView contentContainerStyle={s.content}>
-      <Text style={s.title}>League · {seasonLabel(state.season)}</Text>
-      <Text style={s.subtitle}>Prize money is paid by final position. 1st place earns the most.</Text>
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.divisions}>
+        {COMPS.map((c) => (
+          <Pill
+            key={compKey(c)}
+            label={`${flagOf(c.country)} ${divisionsIn(c.country) > 1 ? `Div ${c.division}` : ''}`.trim()}
+            active={compKey(c) === compKey(comp)}
+            onPress={() => setComp(c)}
+          />
+        ))}
+      </ScrollView>
+      <Text style={s.title}>
+        {flagOf(comp.country)} {compName(comp)}
+      </Text>
+      <Text style={s.subtitle}>
+        Season {seasonLabel(state.season)} ·{' '}
+        {deepest > 1
+          ? [
+              comp.division > 1 ? `top ${PROMOTION_SPOTS} promoted` : null,
+              comp.division < deepest ? `bottom ${PROMOTION_SPOTS} relegated` : null,
+            ]
+              .filter(Boolean)
+              .join(' · ')
+          : 'prize money is paid by final position'}
+      </Text>
 
       <Card style={s.table}>
         <View style={[s.tr, s.th]}>
@@ -34,6 +62,13 @@ export function LeagueScreen() {
           const me = r.clubId === USER_ID;
           return (
             <View key={r.clubId} style={[s.tr, me && s.me, i < table.length - 1 && !me && s.border]}>
+              <View
+                style={[
+                  s.zone,
+                  zoneOf(i, table.length, comp) === 'up' && { backgroundColor: colors.green },
+                  zoneOf(i, table.length, comp) === 'down' && { backgroundColor: colors.red },
+                ]}
+              />
               <Text style={[s.pos, i === 0 && { color: colors.gold }]}>{i + 1}</Text>
               <View style={s.club}>
                 <ClubCrest club={c} size={20} />
@@ -52,12 +87,25 @@ export function LeagueScreen() {
         })}
       </Card>
 
-      <SectionTitle>YOUR MATCHES</SectionTitle>
-      <Card style={s.list}>
-        {mine.map((f, i) => (
-          <FixtureRow key={i} fixture={f} next={f.round === state.round && state.phase !== 'summary'} />
-        ))}
-      </Card>
+      {isMine ? (
+        <>
+          <SectionTitle>YOUR MATCHES</SectionTitle>
+          <Card style={s.list}>
+            {mine.map((f, i) => (
+              <FixtureRow key={i} fixture={f} next={f.round === state.round && state.phase !== 'summary'} />
+            ))}
+          </Card>
+        </>
+      ) : null}
+
+      {state.cups?.length ? (
+        <>
+          <SectionTitle>EUROPEAN CUPS</SectionTitle>
+          {state.cups.map((cup) => (
+            <CupCard key={cup.id} cup={cup} />
+          ))}
+        </>
+      ) : null}
 
       {scorers.length ? (
         <>
@@ -117,6 +165,8 @@ function FixtureRow({ fixture, next }: { fixture: Fixture; next: boolean }) {
 const s = StyleSheet.create({
   content: { padding: 16, paddingBottom: 40, gap: 12 },
   title: { fontSize: 26, fontWeight: '900', color: colors.ink },
+  divisions: { flexDirection: 'row', gap: 8, paddingRight: 8 },
+  zone: { width: 4, alignSelf: 'stretch', borderRadius: 2, marginRight: 6, backgroundColor: 'transparent' },
   subtitle: { color: colors.muted, fontWeight: '600', marginTop: -6 },
   table: { paddingHorizontal: 8, paddingVertical: 6 },
   tr: { flexDirection: 'row', alignItems: 'center', paddingVertical: 9, paddingHorizontal: 4 },

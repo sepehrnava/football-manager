@@ -1,9 +1,8 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { Animated, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
-import { clubById, midWindowRound, projectedPosition, seasonRounds, USER_ID } from '../game/game';
+import { clubById, compTable, midWindowRound, projectedPosition, seasonRounds, USER_ID } from '../game/game';
 import { userFixture } from '../game/insights';
-import { leagueTable } from '../game/league';
 import { useCareer } from '../state/GameContext';
 import { Crest } from '../ui/components';
 import { usePulse } from '../ui/motion';
@@ -61,7 +60,7 @@ export function Roadmap({
     return () => clearTimeout(t);
   }, [cursor, width, contentWidth]);
 
-  const table = leagueTable(state.clubs, state.fixtures);
+  const table = compTable(state);
   const myPos = table.findIndex((r) => r.clubId === USER_ID) + 1;
   const started = table.some((r) => r.played > 0);
   const finishPos = started ? myPos : projectedPosition(state);

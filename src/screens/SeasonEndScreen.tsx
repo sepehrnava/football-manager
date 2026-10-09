@@ -2,6 +2,7 @@ import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ECONOMY } from '../game/constants';
+import { compName, DEFAULT_COUNTRY } from '../game/leagues';
 import { useCareer, useGame } from '../state/GameContext';
 import { Button, Card, Row, SectionTitle } from '../ui/components';
 import { FadeIn } from '../ui/motion';
@@ -32,6 +33,20 @@ export function SeasonEndScreen() {
           {champion ? 'Champions!' : `You finished ${ordinal(sum.position)}`}
         </Text>
         {!champion ? <Text style={s.sub}>Champions: {sum.championName}</Text> : null}
+        {sum.cupResults?.map((c) => (
+          <Text key={c.name} style={s.sub}>
+            🏆 {c.name}: {c.result}
+          </Text>
+        ))}
+        {sum.movement ? (
+          <View style={[s.movement, sum.movement === 'promoted' ? s.promoted : s.relegated]}>
+            <Text style={s.movementText}>
+              {sum.movement === 'promoted'
+                ? `⬆️ PROMOTED to the ${compName({ country: sum.country ?? DEFAULT_COUNTRY, division: (sum.division ?? 2) - 1 })}!`
+                : `⬇️ Relegated to the ${compName({ country: sum.country ?? DEFAULT_COUNTRY, division: (sum.division ?? 1) + 1 })}`}
+            </Text>
+          </View>
+        ) : null}
       </FadeIn>
 
       {sum.board === 'sacked' || sum.board === 'warning' ? (
@@ -52,6 +67,9 @@ export function SeasonEndScreen() {
       <Card>
         <Row label="Prize money" value={`+${formatMoney(sum.prize)}`} color={colors.green} />
         <Row label="Fan revenue" value={`+${formatMoney(sum.fanIncome)}`} color={colors.green} />
+        {sum.tv ? <Row label="TV money" value={`+${formatMoney(sum.tv)}`} color={colors.green} /> : null}
+        {sum.cupPrize ? <Row label="Cup prize money" value={`+${formatMoney(sum.cupPrize)}`} color={colors.green} /> : null}
+        {sum.sponsor ? <Row label="Sponsors" value={`+${formatMoney(sum.sponsor)}`} color={colors.green} /> : null}
         <Row label="Wages" value={`-${formatMoney(sum.wages)}`} color={colors.red} />
         <Row label="Running the club" value={`-${formatMoney(sum.fixedCosts)}`} color={colors.red} />
         {sum.stakeholder ? (
@@ -125,6 +143,10 @@ const s = StyleSheet.create({
   content: { paddingHorizontal: 16, gap: 4, maxWidth: 640, width: '100%', alignSelf: 'center' },
   kicker: { textAlign: 'center', fontSize: 13, fontWeight: '800', letterSpacing: 2, color: colors.muted },
   place: { textAlign: 'center', fontSize: 72, fontWeight: '900', color: colors.ink, marginTop: 8 },
+  movement: { alignSelf: 'center', borderRadius: 14, paddingHorizontal: 16, paddingVertical: 8, marginTop: 12 },
+  promoted: { backgroundColor: colors.green },
+  relegated: { backgroundColor: colors.red },
+  movementText: { color: '#FFFFFF', fontWeight: '900', fontSize: 16 },
   headline: { textAlign: 'center', fontSize: 26, fontWeight: '900', color: colors.ink },
   sub: { textAlign: 'center', fontSize: 15, fontWeight: '700', color: colors.muted, marginTop: 4 },
   sacked: { marginTop: 16, backgroundColor: colors.redSoft, borderColor: '#F6C9CA', borderBottomColor: '#EFA9AB' },

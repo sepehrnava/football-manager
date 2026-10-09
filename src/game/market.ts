@@ -9,7 +9,7 @@ import {
   roundMoney,
   wageDemand,
 } from './players';
-import { packPlayersFor, type PackPlayer } from './leagues';
+import { DEFAULT_COUNTRY, packPlayersFor, type PackPlayer } from './leagues';
 import type { Rng } from './rng';
 import { autoPick, teamStrength } from './team';
 import type { Club, GameState, Line, Offer, Player, Position, Style } from './types';
@@ -73,12 +73,13 @@ function fromPack(rng: Rng, id: string, pp: PackPlayer, clubId: string): Player 
 export function clubSquad(
   rng: Rng,
   clubId: string,
+  country: string,
   short: string,
   level: number,
   nextId: () => string,
   size = AI_SQUAD,
 ): Player[] {
-  const real = packPlayersFor(short).map((pp) => fromPack(rng, nextId(), pp, clubId));
+  const real = packPlayersFor(country, short).map((pp) => fromPack(rng, nextId(), pp, clubId));
   if (real.length >= size) return real;
   // Fill gaps as squad players when the real XI is already there.
   const fillLevel = real.length >= 11 ? level - 6 : level;
@@ -110,7 +111,7 @@ export function buildWorld(rng: Rng, clubs: Club[], startId: number) {
   const id = () => `p${nextId++}`;
   const world: Player[] = [];
   for (const c of clubs) {
-    if (c.id !== USER_ID) world.push(...clubSquad(rng, c.id, c.short, c.level, id));
+    if (c.id !== USER_ID) world.push(...clubSquad(rng, c.id, c.country ?? DEFAULT_COUNTRY, c.short, c.level, id));
   }
   return { world, nextId };
 }
@@ -143,10 +144,25 @@ export function contractFactor(years: number) {
   return years <= 1 ? 0.6 : years === 2 ? 0.85 : 1;
 }
 
+/**
+ * Each club's best XI, cached per world snapshot: state updates replace the
+ * world array, so a new array means a fresh cache.
+ */
+const keyPlayerCache = new WeakMap<Player[], Map<string, Set<string>>>();
+
 function isKeyPlayer(state: GameState, p: Player) {
   if (!p.clubId) return false;
-  const squad = clubPlayers(state, p.clubId);
-  return autoPick(squad, '4-4-2').includes(p.id);
+  let byClub = keyPlayerCache.get(state.world);
+  if (!byClub) {
+    byClub = new Map();
+    keyPlayerCache.set(state.world, byClub);
+  }
+  let xi = byClub.get(p.clubId);
+  if (!xi) {
+    xi = new Set(autoPick(clubPlayers(state, p.clubId), '4-4-2').filter((id): id is string => id !== null));
+    byClub.set(p.clubId, xi);
+  }
+  return xi.has(p.id);
 }
 
 /** The selling club's public asking price. */
@@ -419,11 +435,17 @@ export function advanceWorld(state: GameState, rng: Rng): GameState {
     });
   }
 
+  // Each AI club drifts a little toward its competition's average strength.
+  const compOfClub = (c: Club) => `${c.country ?? DEFAULT_COUNTRY}:${c.division ?? 1}`;
+  const avgLevel = (key: string) => {
+    const inComp = state.clubs.filter((c) => c.id !== USER_ID && compOfClub(c) === key);
+    return inComp.reduce((sum, c) => sum + c.level, 0) / Math.max(1, inComp.length);
+  };
   const clubs = state.clubs.map((c) => {
     if (c.id === USER_ID) return c;
-    const pull = (70 - c.level) * 0.1;
+    const pull = (avgLevel(compOfClub(c)) - c.level) * 0.1;
     const style = rng.chance(0.25) ? rng.pick(STYLE_IDS) : c.style;
-    return { ...c, level: clamp(Math.round(c.level + pull + rng.int(-2, 2)), 58, 84), style };
+    return { ...c, level: clamp(Math.round(c.level + pull + rng.int(-2, 2)), 55, 92), style };
   });
 
   // Keep every AI squad at its size: sign replacements around the club level;

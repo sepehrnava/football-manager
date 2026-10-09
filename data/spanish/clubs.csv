@@ -1,0 +1,45 @@
+# Clubs (2025/26 season). short: 3 letters, unique within the country. pattern: solid, stripes, half or band.
+# strength: typical rating of the starters (55-90). division: 1 = top division.
+short,name,primary,secondary,pattern,strength,division
+RMA,Real Madrid,#FFFFFF,#FEBE10,solid,86,1
+BAR,FC Barcelona,#A50044,#004D98,stripes,86,1
+ATM,Atlético Madrid,#CB3524,#FFFFFF,stripes,83,1
+ATH,Athletic Club,#EE2523,#FFFFFF,stripes,80,1
+VIL,Villarreal,#FFE667,#005187,solid,80,1
+BET,Real Betis,#00954C,#FFFFFF,stripes,79,1
+RSO,Real Sociedad,#0067B1,#FFFFFF,stripes,78,1
+SEV,Sevilla,#FFFFFF,#D9000D,band,76,1
+CEL,Celta Vigo,#8AC3EE,#FFFFFF,solid,76,1
+RAY,Rayo Vallecano,#FFFFFF,#E53027,band,75,1
+OSA,Osasuna,#D91A21,#0A346F,solid,75,1
+VCF,Valencia,#FFFFFF,#000000,band,75,1
+GIR,Girona,#CD2534,#FFFFFF,stripes,75,1
+MLL,Real Mallorca,#E20613,#000000,solid,74,1
+GET,Getafe,#005999,#FFFFFF,solid,74,1
+ESP,Espanyol,#007FC8,#FFFFFF,stripes,74,1
+ALA,Alavés,#0761AF,#FFFFFF,stripes,73,1
+LEV,Levante,#B4053F,#004F9F,half,72,1
+ELC,Elche,#FFFFFF,#05642C,band,72,1
+OVI,Real Oviedo,#0055A5,#FFFFFF,solid,71,1
+ALM,Almería,#E30613,#FFFFFF,stripes,71,2
+ALB,Albacete,#FFFFFF,#000000,solid,66,2
+AND,Andorra,#005BAC,#FFD100,solid,65,2
+BUR,Burgos,#FFFFFF,#000000,band,65,2
+CAD,Cádiz,#FFDD00,#0057B8,solid,69,2
+CAS,Castellón,#000000,#FFFFFF,stripes,66,2
+CEU,Ceuta,#FFFFFF,#000000,solid,64,2
+COR,Córdoba,#00A650,#FFFFFF,stripes,66,2
+CUL,Cultural Leonesa,#FFFFFF,#E30613,solid,64,2
+DEP,Deportivo La Coruña,#0057B8,#FFFFFF,stripes,68,2
+EIB,Eibar,#0057B8,#C8102E,stripes,68,2
+GRA,Granada,#E30613,#FFFFFF,stripes,69,2
+LPA,Las Palmas,#FFDD00,#0057B8,solid,70,2
+LGN,Leganés,#0057B8,#FFFFFF,stripes,69,2
+MAL,Málaga,#0057B8,#FFFFFF,stripes,68,2
+MIR,Mirandés,#E30613,#000000,solid,63,2
+RAC,Racing Santander,#00A650,#FFFFFF,solid,67,2
+RSB,Real Sociedad B,#0067B1,#FFFFFF,stripes,62,2
+VLL,Real Valladolid,#5E2A84,#FFFFFF,solid,70,2
+SPO,Sporting Gijón,#E30613,#FFFFFF,stripes,68,2
+ZAR,Real Zaragoza,#FFFFFF,#0057B8,solid,67,2
+HUE,Huesca,#0057B8,#C8102E,stripes,65,2

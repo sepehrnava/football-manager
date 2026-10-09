@@ -1,4 +1,5 @@
-// Placeholder data for the mockup. Replace with a real player database later.
+// Name parts for generated (fictional) players. Avoid famous footballers' surnames:
+// generated names must never look like real players from the league data.
 
 export const NATIONS: { flag: string; first: string[]; last: string[] }[] = [
   {
@@ -23,7 +24,7 @@ export const NATIONS: { flag: string; first: string[]; last: string[] }[] = [
   },
   {
     flag: '🇧🇷',
-    first: ['Gabriel', 'Rafael', 'Thiago', 'Vinícius', 'Matheus', 'Rodrigo', 'Bruno', 'Caio'],
+    first: ['Gabriel', 'Rafael', 'Felipe', 'Lucas', 'Matheus', 'Rodrigo', 'Henrique', 'Caio'],
     last: ['Silva', 'Santos', 'Oliveira', 'Souza', 'Costa', 'Pereira', 'Lima', 'Alves'],
   },
   {
@@ -44,21 +45,21 @@ export const NATIONS: { flag: string; first: string[]; last: string[] }[] = [
   {
     flag: '🇮🇷',
     first: ['Ali', 'Reza', 'Mehdi', 'Sardar', 'Saman', 'Milad', 'Arash', 'Omid'],
-    last: ['Karimi', 'Rezaei', 'Taremi', 'Hosseini', 'Ahmadi', 'Moradi', 'Nazari', 'Jafari'],
+    last: ['Karimi', 'Rezaei', 'Shahbazi', 'Hosseini', 'Ahmadi', 'Moradi', 'Nazari', 'Jafari'],
   },
   {
     flag: '🇳🇬',
     first: ['Victor', 'Samuel', 'Ademola', 'Kelechi', 'Wilfred', 'Joe', 'Alex', 'Moses'],
-    last: ['Okafor', 'Adeyemi', 'Nwosu', 'Eze', 'Balogun', 'Okoye', 'Bassey', 'Iwobi'],
+    last: ['Okonkwo', 'Adebayo', 'Nwosu', 'Chukwu', 'Obi', 'Okoye', 'Nnamdi', 'Ejiofor'],
   },
   {
     flag: '🇯🇵',
     first: ['Takumi', 'Daichi', 'Kaoru', 'Ritsu', 'Wataru', 'Hiroki', 'Kento', 'Yuto'],
-    last: ['Tanaka', 'Suzuki', 'Kamada', 'Endo', 'Ito', 'Mitoma', 'Tomiyasu', 'Doan'],
+    last: ['Tanaka', 'Suzuki', 'Sato', 'Watanabe', 'Nakamura', 'Kobayashi', 'Yamamoto', 'Kato'],
   },
   {
     flag: '🇦🇷',
-    first: ['Lautaro', 'Julián', 'Enzo', 'Nahuel', 'Facundo', 'Thiago', 'Nicolás', 'Lisandro'],
+    first: ['Mateo', 'Santiago', 'Tomás', 'Joaquín', 'Franco', 'Agustín', 'Ignacio', 'Bautista'],
     last: ['Fernández', 'González', 'Romero', 'Molina', 'Acuña', 'Paredes', 'Medina', 'Díaz'],
   },
 ];

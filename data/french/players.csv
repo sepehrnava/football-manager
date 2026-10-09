@@ -1,0 +1,38 @@
+# Players. club = short code from clubs.csv. positions: GK CB LB RB CDM CM CAM LM RM LW RW ST (max two, with /).
+# Ratings are the game's own estimates. Clubs with fewer than 18 players are topped up with generated players.
+club,name,positions,age,nation,rating,potential
+PSG,Lucas Chevalier,GK,25,FR,83,
+PSG,Matvey Safonov,GK,27,RU,77,
+PSG,Marquinhos,CB,32,BR,85,
+PSG,Willian Pacho,CB,25,EC,83,
+PSG,Illia Zabarnyi,CB,24,UA,80,
+PSG,Lucas Beraldo,CB,23,BR,77,
+PSG,Nuno Mendes,LB,24,PT,86,
+PSG,Lucas Hernández,LB,30,FR,79,
+PSG,Achraf Hakimi,RB,28,MA,87,
+PSG,Vitinha,CM,26,PT,88,
+PSG,João Neves,CM,22,PT,86,90
+PSG,Fabián Ruiz,CM,30,ES,83,
+PSG,Warren Zaïre-Emery,CM,20,FR,80,88
+PSG,Lee Kang-in,CAM,25,KR,79,
+PSG,Ousmane Dembélé,RW,29,FR,89,
+PSG,Désiré Doué,RW,21,FR,84,90
+PSG,Khvicha Kvaratskhelia,LW,25,GE,87,
+PSG,Bradley Barcola,LW,24,FR,82,
+PSG,Gonçalo Ramos,ST,25,PT,80,
+OLM,Gerónimo Rulli,GK,34,AR,81,
+OLM,Leonardo Balerdi,CB,27,AR,80,
+OLM,Nayef Aguerd,CB,30,MA,79,
+OLM,Benjamin Pavard,CB/RB,30,FR,80,
+OLM,CJ Egan-Riley,CB,23,GB,74,
+OLM,Emerson Palmieri,LB,32,IT,76,
+OLM,Facundo Medina,LB,27,AR,77,
+OLM,Pierre-Emile Højbjerg,CDM,31,DK,81,
+OLM,Geoffrey Kondogbia,CDM,33,CF,76,
+OLM,Arthur Vermeeren,CM,21,BE,76,
+OLM,Angel Gomes,CAM,26,GB,77,
+OLM,Hamed Junior Traorè,CAM,26,CI,76,
+OLM,Mason Greenwood,RW,25,GB,84,
+OLM,Igor Paixão,LW,26,BR,79,
+OLM,Amine Gouiri,ST,26,DZ,80,
+OLM,Pierre-Emerick Aubameyang,ST,37,GA,79,

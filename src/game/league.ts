@@ -91,9 +91,10 @@ export function leagueTable(clubs: Club[], fixtures: Fixture[]): TableRow[] {
     ]),
   );
   for (const f of fixtures) {
-    if (!f.result) continue;
-    const h = rows.get(f.homeId)!;
-    const a = rows.get(f.awayId)!;
+    // Skip unplayed games, and games of clubs that have since changed division.
+    const h = rows.get(f.homeId);
+    const a = rows.get(f.awayId);
+    if (!f.result || !h || !a) continue;
     const { home, away } = f.result;
     h.played++;
     a.played++;

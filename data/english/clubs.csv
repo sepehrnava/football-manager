@@ -3,25 +3,50 @@
 # pattern: solid, stripes, half or band (a simple crest shape, never a real badge).
 # strength: typical rating of the club's starters (55-90). Used for generated players
 #   and the club's budget until you add real players for it in players.csv.
+# division: 1 = First Division, 2 = Second Division. Each division needs an even number of clubs.
 # Clubs below are the 2025/26 season. Check promotions/relegations before publishing.
-short,name,primary,secondary,pattern,strength
-ARS,Arsenal,#EF0107,#FFFFFF,band,82
-AVL,Aston Villa,#670E36,#95BFE5,half,77
-BOU,Bournemouth,#DA291C,#000000,stripes,73
-BRE,Brentford,#E30613,#FFFFFF,stripes,72
-BHA,Brighton & Hove Albion,#0057B8,#FFFFFF,stripes,74
-BUR,Burnley,#6C1D45,#99D6EA,half,68
-CHE,Chelsea,#034694,#FFFFFF,solid,79
-CRY,Crystal Palace,#1B458F,#C4122E,stripes,73
-EVE,Everton,#003399,#FFFFFF,solid,72
-FUL,Fulham,#FFFFFF,#000000,band,72
-LEE,Leeds United,#FFFFFF,#1D428A,band,70
-LIV,Liverpool,#C8102E,#FFFFFF,solid,82
-MCI,Manchester City,#6CABDD,#FFFFFF,solid,81
-MUN,Manchester United,#DA291C,#FBE122,solid,76
-NEW,Newcastle United,#241F20,#FFFFFF,stripes,77
-NFO,Nottingham Forest,#DD0000,#FFFFFF,solid,74
-SUN,Sunderland,#EB172B,#FFFFFF,stripes,69
-TOT,Tottenham Hotspur,#FFFFFF,#132257,band,76
-WHU,West Ham United,#7A263A,#1BB1E7,half,72
-WOL,Wolverhampton Wanderers,#FDB913,#231F20,solid,70
+short,name,primary,secondary,pattern,strength,division
+ARS,Arsenal,#EF0107,#FFFFFF,band,82,1
+AVL,Aston Villa,#670E36,#95BFE5,half,77,1
+BOU,Bournemouth,#DA291C,#000000,stripes,73,1
+BRE,Brentford,#E30613,#FFFFFF,stripes,72,1
+BHA,Brighton & Hove Albion,#0057B8,#FFFFFF,stripes,74,1
+BUR,Burnley,#6C1D45,#99D6EA,half,68,1
+CHE,Chelsea,#034694,#FFFFFF,solid,79,1
+CRY,Crystal Palace,#1B458F,#C4122E,stripes,73,1
+EVE,Everton,#003399,#FFFFFF,solid,72,1
+FUL,Fulham,#FFFFFF,#000000,band,72,1
+LEE,Leeds United,#FFFFFF,#1D428A,band,70,1
+LIV,Liverpool,#C8102E,#FFFFFF,solid,82,1
+MCI,Manchester City,#6CABDD,#FFFFFF,solid,81,1
+MUN,Manchester United,#DA291C,#FBE122,solid,76,1
+NEW,Newcastle United,#241F20,#FFFFFF,stripes,77,1
+NFO,Nottingham Forest,#DD0000,#FFFFFF,solid,74,1
+SUN,Sunderland,#EB172B,#FFFFFF,stripes,69,1
+TOT,Tottenham Hotspur,#FFFFFF,#132257,band,76,1
+WHU,West Ham United,#7A263A,#1BB1E7,half,72,1
+WOL,Wolverhampton Wanderers,#FDB913,#231F20,solid,70,1
+BIR,Birmingham City,#0000FF,#FFFFFF,solid,70,2
+BLB,Blackburn Rovers,#009EE0,#FFFFFF,half,69,2
+BRC,Bristol City,#E21B23,#FFFFFF,solid,70,2
+CHA,Charlton Athletic,#D4021D,#FFFFFF,solid,67,2
+COV,Coventry City,#6CADDF,#FFFFFF,solid,72,2
+DER,Derby County,#FFFFFF,#000000,band,68,2
+HUL,Hull City,#F5A12D,#000000,stripes,69,2
+IPS,Ipswich Town,#0044A9,#FFFFFF,solid,73,2
+LEI,Leicester City,#003090,#FDBE11,solid,74,2
+MID,Middlesbrough,#E11B22,#FFFFFF,band,72,2
+MIL,Millwall,#001D5E,#FFFFFF,solid,70,2
+NOR,Norwich City,#FFF200,#00A650,solid,71,2
+OXU,Oxford United,#FFD700,#002147,solid,67,2
+POR,Portsmouth,#001489,#FFFFFF,solid,68,2
+PNE,Preston North End,#FFFFFF,#002147,band,69,2
+QPR,Queens Park Rangers,#1D5BA4,#FFFFFF,band,69,2
+SHU,Sheffield United,#EE2737,#FFFFFF,stripes,72,2
+SHW,Sheffield Wednesday,#0E00F7,#FFFFFF,stripes,66,2
+SOU,Southampton,#D71920,#FFFFFF,stripes,74,2
+STK,Stoke City,#E03A3E,#FFFFFF,stripes,70,2
+SWA,Swansea City,#FFFFFF,#000000,solid,69,2
+WAT,Watford,#FBEE23,#ED2127,solid,70,2
+WBA,West Bromwich Albion,#122F67,#FFFFFF,stripes,71,2
+WRE,Wrexham,#D71920,#FFFFFF,solid,69,2

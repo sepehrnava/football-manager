@@ -72,6 +72,10 @@ export interface Club {
   level: number;
   /** User club only: how big the club is, which sets sponsor income. */
   size?: number;
+  /** 1 = top division. Missing in older saves (treated as 1). */
+  division?: number;
+  /** Country (league data id). Missing in older saves (treated as the first country). */
+  country?: string;
 }
 
 export interface MatchResult {
@@ -82,10 +86,35 @@ export interface MatchResult {
 }
 
 export interface Fixture {
+  /** Round within the fixture's own division. */
   round: number;
+  division?: number;
+  country?: string;
   homeId: string;
   awayId: string;
   result?: MatchResult;
+}
+
+export type CupId = 'champions' | 'europa';
+
+export interface CupTie {
+  homeId: string;
+  awayId: string;
+  result?: MatchResult & { pens?: boolean };
+  winnerId?: string;
+}
+
+export interface CupStage {
+  name: string;
+  /** Played right after this many of the user's league matchdays. */
+  afterRound: number;
+  ties: CupTie[];
+}
+
+export interface Cup {
+  id: CupId;
+  name: string;
+  stages: CupStage[];
 }
 
 export type Phase = 'window' | 'season' | 'summary' | 'gameover';
@@ -119,6 +148,11 @@ export interface SeasonSummary {
   fanIncome: number;
   /** Sponsor income (bigger clubs earn more). Missing in older saves. */
   sponsor?: number;
+  /** TV money for lower divisions. Missing in older saves. */
+  tv?: number;
+  /** Cup prize money and how far the club went in each cup it entered. */
+  cupPrize?: number;
+  cupResults?: { name: string; result: string }[];
   wages: number;
   fixedCosts: number;
   /** Stakeholders' share of the profit (0 in a loss-making season). */
@@ -134,6 +168,10 @@ export interface SeasonSummary {
   academy: string[];
   /** The board's verdict after this season. */
   board: BoardStatus;
+  /** The division played this season, and whether the club moves up or down. */
+  division?: number;
+  country?: string;
+  movement?: 'promoted' | 'relegated' | null;
 }
 
 /** ok: money ≥ 0 · debt: below 0 · warning: final warning · sacked: game over. */
@@ -171,7 +209,13 @@ export interface GameState {
   plans: Record<number, Tactic>;
   nextId: number;
   summary: SeasonSummary | null;
-  history: { season: number; position: number }[];
+  history: { season: number; position: number; division?: number; country?: string }[];
+  /** This season's European cups. Missing in older saves. */
+  cups?: Cup[];
+  /** Cup prize money earned this season, paid at the season end. */
+  cupEarnings?: number;
+  /** Final top-division order per country, used to draw next season's cups. */
+  cupRankings?: Record<string, string[]>;
   /** Money at the season end that earned a final warning; null when there is none. */
   warning?: number | null;
 }

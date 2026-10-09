@@ -35,6 +35,14 @@ export const ECONOMY = {
    */
   sponsorScale: 1_000_000,
   sponsorOffset: 3_500_000,
+  /**
+   * TV money: competitions weaker than the strongest top division earn less prize
+   * money, so they get TV money instead: the full amount once a competition's
+   * average (economy) rating is tvGapForFull points below prizeTopLevel.
+   */
+  tvMax: 3_000_000,
+  prizeTopLevel: 74.5,
+  tvGapForFull: 6,
   /** Reference size for budgets and sponsors (a typical new club). */
   newClubSize: 64,
   /** A new user club starts this far below the league's weakest club. */
@@ -48,8 +56,10 @@ export const ECONOMY = {
   prizeLast: 3_000_000,
   /** Higher = more of the money goes to the top; mid-table roughly breaks even. */
   prizeCurve: 2.5,
-  /** Average club level at which prize money is exactly prizeFirst..prizeLast. */
+  /** Average (economy) level at which last place earns exactly prizeLast. */
   prizeReferenceLevel: 68.5,
+  /** Top-4 (economy) level at which the champion earns exactly prizeFirst. */
+  prizeEliteReference: 73.4,
   /** Share of the wage bill paid as bonuses for a top-3 finish. */
   topFinishBonus: [0.15, 0.1, 0.05],
   /** Ending a season below this earns a final warning; twice in a row is the sack. */
