@@ -65,6 +65,8 @@ export type Action =
       takeOver?: number | null;
       /** Country a new club starts in (lowest division). */
       country?: string;
+      /** A new club's drafted first squad, already signed (see draft.ts), and the money left. */
+      draft?: { squad: Player[]; money: number };
     }
   | { type: 'load'; state: GameState }
   | { type: 'reset' }
@@ -87,7 +89,7 @@ export type Action =
   | { type: 'simToStop' }
   | { type: 'nextSeason' };
 
-const STARTING_SQUAD: [Position, number, number][] = [
+export const STARTING_SQUAD: [Position, number, number][] = [
   // position, rating, age
   ['GK', 66, 31],
   ['GK', 57, 20],
@@ -255,6 +257,21 @@ export function clubEconomy(size: number) {
   };
 }
 
+/** Strength of a brand-new club: just below the weakest club of the country's lowest division. */
+export function newClubSize(country: string) {
+  const lowest = divisionsIn(country);
+  const weakest = Math.min(
+    ...LEAGUE.clubs.filter((c) => c.country === country && c.division === lowest).map((c) => c.level),
+  );
+  return weakest - ECONOMY.newClubBelowWeakest;
+}
+
+/** A new club's founding money, before any players are bought. */
+export function foundingMoney(country: string) {
+  const weakest = newClubSize(country) + ECONOMY.newClubBelowWeakest;
+  return Math.round((clubEconomy(weakest).money * ECONOMY.newClubInvestment) / 500_000) * 500_000;
+}
+
 /**
  * New career: either a brand-new club with a modest squad (taking the place of
  * the league's weakest club), or `takeOver` one of the existing clubs, with its
@@ -311,7 +328,9 @@ export function createGame(action: Extract<Action, { type: 'new' }>): GameState 
       division: lowest,
       country,
     };
-    squad = STARTING_SQUAD.map(([position, rating, age]) =>
+    squad = action.draft?.squad.length
+      ? action.draft.squad.map((p) => ({ ...p, id: nextPlayerId(), clubId: USER_ID }))
+      : STARTING_SQUAD.map(([position, rating, age]) =>
       makePlayer(rng, nextPlayerId(), {
         position,
         rating: rating + shift,
@@ -327,6 +346,8 @@ export function createGame(action: Extract<Action, { type: 'new' }>): GameState 
     // Founding investment: enough to compete with the clubs around you.
     const weakest = (user.size ?? ECONOMY.newClubSize) + ECONOMY.newClubBelowWeakest;
     economy.money = Math.round((clubEconomy(weakest).money * ECONOMY.newClubInvestment) / 500_000) * 500_000;
+    // A drafted squad was paid for out of the full draft budget.
+    if (action.draft?.squad.length) economy.money = action.draft.money;
   }
   const clubs = [user, ...ai];
   const built = buildWorld(rng, clubs, nextId);
@@ -366,7 +387,8 @@ export function createGame(action: Extract<Action, { type: 'new' }>): GameState 
   state = { ...state, nextId: staffNext };
   state = refreshClubs(state);
   state = withCups(state, rng, topRankings(state, false));
-  state = makeOffers(state, rng);
+  // A freshly drafted squad gets no bids on day one.
+  if (!action.draft?.squad.length) state = makeOffers(state, rng);
   return withSeed(state, rng);
 }
 

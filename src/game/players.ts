@@ -95,7 +95,7 @@ export function randomName(rng: Rng) {
   return { name: generatedName(rng, nation), flag: nation.flag };
 }
 
-function generatedName(rng: Rng, nation: (typeof NATIONS)[number]) {
+export function generatedName(rng: Rng, nation: (typeof NATIONS)[number]) {
   for (let i = 0; i < 10; i++) {
     const name = `${rng.pick(nation.first)} ${rng.pick(nation.last)}`;
     if (!REAL_NAMES.has(name.toLowerCase())) return name;

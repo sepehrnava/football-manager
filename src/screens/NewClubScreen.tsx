@@ -18,6 +18,7 @@ import {
 import type { CrestPattern } from '../game/types';
 import { useGame } from '../state/GameContext';
 import { DailyCard } from './Challenge';
+import { DraftScreen } from './DraftScreen';
 import { Button, Card, Crest, Pill, SectionTitle, Sheet } from '../ui/components';
 import { colors, CREST_COLORS, formatMoney } from '../ui/theme';
 
@@ -58,6 +59,7 @@ export function NewClubScreen() {
   const [primary, setPrimary] = useState(CREST_COLORS[0]);
   const [secondary, setSecondary] = useState(CREST_COLORS[9]);
   const [mode, setMode] = useState<'create' | 'manage' | null>(null);
+  const [drafting, setDrafting] = useState(false);
   const [picked, setPicked] = useState<number | null>(null);
   // Chosen league in "Manage a club"; with a single league there is nothing to choose.
   const [comp, setComp] = useState<Comp | null>(COMPS.length === 1 ? COMPS[0] : null);
@@ -67,6 +69,12 @@ export function NewClubScreen() {
 
   const shortCode = shortEdited ? short : makeShort(name);
   const crest = { primary, secondary, pattern };
+
+  if (drafting) {
+    return (
+      <DraftScreen name={name} short={shortCode} crest={crest} country={country} onBack={() => setDrafting(false)} />
+    );
+  }
 
   return (
     <ScrollView
@@ -273,20 +281,14 @@ export function NewClubScreen() {
       <Card style={s.info}>
         <Text style={s.infoTitle}>Your situation</Text>
         <Text style={s.infoText}>
-          Your new club starts in the {compName({ country, division: divisionsIn(country) })} with a modest
-          squad and a founding investment. Develop young players, sell at the right time and climb
+          Your new club starts in the {compName({ country, division: divisionsIn(country) })}. Next, you draft
+          your first squad from a budget. Develop young players, sell at the right time and climb
           {divisionsIn(country) > 1 ? ' all the way to the top' : ' the table'}. Spend too much and the board
           sacks you.
         </Text>
       </Card>
 
-      <Button
-        label="START CAREER"
-        disabled={!name.trim()}
-        onPress={() =>
-          dispatch({ type: 'new', name, short: shortCode, crest, seed: seed(), country })
-        }
-      />
+      <Button label="NEXT: DRAFT YOUR SQUAD ›" variant="green" disabled={!name.trim()} onPress={() => setDrafting(true)} />
       </>
       ) : null}
 
