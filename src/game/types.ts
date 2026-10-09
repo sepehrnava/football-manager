@@ -197,8 +197,8 @@ export interface GameState {
   fans: number;
   /** Every player not in the user's squad: AI squads and free agents. */
   world: Player[];
-  /** Player ids from the last search. */
-  search: string[];
+  /** Players the user is keeping an eye on. Missing in older saves. */
+  watch?: string[];
   /** Scouting level per player id: 0 rough, 1 good, 2 exact. */
   scouting: Record<string, number>;
   talks: Record<string, Talk>;

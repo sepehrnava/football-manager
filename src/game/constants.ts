@@ -292,9 +292,9 @@ export const COUNTER_BONUS = 3;
 export const MARKET = {
   /** One scouting report reveals a player's exact rating and potential. */
   scoutCost: 250_000,
-  /** Rating range width before (0) and after (1) scouting. */
+  /** Rating and potential range width before (0) and after (1) scouting. */
   ratingWidth: [10, 0],
-  potentialWidth: [99, 0],
+  potentialWidth: [16, 0],
   /** Bids per player per window before the club stops talking. */
   maxAttempts: 3,
   /** An offer at or above this share of the hidden price gets a counter. */

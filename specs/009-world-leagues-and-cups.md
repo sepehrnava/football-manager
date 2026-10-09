@@ -29,5 +29,7 @@ leagues plus Champions League and Europa League; data written by the assistant.
 | S009-AC05 | Search and new career stay fast with ~2,750 players | Headless: new career 36 ms, search 1 ms | Passed |
 | S009-AC06 | Saving is batched (about once a second and on app background) | Code | Passed |
 | S009-AC09 | Second divisions for Spain, Germany, Italy, France and the Netherlands (252 clubs in all); flags and highlighted division badges in the league picker; saves written in chunks so they stay under Android storage limits | Converter, headless economy (12 leagues, nobody sacked), web: picker, Dutch Second Division, reload keeps the career | Passed |
+| S009-AC10 | Player finder across all leagues: For you, Wonderkids, Experienced, World class (top 50), Bargains, Browse (name, league, fee) and Watchlist, each filterable by exact position; rankings use the bottom of the visible range so "at least +N" is never broken | Headless: 300 suggestions, 0 broken; tabs under 30 ms; web: search, watchlist | Passed |
+| S009-AC11 | Star premium on transfer fees above rating 75 (economy scale); rough potential ranges before scouting; ranges capped at 99 | Headless: Mbappé ~$136M, mid-club upgrades affordable; youth strategy 0 sacked | Passed |
 | S009-AC07 | Player data for all clubs | User or assistant fills data/<country>/players.csv | Partial |
 | S009-AC08 | Shown correctly on Android | Device observation | Pending |

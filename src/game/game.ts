@@ -20,7 +20,6 @@ import {
   refreshClubs,
   rejectOffer,
   scoutPlayer,
-  search,
   setListed,
   STYLE_IDS,
   topUpClubs,
@@ -38,7 +37,6 @@ import type {
   Fixture,
   FormationId,
   GameState,
-  Line,
   Player,
   Position,
   SeasonSummary,
@@ -74,7 +72,7 @@ export type Action =
   | { type: 'assign'; slot: number; playerId: string | null }
   | { type: 'autoPick' }
   | { type: 'captain'; playerId: string }
-  | { type: 'search'; maxFee: number; line: Line | 'ALL' }
+  | { type: 'watch'; playerId: string }
   | { type: 'scoutPlayer'; playerId: string }
   | { type: 'bid'; playerId: string; fee: number; years: number }
   | { type: 'acceptOffer'; offerId: string }
@@ -349,7 +347,6 @@ export function createGame(action: Extract<Action, { type: 'new' }>): GameState 
     money: economy.money,
     fans: economy.fans,
     world: built.world,
-    search: [],
     scouting: {},
     talks: {},
     offers: [],
@@ -363,20 +360,11 @@ export function createGame(action: Extract<Action, { type: 'new' }>): GameState 
   state = refreshClubs(state);
   state = withCups(state, rng, topRankings(state, false));
   state = makeOffers(state, rng);
-  state = search(state, rng, defaultSearchBudget(state.money), 'ALL');
   return withSeed(state, rng);
 }
 
 function withSeed(state: GameState, rng: Rng): GameState {
   return { ...state, seed: rng.seed() };
-}
-
-/** Fee budgets offered in the search. */
-export const SEARCH_BUDGETS = [1, 2, 5, 10, 20, 40].map((m) => m * 1_000_000);
-
-export function defaultSearchBudget(money: number) {
-  const steps = SEARCH_BUDGETS.filter((b) => b <= Math.max(money, SEARCH_BUDGETS[0]));
-  return steps[steps.length - 1];
 }
 
 function ensureLineup(state: GameState): GameState {
@@ -457,7 +445,7 @@ function playRound(state: GameState, rng: Rng): GameState {
 function openWindow(state: GameState, rng: Rng): GameState {
   let s: GameState = { ...state, phase: 'window', talks: {} };
   s = makeOffers(s, rng);
-  return search(s, rng, defaultSearchBudget(s.money), 'ALL');
+  return s;
 }
 
 export function projectedPosition(state: GameState) {
@@ -711,8 +699,15 @@ export function reducer(state: GameState | null, action: Action): GameState | nu
       return { ...state, lineup: autoPick(state.squad, state.formation) };
     case 'captain':
       return { ...state, captainId: action.playerId };
-    case 'search':
-      return done(search(state, rng, action.maxFee, action.line));
+    case 'watch': {
+      const watch = state.watch ?? [];
+      return {
+        ...state,
+        watch: watch.includes(action.playerId)
+          ? watch.filter((id) => id !== action.playerId)
+          : [...watch, action.playerId],
+      };
+    }
     case 'scoutPlayer':
       return scoutPlayer(state, action.playerId);
     case 'bid':

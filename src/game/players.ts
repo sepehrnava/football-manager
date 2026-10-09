@@ -19,8 +19,11 @@ function ageFactor(age: number) {
 /** Transfer value in dollars. */
 export function playerValue(p: Pick<Player, 'rating' | 'age' | 'potential'>) {
   const growth = Math.max(0, p.potential - p.rating);
-  const base = 500_000 * Math.exp(0.16 * (econRating(p.rating) - 60)) * ageFactor(p.age);
-  return roundMoney(base * (1 + growth / 40));
+  const econ = econRating(p.rating);
+  const base = 500_000 * Math.exp(0.16 * (econ - 60)) * ageFactor(p.age);
+  // Stars cost disproportionately more: each point above 75 adds a premium.
+  const star = econ > 75 ? Math.exp(0.12 * (econ - 75)) : 1;
+  return roundMoney(base * star * (1 + growth / 40));
 }
 
 /** The going yearly wage for a player of this rating, before personal demands. */
@@ -112,7 +115,8 @@ export function makePlayer(rng: Rng, id: string, spec: PlayerSpec): Player {
     age: spec.age,
     positions,
     rating,
-    potential: clamp(rating + rng.int(0, headroom), rating, 96),
+    // Generated players rarely become world class: real stars stay special.
+    potential: clamp(rating + rng.int(0, headroom), rating, Math.max(rating, 90)),
     seasonsAtClub: spec.seasonsAtClub ?? 0,
     goals: 0,
     clubId: spec.clubId ?? null,
@@ -133,7 +137,8 @@ export function makePlayer(rng: Rng, id: string, spec: PlayerSpec): Player {
 export function ratingRange(p: Pick<Player, 'rating' | 'scoutBias'>, level: number): [number, number] {
   const width = MARKET.ratingWidth[Math.min(level, 1)];
   const lo = p.rating - Math.round(p.scoutBias * width);
-  return [lo, lo + width];
+  // Ratings stop at 99, so a top player's range is narrower (and still contains the truth).
+  return [lo, Math.min(99, lo + width)];
 }
 
 export function potentialRange(
@@ -143,7 +148,7 @@ export function potentialRange(
   const width = MARKET.potentialWidth[Math.min(level, 1)];
   if (width >= 99) return null;
   const lo = p.potential - Math.round(((p.scoutBias * 7) % 1) * width);
-  return [lo, lo + width];
+  return [lo, Math.min(99, lo + width)];
 }
 
 export function rangeLabel([lo, hi]: [number, number]) {

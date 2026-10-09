@@ -1,18 +1,19 @@
-import { useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { useMemo, useState } from 'react';
+import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 
 import {
   canTrade,
   clubById,
-  defaultSearchBudget,
   midWindowRound,
   MONEY_STATUS_TEXT,
   moneyStatus,
-  SEARCH_BUDGETS,
 } from '../game/game';
 import { askingPrice } from '../game/market';
+import { DEFAULT_FINDER, findPlayers, type Finder, type FinderTab } from '../game/finder';
+import { COUNTRIES } from '../game/leagues';
+import { LINE_OF } from '../game/constants';
 import { playerValue, ratingRange, trend, wageDemand } from '../game/players';
-import type { Line, Player } from '../game/types';
+import type { Player, Position } from '../game/types';
 import { useCareer } from '../state/GameContext';
 import {
   Button,
@@ -31,23 +32,57 @@ import { colors, formatMoney, lineColors } from '../ui/theme';
 import { wageBill } from '../game/team';
 import { PlayerSheet } from './PlayerSheet';
 
-const LINES: (Line | 'ALL')[] = ['ALL', 'GK', 'DF', 'MD', 'AT'];
+const POSITIONS: (Position | 'ALL')[] = ['ALL', 'GK', 'CB', 'LB', 'RB', 'CDM', 'CM', 'CAM', 'LM', 'RM', 'LW', 'RW', 'ST'];
+const PAGE = 12;
+const FEES = [1, 2, 5, 10, 20, 40].map((m) => m * 1_000_000);
+
+const TABS: { id: FinderTab; label: string }[] = [
+  { id: 'foryou', label: '⭐ For you' },
+  { id: 'wonder', label: '🌱 Wonderkids' },
+  { id: 'experienced', label: '🎖️ Experienced' },
+  { id: 'world', label: '🌍 World class' },
+  { id: 'bargain', label: '🏷️ Bargains' },
+  { id: 'browse', label: '🔎 Browse' },
+  { id: 'watch', label: '☆ Watchlist' },
+];
+
+const TAB_HINT: Record<FinderTab, string> = {
+  foryou: 'Players who would improve your starting XI, and that you can afford.',
+  wonder: 'Players aged 21 or under who will grow the most. Potential is a rough range until you scout them.',
+  experienced: 'Players aged 30 or over: high ratings for low fees, ready to play now.',
+  world: 'The 50 best players in the game, whatever your budget. Something to save up for.',
+  bargain: 'Players in the last year of their contract: the same quality for a lower fee.',
+  browse: '',
+  watch: 'Players you starred. Open a player and tap ☆ Watch.',
+};
+
+const EMPTY: Record<FinderTab, string> = {
+  foryou: 'Nobody you can afford would improve your XI right now. Try Browse, or sell a player first.',
+  wonder: 'No wonderkids found for this position.',
+  experienced: 'No experienced players you can afford for this position.',
+  world: 'Nobody found.',
+  bargain: 'No bargains you can afford right now.',
+  browse: 'No matches. Try other filters.',
+  watch: 'Your watchlist is empty.',
+};
 
 export function TransfersScreen() {
   const { state, dispatch } = useCareer();
-  const [budget, setBudget] = useState(() => defaultSearchBudget(state.money));
-  const [line, setLine] = useState<Line | 'ALL'>('ALL');
+  const [finder, setFinder] = useState<Finder>(DEFAULT_FINDER);
+  const [shown, setShown] = useState(PAGE);
   const [detail, setDetail] = useState<{ id: string; mode: 'squad' | 'market' } | null>(null);
   const open = canTrade(state);
   const status = moneyStatus(state);
-  const find = (maxFee: number, l: Line | 'ALL') => {
-    setBudget(maxFee);
-    setLine(l);
-    dispatch({ type: 'search', maxFee, line: l });
+  const change = (patch: Partial<Finder>) => {
+    setFinder((f) => ({ ...f, ...patch }));
+    setShown(PAGE);
   };
-  const results = state.search
-    .map((id) => state.world.find((p) => p.id === id))
-    .filter((p): p is Player => !!p);
+  const found = useMemo(
+    () => findPlayers(state, finder),
+    // Results depend on the market, your squad and your budget, not on every state change.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [state.world, state.squad, state.lineup, state.formation, state.money, state.scouting, state.watch, finder],
+  );
 
   return (
     <>
@@ -120,44 +155,76 @@ export function TransfersScreen() {
         ) : null}
 
         <SectionTitle>FIND PLAYERS</SectionTitle>
-        <Card style={s.searchCard}>
-          <Text style={s.label}>Max transfer fee</Text>
-          <View style={s.wrap}>
-            {SEARCH_BUDGETS.map((b) => (
-              <Pressable
-                key={b}
-                onPress={() => find(b, line)}
-                style={[s.chip, budget === b && s.chipActive]}
-                accessibilityRole="button"
-                accessibilityState={{ selected: budget === b }}
-              >
-                <Text style={[s.chipText, budget === b && s.chipTextActive]}>
-                  {formatMoney(b)}
-                </Text>
-              </Pressable>
-            ))}
-          </View>
-          <Text style={s.label}>Position</Text>
-          <View style={s.wrap}>
-            {LINES.map((l) => (
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.tabs}>
+          {TABS.map((t) => (
+            <Pill key={t.id} label={t.label} active={finder.tab === t.id} onPress={() => change({ tab: t.id })} />
+          ))}
+        </ScrollView>
+
+        {finder.tab !== 'watch' ? (
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.wrapRow}>
+            {POSITIONS.map((pos) => (
               <Pill
-                key={l}
-                label={l === 'ALL' ? 'All' : l}
-                active={line === l}
-                color={l === 'ALL' ? undefined : lineColors[l]}
-                onPress={() => find(budget, l)}
+                key={pos}
+                label={pos === 'ALL' ? 'All positions' : pos}
+                active={finder.position === pos}
+                color={pos === 'ALL' ? undefined : lineColors[LINE_OF[pos]]}
+                onPress={() => change({ position: pos })}
               />
             ))}
-          </View>
-          <Text style={s.hint}>Ratings are guesses until you scout a player.</Text>
-        </Card>
+          </ScrollView>
+        ) : null}
 
-        {results.length === 0 ? <Text style={s.empty}>No matches. Try another budget or position.</Text> : null}
-        {results.map((p, i) => (
-          <FadeIn key={p.id} delay={i * 30}>
-            <MarketRow player={p} onPress={() => setDetail({ id: p.id, mode: 'market' })} />
+        {finder.tab === 'browse' ? (
+          <Card style={s.searchCard}>
+            <TextInput
+              value={finder.text}
+              onChangeText={(text) => change({ text })}
+              placeholder="Search a player by name"
+              placeholderTextColor={colors.muted}
+              style={s.input}
+              autoCapitalize="words"
+              autoCorrect={false}
+              accessibilityLabel="Search players by name"
+            />
+            <Text style={s.label}>League</Text>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.wrapRow}>
+              <Pill label="All" active={finder.country === 'ALL'} onPress={() => change({ country: 'ALL' })} />
+              {COUNTRIES.map((c) => (
+                <Pill key={c.id} label={c.flag} active={finder.country === c.id} onPress={() => change({ country: c.id })} />
+              ))}
+            </ScrollView>
+            <Text style={s.label}>Max fee</Text>
+            <View style={s.wrap}>
+              {[null, ...FEES].map((b) => (
+                <Pressable
+                  key={String(b)}
+                  onPress={() => change({ maxFee: b })}
+                  style={[s.chip, finder.maxFee === b && s.chipActive]}
+                  accessibilityRole="button"
+                  accessibilityState={{ selected: finder.maxFee === b }}
+                >
+                  <Text style={[s.chipText, finder.maxFee === b && s.chipTextActive]}>
+                    {b === null ? 'Any' : formatMoney(b)}
+                  </Text>
+                </Pressable>
+              ))}
+            </View>
+          </Card>
+        ) : (
+          <Text style={s.hint}>{TAB_HINT[finder.tab]}</Text>
+        )}
+
+        {found.length === 0 ? <Text style={s.empty}>{EMPTY[finder.tab]}</Text> : null}
+        {found.slice(0, shown).map(({ player, note }, i) => (
+          <FadeIn key={player.id} delay={Math.min(i, 8) * 25}>
+            <MarketRow player={player} note={note} onPress={() => setDetail({ id: player.id, mode: 'market' })} />
           </FadeIn>
         ))}
+        {found.length > shown ? (
+          <Button label={`SHOW MORE (${found.length - shown} left)`} variant="light" onPress={() => setShown(shown + PAGE)} />
+        ) : null}
+        <Text style={s.hint}>Ratings are guesses until you scout a player.</Text>
       </ScrollView>
 
       <PlayerSheet playerId={detail?.id ?? null} mode={detail?.mode ?? 'market'} onClose={() => setDetail(null)} />
@@ -165,7 +232,7 @@ export function TransfersScreen() {
   );
 }
 
-function MarketRow({ player: p, onPress }: { player: Player; onPress: () => void }) {
+function MarketRow({ player: p, note, onPress }: { player: Player; note?: string; onPress: () => void }) {
   const { state } = useCareer();
   const level = state.scouting[p.id] ?? 0;
   const fee = askingPrice(state, p);
@@ -189,7 +256,13 @@ function MarketRow({ player: p, onPress }: { player: Player; onPress: () => void
           {trend(p) === 'declining' || trend(p) === 'retiring' ? <TrendTag trend={trend(p)} /> : null}
           {club && p.contract.years === 1 ? <Text style={[s.small, { color: colors.green }]}>Bargain</Text> : null}
           {talk?.last === 'broken' ? <Text style={[s.small, { color: colors.red }]}>Talks off</Text> : null}
+          {(state.watch ?? []).includes(p.id) ? <Text style={[s.small, { color: colors.gold }]}>★</Text> : null}
         </View>
+        {note ? (
+          <Text style={s.note} numberOfLines={1}>
+            {note}
+          </Text>
+        ) : null}
       </View>
       <View style={s.price}>
         <Text style={[s.priceText, fee > state.money && { color: colors.red }]}>{formatMoney(fee)}</Text>
@@ -215,6 +288,20 @@ const s = StyleSheet.create({
   offerButtons: { flexDirection: 'row', gap: 10 },
   flex: { flex: 1 },
   searchCard: { gap: 10 },
+  tabs: { gap: 8, paddingRight: 8 },
+  wrapRow: { gap: 8, paddingRight: 8 },
+  input: {
+    backgroundColor: colors.faint,
+    borderRadius: 14,
+    borderWidth: 2,
+    borderColor: colors.border,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    fontSize: 16,
+    fontWeight: '700',
+    color: colors.ink,
+  },
+  note: { fontSize: 12, fontWeight: '800', color: colors.green },
   label: { fontSize: 14, fontWeight: '800', color: colors.ink },
   wrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   chip: { paddingVertical: 8, paddingHorizontal: 12, borderRadius: 12, backgroundColor: colors.faint, borderWidth: 2, borderColor: colors.border },

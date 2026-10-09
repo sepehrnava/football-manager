@@ -190,21 +190,6 @@ export function renewalDemand(state: GameState, p: Player) {
 
 // ---------------------------------------------------------------- searching
 
-/** Up to ten players matching a fee budget and position line. */
-export function search(state: GameState, rng: Rng, maxFee: number, line: Line | 'ALL'): GameState {
-  const candidates = state.world.filter((p) => {
-    if (line !== 'ALL' && LINE_OF[p.positions[0]] !== line) return false;
-    if (!p.clubId) return false;
-    const price = askingPrice(state, p);
-    return price <= maxFee && price >= maxFee * 0.15;
-  });
-  for (let i = candidates.length - 1; i > 0; i--) {
-    const j = rng.int(0, i);
-    [candidates[i], candidates[j]] = [candidates[j], candidates[i]];
-  }
-  const ids = candidates.slice(0, MARKET.searchSize).map((p) => p.id);
-  return { ...state, search: ids };
-}
 
 export function scoutPlayer(state: GameState, playerId: string): GameState {
   if ((state.scouting[playerId] ?? 0) >= 1 || MARKET.scoutCost > state.money) return state;
@@ -230,7 +215,7 @@ function sign(state: GameState, p: Player, fee: number, years: number): GameStat
     money: state.money - fee,
     squad: [...state.squad, signed],
     world: state.world.filter((w) => w.id !== p.id),
-    search: state.search.filter((id) => id !== p.id),
+    watch: (state.watch ?? []).filter((id) => id !== p.id),
     scouting: { ...state.scouting, [p.id]: 1 },
     talks: { ...state.talks, [p.id]: { attempts: 0, counter: null, last: 'accepted' } },
   };

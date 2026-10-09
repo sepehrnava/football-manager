@@ -133,6 +133,13 @@ function MarketView({ player: p, onClose }: { player: Player; onClose: () => voi
         </View>
       </View>
 
+      <Button
+        label={(state.watch ?? []).includes(p.id) ? '★ Watching: tap to remove' : '☆ Watch this player'}
+        variant="light"
+        small
+        onPress={() => dispatch({ type: 'watch', playerId: p.id })}
+      />
+
       <View style={s.box}>
         <Row label="Price" value={formatMoney(asking)} bold />
         <Row label="Wage" value={`${formatMoney(wage)} per season`} />
