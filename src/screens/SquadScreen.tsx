@@ -175,14 +175,11 @@ export function SquadScreen() {
                       <RatingBadge value={r} size={24} tone={penaltyTone(p.rating - r)} />
                     </View>
                     {state.captainId === p.id ? <Text style={s.captain}>C</Text> : null}
-                    <View
-                      style={[
-                        s.fit,
-                        { backgroundColor: fitColor(p.rating - r) },
-                      ]}
-                    >
-                      <Text style={s.fitText}>{p.rating > r ? `−${p.rating - r}` : '✓'}</Text>
-                    </View>
+                    {p.rating > r ? (
+                      <View style={[s.fit, { backgroundColor: fitColor(p.rating - r) }]}>
+                        <Text style={s.fitText}>−{p.rating - r}</Text>
+                      </View>
+                    ) : null}
                     <Text style={s.tokenName} numberOfLines={1}>
                       {surname(p.name)}
                     </Text>
@@ -201,8 +198,8 @@ export function SquadScreen() {
           })}
         </View>
         <Text style={s.legend}>
-          Tap a player, then another position or a substitute below to swap. ✓ = natural position; −N =
-          rating lost out of position.
+          Tap a player, then another position or a substitute below to swap. −N = rating lost out of
+          position.
         </Text>
 
         <Button label="AUTO-PICK BEST XI" variant="light" onPress={() => dispatch({ type: 'autoPick' })} />
@@ -303,9 +300,9 @@ function PlayerRow({
           {player.listed ? <Text style={s.forSale}>FOR SALE</Text> : null}
         </View>
       </View>
-      {target ? (
+      {target && drop > 0 ? (
         <View style={[s.rowFit, { backgroundColor: fitColor(drop) }]}>
-          <Text style={s.fitText}>{drop > 0 ? `−${drop}` : '✓'}</Text>
+          <Text style={s.fitText}>−{drop}</Text>
         </View>
       ) : null}
       <RatingBadge value={r} size={34} tone={target ? penaltyTone(drop) : 'gold'} />
