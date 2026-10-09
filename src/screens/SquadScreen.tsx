@@ -4,7 +4,7 @@ import { Animated, Pressable, ScrollView, StyleSheet, Text, View } from 'react-n
 import { BENCH_SIZE, FORMATION_IDS, FORMATIONS, TACTICS } from '../game/constants';
 import { userClub } from '../game/game';
 import { lineOf, ratingAt, surname, trend } from '../game/players';
-import { benchFor, starters, userStrength } from '../game/team';
+import { benchBonus, benchFor, starters, userStrength } from '../game/team';
 import type { Player, Position, Tactic } from '../game/types';
 import { useCareer } from '../state/GameContext';
 import {
@@ -25,14 +25,15 @@ import { PlayerSheet } from './PlayerSheet';
 
 const LINE_ORDER = { GK: 0, DF: 1, MD: 2, AT: 3 };
 
+/** What the user tapped first: a position on the pitch or a player on the bench. */
+type Selection = { kind: 'slot'; index: number } | { kind: 'player'; id: string } | null;
+
 const TACTIC_NOTE: Record<Tactic, string> = {
   defensive: 'Harder to beat, scores less',
   balanced: 'No change',
   attacking: 'Scores more, concedes more',
 };
 
-/** What the user tapped first: a position on the pitch or a player in a list. */
-type Selection = { kind: 'slot'; index: number } | { kind: 'player'; id: string } | null;
 
 function fitColor(drop: number) {
   return drop <= 0 ? colors.green : penaltyTone(drop) === 'red' ? colors.red : colors.orange;
@@ -51,14 +52,13 @@ export function SquadScreen({ onFindPlayers }: { onFindPlayers: () => void }) {
   const strength = userStrength(state);
   const chemBonus = Math.round((strength.chemistry - 50) / 10);
   const xi = starters(state.squad, state.lineup);
-  const bench = benchFor(state.squad, state.lineup, BENCH_SIZE);
+  const bench = benchFor(state.squad, state.lineup, BENCH_SIZE, state.bench);
+  const depth = benchBonus(state);
+  const depthText = `BENCH ${depth.rating} · ${depth.bonus >= 0 ? '+' : ''}${depth.bonus} POWER`;
   const reserves = state.squad
     .filter((p) => !state.lineup.includes(p.id) && !bench.includes(p))
     .sort((a, b) => LINE_ORDER[lineOf(a)] - LINE_ORDER[lineOf(b)] || b.rating - a.rating);
   const formation = FORMATIONS[state.formation];
-  const allPlayers = [...state.squad].sort(
-    (a, b) => LINE_ORDER[lineOf(a)] - LINE_ORDER[lineOf(b)] || b.rating - a.rating,
-  );
   const kit = userClub(state).crest;
 
   const assign = (slot: number, playerId: string) => {
@@ -68,10 +68,10 @@ export function SquadScreen({ onFindPlayers }: { onFindPlayers: () => void }) {
   };
 
   // Pitch: first tap selects; a second tap on another position swaps them,
-  // and a tap after picking a substitute brings that player on.
+  // and a tap on the bench brings that player on.
   const select = (next: Selection) => {
     setSel(next);
-    // Keep the bench in view after picking someone on the pitch.
+    // Keep the bench row in view after picking someone on the pitch.
     const { wrap, height, y } = view.current;
     if (next?.kind === 'slot' && wrap && height) {
       const bottom = wrap.y + wrap.height + 12;
@@ -87,24 +87,29 @@ export function SquadScreen({ onFindPlayers }: { onFindPlayers: () => void }) {
       const to = state.lineup[i];
       if (from) return assign(i, from);
       if (to) return assign(sel.index, to);
-      return select({ kind: 'slot', index: i });
     }
     select({ kind: 'slot', index: i });
   };
 
+  // A substitute or reserve: after a pitch position, brings them on; after another non-starter
+  // on the other list, swaps the two (sub <-> reserve); otherwise selects or deselects.
   const tapPlayer = (id: string) => {
     if (sel?.kind === 'slot') return assign(sel.index, id);
+    if (sel?.kind === 'player' && sel.id !== id) {
+      const isSub = (pid: string) => bench.some((p) => p.id === pid);
+      if (isSub(sel.id) !== isSub(id)) {
+        animateNextLayout();
+        dispatch({ type: 'benchSwap', a: sel.id, b: id });
+        return setSel(null);
+      }
+    }
     setSel(sel?.kind === 'player' && sel.id === id ? null : { kind: 'player', id });
   };
 
   const targetPos: Position | undefined = sel?.kind === 'slot' ? formation.slots[sel.index].pos : undefined;
   const selectedSlot = sel?.kind === 'slot' ? sel.index : null;
-  const selectedPlayer =
-    sel?.kind === 'player'
-      ? state.squad.find((p) => p.id === sel.id)
-      : sel?.kind === 'slot'
-        ? xi[sel.index]
-        : null;
+  const slotPlayer = selectedSlot !== null ? xi[selectedSlot] : null;
+  const benchPlayer = sel?.kind === 'player' ? state.squad.find((p) => p.id === sel.id) : null;
 
   return (
     <View style={s.screen}>
@@ -224,6 +229,14 @@ export function SquadScreen({ onFindPlayers }: { onFindPlayers: () => void }) {
               </Pressable>
             );
           })}
+          {selectedSlot !== null && slotPlayer ? (
+            <DetailsChip
+              x={formation.slots[selectedSlot].x}
+              y={formation.slots[selectedSlot].y}
+              below={!slotPlayer.retiring}
+              onPress={() => setDetail(slotPlayer.id)}
+            />
+          ) : null}
         </View>
         <BenchStrip
           players={[...bench, ...reserves]}
@@ -234,46 +247,57 @@ export function SquadScreen({ onFindPlayers }: { onFindPlayers: () => void }) {
           header={
             sel ? (
               <View style={s.benchHead}>
-                <Text style={s.benchHint} numberOfLines={2}>
-                  {sel.kind === 'player'
-                    ? `Bring on ${surname(selectedPlayer?.name ?? '')}: tap a position`
-                    : selectedPlayer
-                      ? `Swap ${surname(selectedPlayer.name)} (${targetPos}): tap a bench player or a position`
-                      : `Fill ${targetPos}: tap a bench player`}
+                <Text style={s.benchHint} numberOfLines={1}>
+                  {benchPlayer
+                    ? `${surname(benchPlayer.name)}: tap a position, or swap below`
+                    : slotPlayer
+                      ? `Swap ${surname(slotPlayer.name)} (${targetPos}): best options first`
+                      : `Fill ${targetPos}: best options first`}
                 </Text>
-                {selectedPlayer ? (
-                  <Pressable onPress={() => setDetail(selectedPlayer.id)} style={s.benchBtn} accessibilityRole="button">
+                {benchPlayer ? (
+                  <Pressable onPress={() => setDetail(benchPlayer.id)} style={s.benchBtn} accessibilityRole="button">
                     <Text style={s.benchBtnText}>Details</Text>
                   </Pressable>
                 ) : null}
-                <Pressable
-                  onPress={() => setSel(null)}
-                  style={s.benchBtn}
-                  accessibilityRole="button"
-                  accessibilityLabel="Cancel"
-                >
+                <Pressable onPress={() => setSel(null)} style={s.benchBtn} accessibilityRole="button" accessibilityLabel="Cancel">
                   <Text style={s.benchBtnText}>✕</Text>
                 </Pressable>
               </View>
             ) : (
-              <Text style={s.benchTitle}>BENCH · TAP TO SWAP</Text>
+              <Text style={s.benchTitle}>{depthText}</Text>
             )
           }
         />
         </View>
-        <SectionTitle>{`PLAYERS · ${state.squad.length}`}</SectionTitle>
-        <View>
-          {allPlayers.map((p, i) => (
-            <PlayerRow
-              key={p.id}
-              player={p}
-              role={state.lineup.includes(p.id) ? 'XI' : bench.includes(p) ? 'Sub' : undefined}
-              last={i === allPlayers.length - 1}
-              onPress={() => setDetail(p.id)}
-            />
-          ))}
-        </View>
 
+        {[
+          { title: `SUBSTITUTES · ${depthText}`, group: bench, sub: true },
+          { title: `RESERVES · ${reserves.length}`, group: reserves, sub: false },
+        ]
+          .filter((g) => g.group.length)
+          .map((g) => (
+            <View key={g.title}>
+              <SectionTitle>{g.title}</SectionTitle>
+              {g.sub ? (
+                <Text style={s.depthHint}>A bench close to your starters adds up to +3 power; a thin one costs some.</Text>
+              ) : null}
+              {benchPlayer && bench.includes(benchPlayer) !== g.sub ? (
+                <Text style={s.listHint}>
+                  Tap one here to swap with {surname(benchPlayer.name)}, or tap a position on the pitch.
+                </Text>
+              ) : null}
+              {g.group.map((p, i) => (
+                <BenchRow
+                  key={p.id}
+                  player={p}
+                  last={i === g.group.length - 1}
+                  selected={sel?.kind === 'player' && sel.id === p.id}
+                  onPress={() => tapPlayer(p.id)}
+                  onDetails={() => setDetail(p.id)}
+                />
+              ))}
+            </View>
+          ))}
       </ScrollView>
 
       <PlayerSheet playerId={detail} mode="squad" onClose={() => setDetail(null)} />
@@ -289,7 +313,29 @@ function SelectRing() {
   return <Animated.View pointerEvents="none" style={[s.ring, { opacity, transform: [{ scale }] }]} />;
 }
 
-/** Subs and reserves on a bench under the pitch: tap one to swap with the selected position. */
+/** A small "Details" button next to the selected pitch player (above them near the bottom edge). */
+function DetailsChip({ x, y, below, onPress }: { x: number; y: number; below: boolean; onPress: () => void }) {
+  const under = below && y < 0.82;
+  return (
+    <Pressable
+      onPress={onPress}
+      accessibilityRole="button"
+      accessibilityLabel="Player details"
+      style={({ pressed }) => [
+        s.detailsChip,
+        { left: `${x * 100}%`, top: `${y * 100}%`, marginTop: under ? 42 : -62 },
+        pressed && { opacity: 0.7 },
+      ]}
+    >
+      <Text style={s.detailsChipText}>Details</Text>
+    </Pressable>
+  );
+}
+
+/**
+ * Subs and reserves in one row under the pitch. With a pitch position selected, everyone is
+ * shown with their rating there and sorted best-first, so the best options come first.
+ */
 function BenchStrip({
   players,
   benchCount,
@@ -307,23 +353,27 @@ function BenchStrip({
 }) {
   const { state } = useCareer();
   const kit = userClub(state).crest;
+  const bench = new Set(players.slice(0, benchCount).map((p) => p.id));
+  const shown = target
+    ? [...players].sort((a, b) => ratingAt(b, target) - ratingAt(a, target) || b.rating - a.rating)
+    : players;
   return (
     <View style={s.bench}>
       {header}
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.benchRow}>
-        {players.map((p, i) => {
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.benchRowStrip}>
+        {shown.map((p, i) => {
           const r = target ? ratingAt(p, target) : p.rating;
           const drop = p.rating - r;
           const on = selectedId === p.id;
           return (
             <View key={p.id} style={s.benchItem}>
-              {i === benchCount ? <View style={s.benchDivider} /> : null}
+              {!target && i === benchCount ? <View style={s.benchDivider} /> : null}
               <Pressable
                 onPress={() => onPress(p.id)}
                 accessibilityRole="button"
                 accessibilityLabel={`Bench ${p.name}`}
                 accessibilityState={{ selected: on }}
-                style={[s.benchToken, i >= benchCount && s.reserve]}
+                style={s.benchToken}
               >
                 {on ? <SelectRing /> : null}
                 <View style={[s.shirt, s.benchShirt, { backgroundColor: kit.primary, borderColor: kit.secondary }, on && s.selected]}>
@@ -340,7 +390,7 @@ function BenchStrip({
                 <Text style={s.tokenName} numberOfLines={1}>
                   {surname(p.name)}
                 </Text>
-                {i === benchCount ? <Text style={s.reserveLabel}>RESERVES</Text> : null}
+                <Text style={s.benchRole}>{bench.has(p.id) ? 'SUB' : 'RESERVE'}</Text>
               </Pressable>
             </View>
           );
@@ -350,40 +400,51 @@ function BenchStrip({
   );
 }
 
-/** One squad player; tapping opens their details. */
-function PlayerRow({
+/** A substitute or reserve under the pitch: tap to select (then swap), Details for the full card. */
+function BenchRow({
   player,
-  role,
-  onPress,
   last,
+  selected,
+  onPress,
+  onDetails,
 }: {
   player: Player;
-  /** In the starting XI or on the bench. */
-  role?: 'XI' | 'Sub';
-  onPress: () => void;
   last?: boolean;
+  selected?: boolean;
+  onPress: () => void;
+  onDetails: () => void;
 }) {
   return (
-    <Pressable
-      onPress={onPress}
-      accessibilityRole="button"
-      accessibilityLabel={`Squad player ${player.name}`}
-      style={({ pressed }) => [s.row, !last && s.rowBorder, pressed && s.rowPressed]}
-    >
-      <View style={s.rowMain}>
-        <Text style={s.rowName} numberOfLines={1}>
-          {player.flag} {player.name}
-        </Text>
-        <View style={s.rowMeta}>
-          <PosTags positions={player.positions} size={12} />
-          <Text style={s.rowAge}>{player.age}</Text>
-          <TrendTag trend={trend(player)} />
-          {player.listed ? <Text style={s.forSale}>FOR SALE</Text> : null}
+    <View style={[s.benchRow, !last && s.benchRowLine, selected && s.benchRowOn]}>
+      <Pressable
+        onPress={onPress}
+        accessibilityRole="button"
+        accessibilityLabel={`Squad player ${player.name}`}
+        accessibilityState={{ selected: !!selected }}
+        style={({ pressed }) => [s.benchRowMain, pressed && s.rowPressed]}
+      >
+        <RatingBadge value={player.rating} size={34} />
+        <View style={s.rowMain}>
+          <Text style={s.benchName} numberOfLines={1}>
+            {player.flag} {player.name}
+          </Text>
+          <View style={s.benchMeta}>
+            <PosTags positions={player.positions} size={12} />
+            <Text style={s.benchAge}>{player.age}</Text>
+            <TrendTag trend={trend(player)} />
+            {player.listed ? <Text style={s.benchSale}>FOR SALE</Text> : null}
+          </View>
         </View>
-      </View>
-      {role ? <Text style={s.role}>{role}</Text> : null}
-      <RatingBadge value={player.rating} size={34} />
-    </Pressable>
+      </Pressable>
+      <Pressable
+        onPress={onDetails}
+        accessibilityRole="button"
+        accessibilityLabel={`Details for ${player.name}`}
+        style={({ pressed }) => [s.rowDetails, pressed && s.rowPressed]}
+      >
+        <Text style={s.rowDetailsText}>Details</Text>
+      </Pressable>
+    </View>
   );
 }
 
@@ -399,7 +460,18 @@ const s = StyleSheet.create({
   best: { backgroundColor: colors.ink, borderRadius: 14, paddingHorizontal: 14, justifyContent: 'center' },
   bestText: { color: '#FFFFFF', fontSize: 14, fontWeight: '900' },
   stats: { flexDirection: 'row', paddingVertical: 4 },
-  role: { fontSize: 12, fontWeight: '900', color: colors.muted, width: 28, textAlign: 'right' },
+  benchRow: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 10 },
+  benchRowLine: { borderBottomWidth: 1, borderBottomColor: colors.border },
+  benchName: { fontSize: 15, fontWeight: '800', color: colors.ink },
+  benchMeta: { flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 2 },
+  benchAge: { fontSize: 12, fontWeight: '700', color: colors.muted },
+  benchSale: { fontSize: 11, fontWeight: '900', color: colors.blue },
+  benchRowMain: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 12 },
+  benchRowOn: { backgroundColor: '#FFF1CC', borderRadius: 12, marginHorizontal: -8, paddingHorizontal: 8 },
+  rowDetails: { backgroundColor: colors.card, borderRadius: 10, paddingHorizontal: 10, paddingVertical: 6 },
+  rowDetailsText: { fontSize: 12, fontWeight: '900', color: colors.ink },
+  depthHint: { fontSize: 12, fontWeight: '600', color: colors.muted, marginTop: -4, marginBottom: 4 },
+  listHint: { fontSize: 13, fontWeight: '700', color: colors.orange, marginBottom: 4 },
   pitchWrap: { borderRadius: 22, overflow: 'hidden', borderWidth: 3, borderColor: colors.pitchDark },
   pitch: {
     backgroundColor: colors.pitch,
@@ -419,20 +491,32 @@ const s = StyleSheet.create({
     borderColor: colors.gold,
     backgroundColor: 'rgba(242,181,68,0.25)',
   },
+  benchShirt: { width: 40, height: 40, borderRadius: 20 },
   bench: { backgroundColor: colors.pitchDark, paddingTop: 8, paddingBottom: 10 },
   benchHead: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 12, minHeight: 30 },
   benchHint: { flex: 1, color: '#FFFFFF', fontSize: 13, fontWeight: '800' },
   benchBtn: { paddingHorizontal: 10, height: 30, borderRadius: 15, backgroundColor: 'rgba(255,255,255,0.18)', justifyContent: 'center' },
   benchBtnText: { color: '#FFFFFF', fontSize: 13, fontWeight: '900' },
   benchTitle: { color: 'rgba(255,255,255,0.75)', fontSize: 11, fontWeight: '900', letterSpacing: 1.2, paddingHorizontal: 12 },
-  benchRow: { paddingHorizontal: 6, paddingTop: 10, gap: 2 },
+  benchRowStrip: { paddingHorizontal: 6, paddingTop: 10, gap: 2 },
   benchItem: { flexDirection: 'row', alignItems: 'stretch' },
   benchToken: { width: 72, alignItems: 'center' },
-  benchShirt: { width: 40, height: 40, borderRadius: 20 },
   benchFit: { top: 24, left: 4 },
   benchDivider: { width: 2, marginHorizontal: 6, marginVertical: 4, backgroundColor: 'rgba(255,255,255,0.3)', borderRadius: 1 },
-  reserve: { opacity: 0.8 },
-  reserveLabel: { position: 'absolute', top: -12, color: 'rgba(255,255,255,0.6)', fontSize: 8, fontWeight: '900', letterSpacing: 1 },
+  benchRole: { color: 'rgba(255,255,255,0.6)', fontSize: 8, fontWeight: '900', letterSpacing: 0.8, marginTop: 1 },
+  detailsChip: {
+    position: 'absolute',
+    width: 72,
+    marginLeft: -36,
+    alignItems: 'center',
+    backgroundColor: colors.ink,
+    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: '#FFFFFF',
+    paddingVertical: 4,
+    zIndex: 5,
+  },
+  detailsChipText: { color: '#FFFFFF', fontSize: 12, fontWeight: '900' },
   boxTop: {
     position: 'absolute',
     top: -3,
@@ -548,30 +632,7 @@ const s = StyleSheet.create({
     justifyContent: 'center',
   },
   emptyPos: { color: '#FFFFFF', fontWeight: '900', fontSize: 11 },
-  legend: { color: colors.muted, fontWeight: '600', fontSize: 13, textAlign: 'center' },
-  list: { paddingVertical: 4, paddingHorizontal: 12 },
-  emptyList: { color: colors.muted, fontWeight: '700', paddingVertical: 12, textAlign: 'center' },
-  row: { flexDirection: 'row', alignItems: 'center', paddingVertical: 10, gap: 10 },
-  rowBorder: { borderBottomWidth: 1, borderBottomColor: colors.border },
   rowPressed: { opacity: 0.6 },
-  rowSelected: {
-    backgroundColor: '#FFF3D6',
-    borderRadius: 12,
-    marginHorizontal: -8,
-    paddingHorizontal: 8,
-  },
-  rowFit: {
-    minWidth: 26,
-    height: 20,
-    paddingHorizontal: 5,
-    borderRadius: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
   rowMain: { flex: 1, gap: 3 },
-  rowName: { fontSize: 16, fontWeight: '800', color: colors.ink },
-  rowMeta: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  rowAge: { fontSize: 12, color: colors.muted, fontWeight: '700' },
-  forSale: { fontSize: 11, color: colors.blue, fontWeight: '900' },
 });
 

@@ -2,9 +2,9 @@ import { useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 import { SQUAD_MAX } from '../game/constants';
-import { canTrade, clubById } from '../game/game';
+import { canTrade, clubById, seasonForecast } from '../game/game';
 import { scoutCost } from '../game/staff';
-import { askingPrice, quickSalePrice, releaseBlocker } from '../game/market';
+import { askingPrice, offersLeft, quickSalePrice, releaseBlocker } from '../game/market';
 import {
   playerValue,
   potentialRange,
@@ -16,6 +16,7 @@ import {
 } from '../game/players';
 import type { Player } from '../game/types';
 import { useAds } from '../ads/AdsContext';
+import { useOffers } from './useOffers';
 import { useCareer } from '../state/GameContext';
 import { Button, ClubCrest, PosTags, RangeBadge, RatingBadge, Row, Sheet, TrendTag } from '../ui/components';
 import { FadeIn } from '../ui/motion';
@@ -70,6 +71,8 @@ const OFFERS = [
 function MarketView({ player: p, onClose }: { player: Player; onClose: () => void }) {
   const { state, dispatch } = useCareer();
   const ads = useAds();
+  // Paying the full price now, plus the new wage at season end.
+  const afterDeal = seasonForecast(state).end - askingPrice(state, p) - wageDemand(p);
   const asking = askingPrice(state, p);
   const scouted = (state.scouting[p.id] ?? 0) >= 1;
   const talk = state.talks[p.id];
@@ -147,6 +150,11 @@ function MarketView({ player: p, onClose }: { player: Player; onClose: () => voi
       <View style={s.box}>
         <Row label="Price" value={formatMoney(asking)} bold />
         <Row label="Wage" value={`${formatMoney(wage)} per season`} />
+        <Row
+          label="Season end after this deal"
+          value={`~${formatMoney(afterDeal)}`}
+          color={afterDeal < 0 ? colors.red : colors.green}
+        />
         {scouted ? (
           <Text style={s.hint}>Scouted: exact rating.</Text>
         ) : (
@@ -181,15 +189,24 @@ function MarketView({ player: p, onClose }: { player: Player; onClose: () => voi
                 ? `They want ${formatMoney(talk.counter ?? 0)}`
                 : talk.last === 'rejected'
                   ? 'Offer rejected'
-                  : 'They walked away'}
+                  : 'They stopped talking'}
             </Text>
             <Text style={s.replyText}>
               {talk.last === 'countered'
                 ? 'Close! Pay their price to sign the player.'
                 : talk.last === 'rejected'
                   ? 'Too low. Try a higher offer.'
-                  : 'You offered too little too often. Try again next window.'}
+                  : 'Too many low offers. Try again in the next transfer window.'}
             </Text>
+            {talk.last !== 'broken' ? (
+              offersLeft(talk) === 1 ? (
+                <Text style={s.lastChance}>
+                  Last chance: if your next offer is turned down, they stop talking until the next window.
+                </Text>
+              ) : (
+                <Text style={s.replyText}>They will listen to {offersLeft(talk)} more offers.</Text>
+              )
+            ) : null}
             {talk.last === 'countered' && talk.counter && !blocked ? (
               <Button
                 label={`PAY ${formatMoney(talk.counter)}`}
@@ -209,6 +226,7 @@ function MarketView({ player: p, onClose }: { player: Player; onClose: () => voi
 
 function SquadView({ player: p, onClose }: { player: Player; onClose: () => void }) {
   const { state, dispatch } = useCareer();
+  const { offers, pending } = useOffers();
   const [confirmSell, setConfirmSell] = useState(false);
   const isCaptain = state.captainId === p.id;
   const sale = quickSalePrice(p);
@@ -228,7 +246,7 @@ function SquadView({ player: p, onClose }: { player: Player; onClose: () => void
             label={p.listed ? 'TAKE OFF TRANSFER LIST' : 'PUT ON TRANSFER LIST'}
             variant={p.listed ? 'light' : 'green'}
             small
-            onPress={() => dispatch({ type: 'list', playerId: p.id, listed: !p.listed })}
+            onPress={() => dispatch({ type: 'list', playerId: p.id, listed: !p.listed, now: Date.now() })}
           />
           <View style={s.actions}>
             <Button
@@ -255,9 +273,13 @@ function SquadView({ player: p, onClose }: { player: Player; onClose: () => void
           {p.listed || sellBlocked ? (
             <Text style={s.reason}>
               {p.listed
-                ? canTrade(state)
-                  ? 'Listed: offers are in Transfers.'
-                  : 'Listed: offers come next window.'
+                ? !canTrade(state)
+                  ? 'Listed: offers come next window.'
+                  : offers.some((o) => o.playerId === p.id)
+                    ? 'Listed: offers are in Transfers.'
+                    : pending.some((o) => o.playerId === p.id)
+                      ? 'Listed: clubs are looking at him.'
+                      : 'Listed: no interest yet. Offers may come next window.'
                 : sellBlocked}
             </Text>
           ) : null}
@@ -329,6 +351,7 @@ const s = StyleSheet.create({
   replyNo: { backgroundColor: colors.redSoft },
   replyTitle: { fontSize: 17, fontWeight: '900', color: colors.ink },
   replyText: { fontSize: 13, fontWeight: '600', color: colors.muted },
+  lastChance: { fontSize: 13, fontWeight: '800', color: colors.red },
   retireBox: { backgroundColor: '#FFF8F8' },
   retireTitle: { fontSize: 15, fontWeight: '900', color: colors.red },
   offerLabel: { textAlign: 'center', fontSize: 11, fontWeight: '900', color: colors.muted, marginTop: 4, letterSpacing: 0.5 },

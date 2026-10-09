@@ -227,9 +227,9 @@ function sign(state: GameState, p: Player, fee: number, years: number): GameStat
 }
 
 /**
- * The user offers a fee and contract length. The club accepts at its hidden
- * price, counters if close, rejects if not, and walks away if insulted or
- * after too many attempts.
+ * The user offers a fee and contract length. The club accepts at its hidden price, counters if
+ * close and rejects if not. Each failed offer uses up patience (an insulting one twice as much);
+ * talks end only after the user has been warned that the next offer is the last chance.
  */
 export function placeBid(state: GameState, playerId: string, fee: number, years: number): GameState {
   const p = state.world.find((w) => w.id === playerId);
@@ -239,15 +239,20 @@ export function placeBid(state: GameState, playerId: string, fee: number, years:
   const price = hiddenPrice(state, p);
   if (!p.clubId) return state;
   if (fee >= price) return sign(state, p, fee, years);
-  const attempts = talk.attempts + 1;
+  const cost = fee < price * MARKET.insultBelow ? 2 : 1;
+  // Never end talks without the last-chance warning: stop one short of the limit until it was shown.
+  const warned = talk.attempts >= MARKET.maxAttempts - 1;
+  const attempts = warned ? talk.attempts + cost : Math.min(talk.attempts + cost, MARKET.maxAttempts - 1);
   const last =
-    fee < price * MARKET.insultBelow || attempts >= MARKET.maxAttempts
-      ? 'broken'
-      : fee >= price * MARKET.counterAbove
-        ? 'countered'
-        : 'rejected';
+    attempts >= MARKET.maxAttempts ? 'broken' : fee >= price * MARKET.counterAbove ? 'countered' : 'rejected';
   const counter = last === 'countered' ? Math.ceil(price / 50_000) * 50_000 : talk.counter;
   return { ...state, talks: { ...state.talks, [p.id]: { attempts, counter, last } } };
+}
+
+/** Offers the club will still listen to for this player this window (0 once talks have ended). */
+export function offersLeft(talk: { attempts: number; last: string | null } | undefined) {
+  if (!talk) return MARKET.maxAttempts;
+  return talk.last === 'broken' ? 0 : Math.max(0, MARKET.maxAttempts - talk.attempts);
 }
 
 // ---------------------------------------------------------------- academy
@@ -361,30 +366,50 @@ export function quickSale(state: GameState, rng: Rng, playerId: string): GameSta
 }
 
 /** 1–2 fair bids (85–110% of value) for a listed player: certainty, not a premium. */
-function listedOffers(state: GameState, rng: Rng, p: Player, startId: number) {
+/**
+ * Bids for a listed player: always at least one, from clubs at his level (any club if none is).
+ * At a window's opening they are already there. Listed during an open window (`now` given), they
+ * take a moment: the first after 8–25 s, often a second 15–40 s later (likelier for youngsters),
+ * so a player listed in a window can still be sold in that window.
+ */
+function listedOffers(state: GameState, rng: Rng, p: Player, startId: number, now?: number) {
   let n = startId;
   const clubs = state.clubs.filter((c) => c.id !== USER_ID);
   const keen = clubs.filter((c) => c.level >= p.rating - 8);
   const pool = keen.length ? keen : clubs;
+  const count = now === undefined ? rng.int(1, 2) : rng.chance(p.age <= 23 ? 0.75 : 0.6) ? 2 : 1;
   const offers: Offer[] = [];
-  for (let i = 0; i < rng.int(1, 2); i++) {
+  let at = now === undefined ? undefined : now + rng.int(8, 25) * 1000;
+  for (let i = 0; i < count; i++) {
     const club = rng.pick(pool);
     if (offers.some((o) => o.clubId === club.id)) continue;
     const fee = roundMoney(playerValue(p) * contractFactor(p.contract.years) * (0.85 + rng.next() * 0.25));
-    offers.push({ id: `o${n++}`, playerId: p.id, clubId: club.id, fee });
+    offers.push({ id: `o${n++}`, playerId: p.id, clubId: club.id, fee, ...(at === undefined ? {} : { at }) });
+    if (at !== undefined) at += rng.int(15, 40) * 1000;
   }
   return { offers, nextId: n };
 }
 
-/** Put a player on (or take them off) the transfer list. Listing in a window brings bids at once. */
-export function setListed(state: GameState, rng: Rng, playerId: string, listed: boolean): GameState {
+/** Offers that have arrived by `now`. */
+export function visibleOffers(state: Pick<GameState, 'offers'>, now: number) {
+  return state.offers.filter((o) => !o.at || o.at <= now);
+}
+
+/**
+ * Put a player on (or take them off) the transfer list. With `now` (the screen passes the clock),
+ * interest in an open window builds over time; without it, bids arrive at once.
+ */
+export function setListed(state: GameState, rng: Rng, playerId: string, listed: boolean, now?: number): GameState {
   const p = state.squad.find((m) => m.id === playerId);
   if (!p) return state;
   const squad = state.squad.map((m) => (m.id === playerId ? { ...m, listed } : m));
-  const next = { ...state, squad };
+  // Taking a player off the list withdraws bids that haven't arrived yet.
+  const offers =
+    listed || now === undefined ? state.offers : state.offers.filter((o) => o.playerId !== playerId || !o.at || o.at <= now);
+  const next = { ...state, squad, offers };
   if (!listed || !canTrade(state) || state.offers.some((o) => o.playerId === playerId)) return next;
-  const extra = listedOffers(next, rng, p, state.nextId);
-  return { ...next, offers: [...state.offers, ...extra.offers], nextId: extra.nextId };
+  const extra = listedOffers(next, rng, p, state.nextId, now);
+  return { ...next, offers: [...offers, ...extra.offers], nextId: extra.nextId };
 }
 
 /**

@@ -16,6 +16,12 @@ In scope: AI clubs with real squads, negotiation, scouting uncertainty, contract
 renewal raises and free departures, incoming offers, quick sales, board warning, opponent
 styles with per-match tactic plans. Excluded: divisions/levels, fatigue, continental cups.
 
+Negotiation patience (revised 2026-10-10 at the user's request): 5 offers per player per
+window instead of 3; an insulting offer (under 55% of the hidden price) uses two instead of
+ending talks at once; talks only end after a red "last chance" warning, and each reply says how
+many offers are left. Checked headlessly: 5 low offers end with the warning on the 4th;
+insulting offers warn at "1 left" before ending.
+
 ## Acceptance criteria
 
 | ID | Observable result | Verification method | Evidence / state |

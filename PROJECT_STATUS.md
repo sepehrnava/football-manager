@@ -38,7 +38,11 @@ Updated: 2026-10-09. Replace outdated entries; keep this as a snapshot.
   Firestore (free plan), restore and account deletion (S018, D012). Firebase project
   top-squad-fm-97218 is fully set up, Google and Apple sign-in enabled; untested on a device.
 - Remote updates with EAS Update (Expo project @sepehrnava/top-squad, channels per build) (D013).
-- Ads (S019, D014): rewarded sponsor bonus (2% of wages, once per window) and free scouting, one
+- Bench strength (−2 to +3 power from bench depth) and transfer-list bids that arrive over
+  time with a notice, instead of instantly (S021).
+- Season money forecast: now, ~season end and safe to spend on the Club and Transfers tabs, a
+  breakdown sheet, and each deal's effect on the season end (S020).
+- Ads (S019, D014): rewarded sponsor bonus (1% of wages per ad, unlimited in windows) and free scouting, one
   capped interstitial at the season break; simulated in development, Google test ads in builds.
 - Game rules in src/game (pure TypeScript); screens in src/screens; theme in src/ui.
 - npm lockfile, lint configuration, and setup instructions in README.md.

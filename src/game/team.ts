@@ -1,4 +1,4 @@
-import { FORMATIONS, SLOT_WEIGHTS, TACTICS } from './constants';
+import { BENCH_SIZE, FORMATIONS, SLOT_WEIGHTS, TACTICS } from './constants';
 import { chemFromLinks, lineupLinks } from './links';
 import { clamp, ratingAt } from './players';
 import { coachBonus } from './staff';
@@ -60,12 +60,27 @@ export function teamStrength(
 }
 
 /** The user's team: squad strength plus the head coach's effect. */
-export function userTeam(state: GameState, tactic: Tactic = state.tactic): TeamStrength {
+/**
+ * Bench depth: the substitutes' average rating against the starters'. A bench as good as the XI
+ * adds 3 to attack and defence, a typical one (2–3 points weaker) adds 1, a thin one costs up to 2.
+ * Relative to the club's own XI, so it is fair in every league.
+ */
+export function benchBonus(state: Pick<GameState, 'squad' | 'lineup' | 'bench'>) {
+  const xi = starters(state.squad, state.lineup).filter((p): p is Player => !!p);
+  const bench = benchFor(state.squad, state.lineup, BENCH_SIZE, state.bench);
+  if (!xi.length || !bench.length) return { rating: 0, bonus: 0 };
+  const avg = (ps: Player[]) => ps.reduce((sum, p) => sum + p.rating, 0) / ps.length;
+  const depth = avg(bench) - avg(xi);
+  return { rating: Math.round(avg(bench)), bonus: clamp(Math.round((depth + 4.5) / 1.5), -2, 3) };
+}
+
+export function userTeam(state: GameState, tactic: Tactic = state.tactic): TeamStrength & { bench: number } {
   const s = teamStrength(state.squad, state.lineup, state.formation, tactic, state.captainId);
   const c = coachBonus(state.staff);
-  const attack = s.attack + c.attack;
-  const defense = s.defense + c.defense;
-  return { ...s, attack, defense, power: Math.round((attack + defense) / 2) };
+  const b = benchBonus(state).bonus;
+  const attack = s.attack + c.attack + b;
+  const defense = s.defense + c.defense + b;
+  return { ...s, attack, defense, power: Math.round((attack + defense) / 2), bench: b };
 }
 
 export function userStrength(state: GameState) {
@@ -188,16 +203,21 @@ export function remapLineup(
 }
 
 /**
- * The 7 substitutes: a backup goalkeeper first, then the best remaining
- * reserves. Everyone else is outside the matchday squad.
+ * The 7 substitutes: the ones the user chose (still in the squad and not starting) first, then
+ * filled automatically with a backup goalkeeper and the best remaining players. Everyone else is
+ * a reserve, outside the matchday squad.
  */
-export function benchFor(squad: Player[], lineup: (string | null)[], size: number): Player[] {
-  const reserves = squad
-    .filter((p) => !lineup.includes(p.id))
-    .sort((a, b) => b.rating - a.rating);
-  const gk = reserves.find((p) => p.positions[0] === 'GK');
-  const rest = reserves.filter((p) => p !== gk);
-  return (gk ? [gk, ...rest] : rest).slice(0, size);
+export function benchFor(squad: Player[], lineup: (string | null)[], size: number, chosen: string[] = []): Player[] {
+  const out = squad.filter((p) => !lineup.includes(p.id));
+  const picked = chosen
+    .map((id) => out.find((p) => p.id === id))
+    .filter((p): p is Player => !!p)
+    .slice(0, size);
+  const rest = out.filter((p) => !picked.includes(p)).sort((a, b) => b.rating - a.rating);
+  const needGk = !picked.some((p) => p.positions[0] === 'GK');
+  const gk = needGk ? rest.find((p) => p.positions[0] === 'GK') : undefined;
+  const fill = gk ? [gk, ...rest.filter((p) => p !== gk)] : rest;
+  return [...picked, ...fill].slice(0, size);
 }
 
 export function wageBill(squad: Player[]) {

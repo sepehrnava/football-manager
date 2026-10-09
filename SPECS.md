@@ -37,6 +37,8 @@ a backend are approved only for optional sign-in and cloud save (S018, Firebase)
 | S017 | [Crest shapes](specs/017-crest-shapes.md) | Implemented; Android observed |
 | S018 | [Sign in and cloud save](specs/018-accounts-cloud-save.md) | Implemented; Firebase set up, device test pending |
 | S019 | [Ads (AdMob)](specs/019-ads.md) | Implemented; test ads on device and AdMob account pending |
+| S020 | [Season money forecast](specs/020-money-forecast.md) | Implemented; Android observation pending |
+| S021 | [Bench strength and realistic transfer-list interest](specs/021-bench-strength-and-listing.md) | Implemented; Android observation pending |
 
 Use [the template](specs/_template.md) for the next feature. Number specs sequentially.
 Keep IDs stable; criteria use S002-AC01 style IDs referenced by tasks and evidence.

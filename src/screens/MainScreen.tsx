@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -21,6 +21,7 @@ import { SeasonEndScreen } from './SeasonEndScreen';
 import { SimScreen } from './SimScreen';
 import { SquadScreen } from './SquadScreen';
 import { TransfersScreen } from './TransfersScreen';
+import { useOffers } from './useOffers';
 
 type Tab = 'club' | 'squad' | 'transfers' | 'league';
 
@@ -131,6 +132,7 @@ export function MainScreen() {
       </View>
 
       {sim ? <SimScreen until={sim.until} onClose={() => setSim(null)} /> : null}
+      <OfferToast top={insets.top} onPress={() => setTab('transfers')} />
       <SettingsSheet visible={settings} onClose={() => setSettings(false)} onAccount={() => setAccountOpen(true)} />
       <AccountSheet visible={accountOpen} onClose={() => setAccountOpen(false)} />
       <HonoursSheet visible={honours} onClose={() => setHonours(false)} />
@@ -194,6 +196,50 @@ function SettingsSheet({
   );
 }
 
+/** A short notice when a bid for a listed player arrives; tap to open Transfers. */
+function OfferToast({ top, onPress }: { top: number; onPress: () => void }) {
+  const { state } = useCareer();
+  const { offers } = useOffers();
+  const key = offers.map((o) => o.id).join(',');
+  const seen = useRef<Set<string> | null>(null);
+  const [shown, setShown] = useState<{ id: string; text: string } | null>(null);
+  useEffect(() => {
+    // The first render only remembers what is already there.
+    if (!seen.current) {
+      seen.current = new Set(offers.map((o) => o.id));
+      return;
+    }
+    const fresh = offers.find((o) => o.at && !seen.current!.has(o.id));
+    offers.forEach((o) => seen.current!.add(o.id));
+    if (!fresh) return;
+    const player = state.squad.find((p) => p.id === fresh.playerId);
+    const club = state.clubs.find((c) => c.id === fresh.clubId);
+    setShown({ id: fresh.id, text: `${club?.name ?? 'A club'} bids ${formatMoney(fresh.fee)} for ${player?.name ?? 'your player'}` });
+    const t = setTimeout(() => setShown(null), 4000);
+    return () => clearTimeout(t);
+    // Runs when the set of arrived offers changes.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [key]);
+  if (!shown) return null;
+  return (
+    <View pointerEvents="box-none" style={[s.toastWrap, { top: top + 56 }]}>
+      <FadeIn key={shown.id} from="scale" duration={260}>
+        <Pressable
+          onPress={() => {
+            setShown(null);
+            onPress();
+          }}
+          accessibilityRole="alert"
+          style={s.toast}
+        >
+          <Text style={s.toastKicker}>NEW OFFER</Text>
+          <Text style={s.toastText}>{shown.text}</Text>
+        </Pressable>
+      </FadeIn>
+    </View>
+  );
+}
+
 /** Colourful vector tab icons: your crest, your shirt, a coin and a trophy. */
 function TabIcon({ tab }: { tab: Tab }) {
   const { state } = useCareer();
@@ -232,6 +278,10 @@ const ICON = 28;
 
 const s = StyleSheet.create({
   root: { flex: 1, backgroundColor: colors.bg },
+  toastWrap: { position: 'absolute', left: 16, right: 16, alignItems: 'center' },
+  toast: { backgroundColor: colors.ink, borderRadius: 16, paddingHorizontal: 16, paddingVertical: 10, gap: 2 },
+  toastKicker: { fontSize: 10, fontWeight: '900', letterSpacing: 1, color: colors.gold },
+  toastText: { fontSize: 14, fontWeight: '800', color: '#FFFFFF' },
   top: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 16, paddingVertical: 10 },
   club: { flexDirection: 'row', alignItems: 'center', gap: 10, flexShrink: 1 },
   money: { fontWeight: '900', fontSize: 18, color: colors.ink },

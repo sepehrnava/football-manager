@@ -22,8 +22,15 @@ and long scrolling chip rows for choices. They looked busy and felt harder than 
 - Club: plain heading with position, roadmap without box or emoji (current stop marked by a
   still soft-gold highlight; the pulsing ring overlapped the line and was removed), one tappable next-match
   row, one list for notes, Staff (moved from Squad) and Daily; plain news lines.
-- Squad: Formation and Tactic pickers plus Best XI; strength numbers without a card; one
-  player list (tap = details); pitch and bench strip remain the place to swap.
+- Squad: Formation and Tactic pickers plus Best XI; strength numbers without a card. Revised
+  2026-10-10 (user): the pitch holds the 11 starters with a horizontal bench row at its bottom
+  (a pop-up swap panel was tried and rejected). Tapping a pitch player shows a "Details" button
+  next to them and sorts the bench row by rating in that position, best first, with SUB /
+  RESERVE labels; tap a bench player or another position to swap. Substitutes and Reserves are
+  also lists below the pitch: tap one to select (highlighted), then one in the other list to swap
+  sub and reserve, or a pitch position to bring them on; each row has a Details button. The
+  chosen bench is saved (GameState.bench, optional) and a substitute coming on leaves his bench
+  place to the starter he replaces. The bench has no match effect yet (no in-match substitutions).
 - Transfers: wages line instead of banner and money card; plain offer rows; Show and
   Position pickers (explanations live in the picker notes); Browse adds League and Max fee.
 - League: one League picker instead of 12 chips; short promotion line.

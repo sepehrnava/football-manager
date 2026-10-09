@@ -6,6 +6,7 @@ import {
   compTable,
   MONEY_STATUS_TEXT,
   moneyStatus,
+  seasonForecast,
   seasonRounds,
   USER_ID,
   userClub,
@@ -17,14 +18,16 @@ import { matchInsight, percent, userFixture } from '../game/insights';
 import { useCareer } from '../state/GameContext';
 import { ClubCrest, Sheet } from '../ui/components';
 import { FadeIn } from '../ui/motion';
-import { colors, ordinal, seasonLabel } from '../ui/theme';
+import { colors, formatMoney, ordinal, seasonLabel } from '../ui/theme';
 import { ChallengeBanner } from './Challenge';
 import { DailyRow } from './StartHome';
 import type { NewsItem } from '../game/types';
 import { MatchSheet } from './MatchSheet';
 import { BuildSquadCard } from './BuildSquad';
 import { Roadmap } from './Roadmap';
+import { MoneySheet } from './MoneySheet';
 import { StaffSheet } from './StaffSheet';
+import { useOffers } from './useOffers';
 
 /** Home: the club, the season roadmap, and one card that says what to do next. */
 export function ClubScreen({
@@ -40,9 +43,11 @@ export function ClubScreen({
   onOpenSquad: () => void;
 }) {
   const { state } = useCareer();
+  const { offers } = useOffers();
   const [sheetRound, setSheetRound] = useState<number | null>(null);
   const [allNews, setAllNews] = useState(false);
   const [staffOpen, setStaffOpen] = useState(false);
+  const [moneyOpen, setMoneyOpen] = useState(false);
   const news = state.news ?? [];
 
   const club = userClub(state);
@@ -59,9 +64,9 @@ export function ClubScreen({
   if (status !== 'ok') notes.push({ text: MONEY_STATUS_TEXT[status], color: colors.red });
   const inCups = (state.cups ?? []).filter((c) => cupProgress(c, USER_ID) && !cupProgress(c, USER_ID)!.out);
   if (inCups.length) notes.push({ text: `Still in the ${inCups.map((c) => c.name).join(' and ')}`, onPress: onOpenLeague });
-  if (state.offers.length) {
+  if (offers.length) {
     notes.push({
-      text: `${state.offers.length} ${state.offers.length > 1 ? 'offers' : 'offer'} for your players`,
+      text: `${offers.length} ${offers.length > 1 ? 'offers' : 'offer'} for your players`,
       onPress: onOpenTransfers,
     });
   }
@@ -109,6 +114,14 @@ export function ClubScreen({
           <NextMatch round={state.round} onPress={() => setSheetRound(state.round)} />
         </FadeIn>
       ) : null}
+
+      {!state.challenge ? (
+        <FadeIn delay={120}>
+          <Text style={s.headText}>MONEY</Text>
+          <MoneyRow onPress={() => setMoneyOpen(true)} />
+        </FadeIn>
+      ) : null}
+      <MoneySheet visible={moneyOpen} onClose={() => setMoneyOpen(false)} />
 
       <FadeIn delay={140} style={s.list}>
           {notes.map((n) => (
@@ -163,6 +176,36 @@ export function ClubScreen({
         </Sheet>
       ) : null}
     </ScrollView>
+  );
+}
+
+/** Money now, at season end and safe to spend, in one tappable row. Opens the breakdown. */
+function MoneyRow({ onPress }: { onPress: () => void }) {
+  const { state } = useCareer();
+  const f = seasonForecast(state);
+  return (
+    <Pressable
+      onPress={onPress}
+      accessibilityRole="button"
+      accessibilityLabel="Season money forecast"
+      style={({ pressed }) => [s.match, pressed && { opacity: 0.6 }]}
+    >
+      <Figure label="NOW" value={formatMoney(f.now)} />
+      <Figure label="SEASON END" value={`~${formatMoney(f.end)}`} color={f.end < 0 ? colors.red : colors.ink} />
+      <Figure label="SAFE TO SPEND" value={formatMoney(f.safeToSpend)} color={colors.green} />
+      <Text style={s.chevron}>›</Text>
+    </Pressable>
+  );
+}
+
+function Figure({ label, value, color }: { label: string; value: string; color?: string }) {
+  return (
+    <View style={s.figure}>
+      <Text style={[s.figureValue, color ? { color } : null]} numberOfLines={1}>
+        {value}
+      </Text>
+      <Text style={s.figureLabel}>{label}</Text>
+    </View>
   );
 }
 
@@ -236,6 +279,9 @@ const s = StyleSheet.create({
   matchName: { fontSize: 17, fontWeight: '900', color: colors.ink },
   matchMeta: { fontSize: 13, fontWeight: '700', color: colors.muted, marginTop: 1 },
   matchOdds: { fontSize: 20, fontWeight: '900', color: colors.ink },
+  figure: { flex: 1, alignItems: 'center', gap: 2 },
+  figureValue: { fontSize: 16, fontWeight: '900', color: colors.ink },
+  figureLabel: { fontSize: 9, fontWeight: '900', letterSpacing: 0.8, color: colors.muted },
   list: { borderTopWidth: 1, borderTopColor: colors.border },
   note: {
     flexDirection: 'row',

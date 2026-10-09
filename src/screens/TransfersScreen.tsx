@@ -9,6 +9,7 @@ import {
   midWindowRound,
   MONEY_STATUS_TEXT,
   moneyStatus,
+  seasonForecast,
 } from '../game/game';
 import { askingPrice } from '../game/market';
 import { DEFAULT_FINDER, findPlayers, type Finder, type FinderTab } from '../game/finder';
@@ -31,6 +32,8 @@ import {
 import { FadeIn } from '../ui/motion';
 import { colors, formatMoney } from '../ui/theme';
 import { wageBill } from '../game/team';
+import { MoneySheet } from './MoneySheet';
+import { useOffers } from './useOffers';
 import { PlayerSheet } from './PlayerSheet';
 
 const POSITIONS: (Position | 'ALL')[] = ['ALL', 'GK', 'CB', 'LB', 'RB', 'CDM', 'CM', 'CAM', 'LM', 'RM', 'LW', 'RW', 'ST'];
@@ -62,6 +65,9 @@ type Picker = 'tab' | 'position' | 'country' | 'fee' | null;
 export function TransfersScreen() {
   const { state, dispatch } = useCareer();
   const ads = useAds();
+  const { offers } = useOffers();
+  const forecast = seasonForecast(state);
+  const [moneyOpen, setMoneyOpen] = useState(false);
   const [finder, setFinder] = useState<Finder>(DEFAULT_FINDER);
   const [shown, setShown] = useState(PAGE);
   const [picker, setPicker] = useState<Picker>(null);
@@ -85,6 +91,14 @@ export function TransfersScreen() {
     <>
       <ScrollView contentContainerStyle={s.content}>
         <View>
+          <Pressable onPress={() => setMoneyOpen(true)} accessibilityRole="button" style={s.moneyLine}>
+            <Text style={s.line}>
+              Safe to spend <Text style={[s.lineStrong, { color: colors.green }]}>{formatMoney(forecast.safeToSpend)}</Text>
+              {'  ·  '}season end{' '}
+              <Text style={[s.lineStrong, forecast.end < 0 && { color: colors.red }]}>~{formatMoney(forecast.end)}</Text>
+            </Text>
+            <Text style={s.moneyArrow}>›</Text>
+          </Pressable>
           <Text style={s.line}>
             Wages <Text style={s.lineStrong}>{formatMoney(wageBill(state.squad))}</Text> a season
           </Text>
@@ -112,10 +126,10 @@ export function TransfersScreen() {
           </Pressable>
         ) : null}
 
-        {state.offers.length ? (
+        {offers.length ? (
           <FadeIn>
-            <SectionTitle>{`OFFERS · ${state.offers.length}`}</SectionTitle>
-            {state.offers.map((o) => {
+            <SectionTitle>{`OFFERS · ${offers.length}`}</SectionTitle>
+            {offers.map((o) => {
               const p = state.squad.find((m) => m.id === o.playerId);
               if (!p) return null;
               const diff = o.fee - playerValue(p);
@@ -242,6 +256,7 @@ export function TransfersScreen() {
         onPick={(v) => change({ maxFee: v === 'any' ? null : Number(v) })}
         onClose={close}
       />
+      <MoneySheet visible={moneyOpen} onClose={() => setMoneyOpen(false)} />
       <PlayerSheet playerId={detail?.id ?? null} mode={detail?.mode ?? 'market'} onClose={() => setDetail(null)} />
     </>
   );
@@ -292,6 +307,8 @@ const s = StyleSheet.create({
   content: { padding: 16, paddingBottom: 40, gap: 12 },
   line: { fontSize: 14, fontWeight: '700', color: colors.muted, paddingVertical: 2 },
   lineStrong: { fontWeight: '900', color: colors.ink },
+  moneyLine: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  moneyArrow: { fontSize: 20, fontWeight: '900', color: colors.borderDark },
   bonus: {
     flexDirection: 'row',
     alignItems: 'center',

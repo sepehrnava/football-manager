@@ -150,6 +150,8 @@ export interface Offer {
   playerId: string;
   clubId: string;
   fee: number;
+  /** When the offer arrives (ms since 1970); offers without it are already there. */
+  at?: number;
 }
 
 /** The state of the user's talks with a selling club this window. */
@@ -231,14 +233,14 @@ export interface GameState {
   season: number;
   phase: Phase;
   window: 'pre' | 'mid';
-  /** The transfer window ("season-window") in which the ad sponsor bonus was last taken. */
-  adBonusAt?: string;
   /** Index of the next round to play, 0-based. */
   round: number;
   userClubId: string;
   clubs: Club[];
   squad: Player[];
   lineup: (string | null)[];
+  /** Substitutes the user chose, in order; the rest of the bench is filled automatically. */
+  bench?: string[];
   formation: FormationId;
   tactic: Tactic;
   captainId: string | null;

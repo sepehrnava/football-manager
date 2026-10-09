@@ -317,11 +317,11 @@ export const MARKET = {
   /** Rating and potential range width before (0) and after (1) scouting. */
   ratingWidth: [10, 0],
   potentialWidth: [16, 0],
-  /** Bids per player per window before the club stops talking. */
-  maxAttempts: 3,
+  /** Bids per player per window before the club stops talking (the last one is always warned). */
+  maxAttempts: 5,
   /** An offer at or above this share of the hidden price gets a counter. */
   counterAbove: 0.8,
-  /** Below this share the club is insulted and ends talks. */
+  /** Below this share the offer is insulting and uses up two attempts instead of one. */
   insultBelow: 0.55,
   /** A quick sale returns this share of value. */
   quickSale: 0.6,

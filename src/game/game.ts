@@ -1,4 +1,5 @@
 import {
+  BENCH_SIZE,
   COUNTER_BONUS,
   ECONOMY,
   FIRST_SEASON,
@@ -35,7 +36,7 @@ import { hireStaff, staffMarket, staffWages, startingStaff, youthBoostChance } f
 import { compKey, compName, DEFAULT_COUNTRY, divisionsIn, econRating, LEAGUE, PROMOTION_SPOTS, type Comp } from './leagues';
 import { develop, makePlayer, markRetirements, playerValue, roundMoney } from './players';
 import { createRng, type Rng } from './rng';
-import { autoPick, remapLineup, userStrength, userTeam, wageBill } from './team';
+import { autoPick, benchFor, remapLineup, userStrength, userTeam, wageBill } from './team';
 import type {
   BoardStatus,
   Club,
@@ -79,6 +80,8 @@ export type Action =
   | { type: 'tactic'; tactic: Tactic }
   | { type: 'plan'; round: number; tactic: Tactic }
   | { type: 'assign'; slot: number; playerId: string | null }
+  /** Swap a substitute and a reserve (either order). */
+  | { type: 'benchSwap'; a: string; b: string }
   | { type: 'autoPick' }
   | { type: 'captain'; playerId: string }
   | { type: 'watch'; playerId: string }
@@ -89,7 +92,7 @@ export type Action =
   | { type: 'acceptOffer'; offerId: string }
   | { type: 'rejectOffer'; offerId: string }
   | { type: 'quickSale'; playerId: string }
-  | { type: 'list'; playerId: string; listed: boolean }
+  | { type: 'list'; playerId: string; listed: boolean; now?: number }
   | { type: 'startSeason' }
   | { type: 'playRound' }
   | { type: 'simToStop' }
@@ -272,16 +275,17 @@ export function sponsorFor(size: number) {
   return Math.max(0, Math.round(raw / 50_000) * 50_000);
 }
 
-const windowKey = (state: GameState) => `${state.season}-${state.window}`;
-
-/** The ad sponsor bonus: small on purpose, 2% of the season's wage bill (at least $25K). */
+/**
+ * The ad sponsor bonus: small on purpose and sized to the club, 1% of the season's wage bill
+ * (at least $10K). Ads are unlimited in a window, so each one stays hardly noticeable.
+ */
 export function adBonusAmount(state: GameState) {
-  return Math.max(25_000, roundMoney(wageBill(state.squad) * 0.02));
+  return Math.max(10_000, roundMoney(wageBill(state.squad) * 0.01));
 }
 
-/** Once per transfer window, while it is open, outside the Daily Challenge. */
+/** Any number of times while a transfer window is open (user's choice), outside the Daily Challenge. */
 export function canTakeAdBonus(state: GameState) {
-  return state.phase === 'window' && !state.challenge && state.adBonusAt !== windowKey(state);
+  return state.phase === 'window' && !state.challenge;
 }
 
 /** Starting budget, fan base and sponsor income for a club of this size. */
@@ -685,6 +689,41 @@ function movements(state: GameState) {
   return next;
 }
 
+/** The season's books for a final position: the same sums at season end and in the forecast. */
+function settlement(state: GameState, position: number) {
+  const costs = seasonCosts(state);
+  const income = seasonIncome(
+    position,
+    state.fans,
+    sponsorFor(userClub(state).size ?? ECONOMY.newClubSize),
+    compClubs(state),
+    tvFor(state, userComp(state)),
+    state.cupEarnings ?? 0,
+  );
+  const bonuses = Math.round(costs.wages * (ECONOMY.topFinishBonus[position - 1] ?? 0));
+  const profit = income.total - costs.total - bonuses;
+  const stakeholder = stakeholderShare(profit);
+  return { costs, income, bonuses, stakeholder, net: profit - stakeholder };
+}
+
+/** Matches played before the table, not squad strength, predicts the finish. */
+const FORECAST_FROM_TABLE = 5;
+
+/**
+ * Where the money is heading: today's balance plus this season's expected income and costs
+ * (wages are paid at season end). Early on the finish comes from squad strength, later from
+ * the table. "Safe to spend" keeps both today and the season end out of debt.
+ */
+export function seasonForecast(state: GameState) {
+  const table = compTable(state);
+  const mine = table.find((r) => r.clubId === USER_ID);
+  const position =
+    mine && mine.played >= FORECAST_FROM_TABLE ? table.indexOf(mine) + 1 : Math.min(projectedPosition(state), table.length);
+  const books = settlement(state, position);
+  const end = state.money + books.net;
+  return { ...books, position, now: state.money, end, safeToSpend: Math.max(0, Math.min(state.money, end)) };
+}
+
 function endSeason(state: GameState, rng: Rng): GameState {
   const comp = userComp(state);
   const division = comp.division;
@@ -695,19 +734,7 @@ function endSeason(state: GameState, rng: Rng): GameState {
   const newDivision = moves.get(USER_ID)!;
   const movement = newDivision < division ? 'promoted' : newDivision > division ? 'relegated' : null;
   const cupsWon = (state.cups ?? []).filter((c) => cupProgress(c, USER_ID)?.champion).map((c) => c.name);
-  const costs = seasonCosts(state);
-  const income = seasonIncome(
-    position,
-    state.fans,
-    sponsorFor(userClub(state).size ?? ECONOMY.newClubSize),
-    compClubs(state),
-    tvFor(state, comp),
-    state.cupEarnings ?? 0,
-  );
-  const bonuses = Math.round(costs.wages * (ECONOMY.topFinishBonus[position - 1] ?? 0));
-  const profit = income.total - costs.total - bonuses;
-  const stakeholder = stakeholderShare(profit);
-  const net = profit - stakeholder;
+  const { costs, income, bonuses, stakeholder, net } = settlement(state, position);
   const money = state.money + net;
   const board = boardVerdict(state, money);
   // Fans follow the finish relative to the table, plus a swing for moving divisions.
@@ -864,12 +891,26 @@ function step(state: GameState | null, action: Action): GameState | null {
       return { ...state, plans: { ...state.plans, [action.round]: action.tactic } };
     case 'assign': {
       const lineup = [...state.lineup];
+      const bench = benchFor(state.squad, state.lineup, BENCH_SIZE, state.bench).map((p) => p.id);
+      const leaving = state.lineup[action.slot];
       if (action.playerId) {
         const from = lineup.indexOf(action.playerId);
         if (from >= 0) lineup[from] = lineup[action.slot];
       }
       lineup[action.slot] = action.playerId;
-      return { ...state, lineup };
+      // A substitute coming on leaves his bench place to the starter he replaces.
+      const spot = action.playerId ? bench.indexOf(action.playerId) : -1;
+      if (spot >= 0 && leaving && !lineup.includes(leaving)) bench[spot] = leaving;
+      return { ...state, lineup, bench };
+    }
+    case 'benchSwap': {
+      const bench = benchFor(state.squad, state.lineup, BENCH_SIZE, state.bench).map((p) => p.id);
+      const [inB, outB] = bench.includes(action.a) ? [action.a, action.b] : [action.b, action.a];
+      const spot = bench.indexOf(inB);
+      const valid = spot >= 0 && !bench.includes(outB) && !state.lineup.includes(outB) && state.squad.some((p) => p.id === outB);
+      if (!valid) return state;
+      bench[spot] = outB;
+      return { ...state, bench };
     }
     case 'autoPick':
       return { ...state, lineup: autoPick(state.squad, state.formation) };
@@ -890,7 +931,7 @@ function step(state: GameState | null, action: Action): GameState | null {
       return scoutPlayer(state, action.playerId, action.free);
     case 'adBonus':
       return canTakeAdBonus(state)
-        ? { ...state, money: state.money + adBonusAmount(state), adBonusAt: windowKey(state) }
+        ? { ...state, money: state.money + adBonusAmount(state) }
         : state;
     case 'bid':
       return placeBid(state, action.playerId, action.fee, action.years);
@@ -899,7 +940,7 @@ function step(state: GameState | null, action: Action): GameState | null {
     case 'rejectOffer':
       return rejectOffer(state, action.offerId);
     case 'list':
-      return done(setListed(state, rng, action.playerId, action.listed));
+      return done(setListed(state, rng, action.playerId, action.listed, action.now));
     case 'quickSale':
       return done(quickSale(state, rng, action.playerId));
     case 'fillAcademy': {

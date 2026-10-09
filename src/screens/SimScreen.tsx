@@ -34,7 +34,9 @@ export function SimScreen({ until: initialUntil, onClose }: { until?: number; on
   const inSeason = state.phase === 'season';
   const reached = until !== undefined && state.round >= until;
   // When a window opens, clubs' bids are shown right here, one at a time.
-  const offer = state.phase === 'window' ? state.offers[0] : undefined;
+  // (Only bids made as the window opened; bids still on their way are not shown here.)
+  const windowOffers = state.offers.filter((o) => !o.at);
+  const offer = state.phase === 'window' ? windowOffers[0] : undefined;
   // Matches run without interruption until a transfer window or the season end.
   const active = running && inSeason && !reached;
 
@@ -72,8 +74,8 @@ export function SimScreen({ until: initialUntil, onClose }: { until?: number; on
 
   const stopText =
     state.phase === 'window'
-      ? state.offers.length
-        ? `Transfer window is open · ${state.offers.length} ${state.offers.length > 1 ? 'offers' : 'offer'} for your players`
+      ? windowOffers.length
+        ? `Transfer window is open · ${windowOffers.length} ${windowOffers.length > 1 ? 'offers' : 'offer'} for your players`
         : 'Transfer window is open'
       : state.phase === 'summary' || state.phase === 'gameover'
         ? 'Season finished'

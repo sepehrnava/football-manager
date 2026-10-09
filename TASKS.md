@@ -37,6 +37,10 @@ Keep current work and a short completed baseline; avoid session logs.
 | T030: Crest shapes; CB–midfield chemistry links | S017-AC01–AC03, S011 | Done | tsc, lint, web and BlueStacks screenshots; chemistry mean 67.2 before and after |
 | T031: Sign in and cloud save | S018-AC01–AC05 | In progress | Firebase fully configured (apps, Firestore + rules, Google and Apple enabled, env and EAS vars); next: development build and device tests |
 | T032: Remote updates (EAS Update) | D013 | Done (config) | Expo project linked, channels in eas.json; first update needs a store or preview build |
+| T037: Bench strength bonus; offers arrive over time | S021-AC01–AC03 | Done | Headless bench distribution, web flows |
+| T036: Choose the bench (swap subs and reserves) | S016 revision | Done | Headless bench swap and substitution; web flow, no console errors |
+| T035: Fairer negotiation (5 offers, last-chance warning) | S004 revision | Done | Headless bid sequences; web: 4, 3, 2 left, last-chance warning, then talks end |
+| T034: Season money forecast | S020-AC01, AC02 | Done | Headless accuracy check, web flow; Android pending |
 | T033: Ads (AdMob) | S019-AC01–AC05 | In progress | AC01, AC02, AC05 passed (headless and simulated ads); next: Google test ads in an Android development build, then the user's AdMob account |
 
 New implementation tasks reference one spec, relevant acceptance IDs, and a concrete check.
