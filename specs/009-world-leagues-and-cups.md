@@ -28,5 +28,6 @@ leagues plus Champions League and Europa League; data written by the assistant.
 | S009-AC04 | Top, middle and bottom clubs of every league are viable | Headless, 8 careers × 3 seasons each: nobody sacked | Passed |
 | S009-AC05 | Search and new career stay fast with ~2,750 players | Headless: new career 36 ms, search 1 ms | Passed |
 | S009-AC06 | Saving is batched (about once a second and on app background) | Code | Passed |
+| S009-AC09 | Second divisions for Spain, Germany, Italy, France and the Netherlands (252 clubs in all); flags and highlighted division badges in the league picker; saves written in chunks so they stay under Android storage limits | Converter, headless economy (12 leagues, nobody sacked), web: picker, Dutch Second Division, reload keeps the career | Passed |
 | S009-AC07 | Player data for all clubs | User or assistant fills data/<country>/players.csv | Partial |
 | S009-AC08 | Shown correctly on Android | Device observation | Pending |

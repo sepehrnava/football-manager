@@ -48,6 +48,12 @@ profit only, so a cheap squad can break even anywhere in the table and debt alwa
 to the player's spending. Selling is never blocked; academy call-ups keep the squad legal.
 Revisit if real league finances replace the generated economy.
 
+## D009: Chunked saves
+
+The saved world (about 1.6 MB) is written as 400 KB chunks plus a manifest, because Android's
+AsyncStorage fails on single values near 2 MB. Writes are queued so chunks never interleave, and
+the old chunks are removed only after the new manifest is in place.
+
 ## D008: Real names as data, never as assets
 
 Accepted for S007 at the user's request, following the approach of comparable apps: real club

@@ -1,4 +1,3 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AppState } from 'react-native';
 import {
   createContext,
@@ -13,9 +12,7 @@ import {
 
 import { reducer, type Action } from '../game/game';
 import type { GameState } from '../game/types';
-
-// v2 changed the save format (contracts, market); v1 saves start a new career.
-const SAVE_KEY = 'pocket-manager/save-v2';
+import { clearGame, loadGame, saveGame } from './saveStore';
 
 interface GameContextValue {
   state: GameState | null;
@@ -31,10 +28,9 @@ export function GameProvider({ children }: { children: ReactNode }) {
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
-    AsyncStorage.getItem(SAVE_KEY)
-      .then((raw) => {
-        const saved = raw ? (JSON.parse(raw) as GameState) : null;
-        if (saved?.version === 2) dispatch({ type: 'load', state: saved });
+    loadGame()
+      .then((saved) => {
+        if (saved) dispatch({ type: 'load', state: saved });
       })
       .catch(() => {})
       .finally(() => setLoaded(true));
@@ -48,21 +44,22 @@ export function GameProvider({ children }: { children: ReactNode }) {
     if (!loaded || !state) return;
     latest.current = state;
     const t = setTimeout(() => {
-      AsyncStorage.setItem(SAVE_KEY, JSON.stringify(state)).catch(() => {});
+      saveGame(state);
     }, 1000);
     return () => clearTimeout(t);
   }, [state, loaded]);
   useEffect(() => {
     const sub = AppState.addEventListener('change', (next) => {
       if (next !== 'active' && latest.current) {
-        AsyncStorage.setItem(SAVE_KEY, JSON.stringify(latest.current)).catch(() => {});
+        saveGame(latest.current);
       }
     });
     return () => sub.remove();
   }, []);
 
   const resetCareer = () => {
-    AsyncStorage.removeItem(SAVE_KEY).catch(() => {});
+    latest.current = null;
+    clearGame().catch(() => {});
     dispatch({ type: 'reset' });
   };
 

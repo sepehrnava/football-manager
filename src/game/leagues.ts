@@ -157,6 +157,8 @@ export function econRating(rating: number) {
 export const DISCLAIMER =
   LEAGUE.id === 'fictional'
     ? null
-    : 'Club and player names are used only to identify them and belong to their respective owners. ' +
-      'Pocket Manager is not affiliated with, endorsed or sponsored by any club, league, players\' ' +
-      'association or player. Ratings, values and all other game data are the game\'s own.';
+    : 'Pocket Manager is an independent game. Club and player names are used only to identify real ' +
+      'clubs and players and belong to their respective owners. It is not licensed by, affiliated with, ' +
+      'or endorsed by any club, league, players\' association or player. Crests are original simple ' +
+      'designs, and all ratings, values and game data are created by the game, not taken from any real ' +
+      'database or other game.';

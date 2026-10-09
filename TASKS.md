@@ -23,6 +23,7 @@ Keep current work and a short completed baseline; avoid session logs.
 | T016: Second Division player data | S008 | Todo | Fill real players for the 24 Second Division clubs (optional) |
 | T017: Continental cups | S009-AC03 | Done | Champions Cup and Europa Cup built |
 | T018: Six leagues | S009-AC01–AC06 | Done | Converter, picker, headless per-league economy |
+| T020: Second divisions, flags, chunked saves | S009-AC09 | Done | Converter, headless 12 leagues, web picker and reload |
 | T019: Fill remaining player data | S009-AC07 | Todo | Real players for the other clubs of the five new leagues and the Second Division | tsc, lint, web flow; 6 strategies × 30 careers | tsc, lint, web flows; 3 strategies × 30 careers × 5 seasons |
 
 New implementation tasks reference one spec, relevant acceptance IDs, and a concrete check.

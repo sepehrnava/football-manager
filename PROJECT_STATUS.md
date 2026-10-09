@@ -17,8 +17,8 @@ Updated: 2026-10-08. Replace outdated entries; keep this as a snapshot.
   Squads reflect 2025/26 knowledge; recent transfers need checking before publishing.
 - Two divisions with promotion and relegation; Second Division clubs use generated
   players for now; new clubs start in the Second Division (S008).
-- Six countries (England with two divisions, Spain, Germany, Italy, France, Netherlands),
-  138 clubs; Champions Cup and Europa Cup knockouts for top finishers (S009). Real players
+- Six countries with two divisions each (252 clubs), flags and division badges in the league
+  picker; Champions Cup and Europa Cup knockouts for top finishers (S009). Real players
   exist for 20 English clubs and the top 2-4 clubs elsewhere; the rest are generated.
 - Game rules in src/game (pure TypeScript); screens in src/screens; theme in src/ui.
 - npm lockfile, lint configuration, and setup instructions in README.md.
