@@ -1,14 +1,14 @@
-import { useState } from 'react';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { useEffect, useState } from 'react';
+import { Animated, Pressable, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { seasonRounds, userClub, userComp } from '../game/game';
 import { compName, DISCLAIMER } from '../game/leagues';
 import { useCareer, useGame } from '../state/GameContext';
 import { Button, ClubCrest, CountBadge, Icon, IconButton, Sheet, Text, type IconName } from '../ui/components';
-import { FadeIn, haptic } from '../ui/motion';
+import { FadeIn, haptic, NATIVE, useCountUp } from '../ui/motion';
 import { DISPLAY } from '../ui/text';
-import { colors, formatMoney, shadow } from '../ui/theme';
+import { colors, formatMoney, radius } from '../ui/theme';
 import { ChallengeEndScreen } from './Challenge';
 import { ClubScreen } from './ClubScreen';
 import { HonoursSheet } from './Honours';
@@ -50,9 +50,7 @@ export function MainScreen() {
   };
   const club = userClub(state);
   const inWindow = state.phase === 'window';
-  const status = state.challenge
-    ? `Daily challenge · ${state.challenge.title}`
-    : inWindow
+  const status = inWindow
       ? 'Transfer window open'
       : `Matchday ${state.round + 1} of ${seasonRounds(state)}`;
 
@@ -78,17 +76,10 @@ export function MainScreen() {
             </View>
           </View>
         </Pressable>
-        <Pressable
-          onPress={() => setTab('transfers')}
-          style={[s.money, state.money < 0 && s.moneyDebt]}
-          accessibilityRole="button"
-          accessibilityLabel={`Money ${formatMoney(state.money)}`}
-        >
-          <Icon name="cash" size={17} color={state.money < 0 ? colors.red : colors.green} />
-          <Text style={[s.moneyText, state.money < 0 && { color: colors.red }]}>{formatMoney(state.money)}</Text>
-        </Pressable>
+        <Money value={state.money} onPress={() => setTab('transfers')} />
         <IconButton icon="cog-outline" label="Settings" onPress={() => setSettings(true)} size={38} />
       </View>
+      {state.challenge ? <ChallengeBar /> : null}
 
       <FadeIn key={tab} from={from} distance={18} duration={200} style={s.body}>
         {tab === 'club' && <ClubScreen onPlay={play} onTab={setTab} />}
@@ -97,34 +88,14 @@ export function MainScreen() {
         {tab === 'league' && <LeagueScreen />}
       </FadeIn>
 
-      <View style={[s.tabs, { paddingBottom: Math.max(insets.bottom, 10) }]}>
-        {TABS.slice(0, 2).map((t) => (
-          <TabButton key={t.id} {...t} active={tab === t.id} onPress={() => setTab(t.id)} />
-        ))}
-        <View style={s.playSlot}>
-          <Pressable
-            onPress={() => {
-              haptic();
-              play();
-            }}
-            style={({ pressed }) => [s.play, pressed && s.playPressed]}
-            accessibilityRole="button"
-            accessibilityLabel={inWindow ? 'Kick off' : 'Play'}
-          >
-            <Icon name="play" size={30} color="#FFFFFF" />
-          </Pressable>
-          <Text style={s.playLabel}>{inWindow ? 'Kick off' : 'Play'}</Text>
-        </View>
-        {TABS.slice(2).map((t) => (
-          <TabButton
-            key={t.id}
-            {...t}
-            badge={t.id === 'transfers' ? state.offers.length : 0}
-            active={tab === t.id}
-            onPress={() => setTab(t.id)}
-          />
-        ))}
-      </View>
+      <TabBar
+        tab={tab}
+        onTab={setTab}
+        playLabel={inWindow ? 'Kick off' : 'Play'}
+        onPlay={() => play()}
+        offers={state.offers.length}
+        bottom={Math.max(insets.bottom, 8)}
+      />
 
       {sim ? <SimScreen until={sim.until} onClose={() => setSim(null)} /> : null}
       <SettingsSheet visible={settings} onClose={() => setSettings(false)} />
@@ -168,6 +139,126 @@ function SettingsSheet({ visible, onClose }: { visible: boolean; onClose: () => 
   );
 }
 
+/** Money in the header; it counts to its new value after a sale, wages or prize money. */
+function Money({ value, onPress }: { value: number; onPress: () => void }) {
+  const shown = useCountUp(value, 700);
+  const debt = value < 0;
+  return (
+    <Pressable
+      onPress={onPress}
+      style={({ pressed }) => [s.money, pressed && { opacity: 0.6 }]}
+      accessibilityRole="button"
+      accessibilityLabel={`Money ${formatMoney(value)}`}
+    >
+      <Text style={s.moneyLabel}>{debt ? 'DEBT' : 'BUDGET'}</Text>
+      <Text style={[s.moneyText, debt && { color: colors.red }]}>{formatMoney(shown)}</Text>
+    </Pressable>
+  );
+}
+
+/** While playing today's challenge: what it is, and a way straight back to the career. */
+function ChallengeBar() {
+  const { state } = useCareer();
+  const { leaveChallenge, returnTo } = useGame();
+  return (
+    <FadeIn from="up" distance={6} style={s.challengeBar}>
+      <Icon name="target" size={18} color={colors.gold} />
+      <Text style={s.challengeText} numberOfLines={1}>
+        <Text style={s.challengeKicker}>DAILY </Text>
+        {state.challenge?.text}
+      </Text>
+      <Pressable
+        onPress={() => {
+          haptic();
+          leaveChallenge();
+        }}
+        style={({ pressed }) => [s.challengeBack, pressed && { opacity: 0.7 }]}
+        accessibilityRole="button"
+        accessibilityLabel={returnTo ? `Back to ${returnTo}` : 'Leave challenge'}
+      >
+        <Icon name="arrow-u-left-top" size={16} color="#FFFFFF" />
+        <Text style={s.challengeBackText} numberOfLines={1}>
+          {returnTo ?? 'Leave'}
+        </Text>
+      </Pressable>
+    </FadeIn>
+  );
+}
+
+const SLOTS = ['club', 'squad', 'play', 'transfers', 'league'] as const;
+const PLAY_FLEX = 1.5;
+
+/** Bottom bar: four tabs around the play button; a line slides to the open tab. */
+function TabBar({
+  tab,
+  onTab,
+  playLabel,
+  onPlay,
+  offers,
+  bottom,
+}: {
+  tab: Tab;
+  onTab: (tab: Tab) => void;
+  playLabel: string;
+  onPlay: () => void;
+  offers: number;
+  bottom: number;
+}) {
+  const [width, setWidth] = useState(0);
+  const index = SLOTS.indexOf(tab);
+  const [x] = useState(() => new Animated.Value(index));
+  useEffect(() => {
+    Animated.spring(x, { toValue: index, useNativeDriver: NATIVE, speed: 20, bounciness: 5 }).start();
+  }, [x, index]);
+  // Tabs are flex 1 and the play slot PLAY_FLEX: work out where each tab's centre is.
+  const unit = (width - 8) / (4 + PLAY_FLEX);
+  const centre = (i: number) => 4 + unit * (i < 2 ? i + 0.5 : i === 2 ? 2 + PLAY_FLEX / 2 : i - 0.5 + PLAY_FLEX);
+  const lineWidth = 28;
+  const left = x.interpolate({
+    inputRange: [0, 1, 2, 3, 4],
+    outputRange: [0, 1, 2, 3, 4].map((i) => centre(i) - lineWidth / 2),
+  });
+  const render = (id: Tab) => {
+    const t = TABS.find((x2) => x2.id === id)!;
+    return (
+      <TabButton
+        key={id}
+        {...t}
+        badge={id === 'transfers' ? offers : 0}
+        active={tab === id}
+        onPress={() => onTab(id)}
+      />
+    );
+  };
+  return (
+    <View style={[s.tabs, { paddingBottom: bottom }]} onLayout={(e) => setWidth(e.nativeEvent.layout.width)}>
+      {render('club')}
+      {render('squad')}
+      <View style={s.playSlot}>
+        <Pressable
+          onPress={() => {
+            haptic();
+            onPlay();
+          }}
+          style={({ pressed }) => [s.play, pressed && s.playPressed]}
+          accessibilityRole="button"
+          accessibilityLabel={playLabel}
+        >
+          <Icon name="play" size={20} color="#FFFFFF" />
+          <Text style={s.playLabel} numberOfLines={1}>
+            {playLabel}
+          </Text>
+        </Pressable>
+      </View>
+      {render('transfers')}
+      {render('league')}
+      {width ? (
+        <Animated.View pointerEvents="none" style={[s.tabLine, { width: lineWidth, transform: [{ translateX: left }] }]} />
+      ) : null}
+    </View>
+  );
+}
+
 function TabButton({
   icon,
   iconOn,
@@ -189,12 +280,12 @@ function TabButton({
         if (!active) haptic();
         onPress();
       }}
-      style={s.tab}
+      style={({ pressed }) => [s.tab, pressed && { opacity: 0.6 }]}
       accessibilityRole="tab"
       accessibilityLabel={label}
       accessibilityState={{ selected: active }}
     >
-      <View style={[s.tabIcon, active && s.tabIconOn]}>
+      <View style={s.tabIcon}>
         <Icon name={active ? iconOn : icon} size={24} color={active ? colors.ink : colors.muted} />
         <CountBadge n={badge} style={s.tabBadge} />
       </View>
@@ -212,50 +303,54 @@ const s = StyleSheet.create({
   statusLine: { flexDirection: 'row', alignItems: 'center', gap: 5, marginTop: 1 },
   liveDot: { width: 7, height: 7, borderRadius: 4, backgroundColor: colors.green },
   status: { fontSize: 12, fontWeight: '600', color: colors.muted, flexShrink: 1 },
-  money: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 5,
-    height: 38,
-    paddingHorizontal: 12,
-    borderRadius: 19,
-    backgroundColor: colors.card,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  moneyDebt: { backgroundColor: colors.redSoft, borderColor: '#F6CACC' },
-  moneyText: { fontSize: 19, fontFamily: DISPLAY, fontWeight: '800', color: colors.ink },
+  money: { alignItems: 'flex-end', paddingHorizontal: 4 },
+  moneyLabel: { fontSize: 10, fontWeight: '700', color: colors.muted, letterSpacing: 0.6 },
+  moneyText: { fontSize: 22, fontFamily: DISPLAY, fontWeight: '800', color: colors.ink, marginTop: -3 },
   body: { flex: 1 },
   tabs: {
     flexDirection: 'row',
-    alignItems: 'flex-end',
+    alignItems: 'center',
     backgroundColor: colors.card,
     borderTopWidth: 1,
     borderTopColor: colors.border,
     paddingTop: 6,
-    paddingHorizontal: 6,
+    paddingHorizontal: 4,
   },
-  tab: { flex: 1, alignItems: 'center', gap: 2 },
-  tabIcon: { width: 52, height: 30, borderRadius: 15, alignItems: 'center', justifyContent: 'center' },
-  tabIconOn: { backgroundColor: colors.faint },
-  tabBadge: { position: 'absolute', top: -4, right: 6 },
+  tabLine: { position: 'absolute', top: -1, left: 0, height: 3, borderRadius: 2, backgroundColor: colors.ink },
+  tab: { flex: 1, alignItems: 'center', gap: 1, paddingVertical: 2 },
+  tabIcon: { height: 28, justifyContent: 'center' },
+  tabBadge: { position: 'absolute', top: -3, right: -12 },
   tabText: { fontSize: 11, fontWeight: '600', color: colors.muted },
   tabTextOn: { color: colors.ink, fontWeight: '800' },
-  playSlot: { flex: 1, alignItems: 'center', gap: 2 },
+  playSlot: { flex: PLAY_FLEX, alignItems: 'center', paddingHorizontal: 4 },
   play: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    marginTop: -26,
-    backgroundColor: colors.green,
-    borderWidth: 4,
-    borderColor: colors.card,
+    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    ...shadow.float,
+    gap: 4,
+    alignSelf: 'stretch',
+    height: 46,
+    borderRadius: radius.md,
+    backgroundColor: colors.green,
   },
-  playPressed: { transform: [{ scale: 0.94 }], backgroundColor: colors.greenDark },
-  playLabel: { fontSize: 11, fontWeight: '800', color: colors.greenDark },
+  playPressed: { backgroundColor: colors.greenDark },
+  playLabel: { fontSize: 18, fontFamily: DISPLAY, fontWeight: '800', color: '#FFFFFF', letterSpacing: 0.6, textTransform: 'uppercase' },
+  challengeBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginHorizontal: 16,
+    marginBottom: 8,
+    paddingLeft: 12,
+    paddingRight: 4,
+    paddingVertical: 4,
+    borderRadius: radius.md,
+    backgroundColor: colors.night,
+  },
+  challengeText: { flex: 1, fontSize: 13, fontWeight: '700', color: '#FFFFFF' },
+  challengeKicker: { fontFamily: DISPLAY, fontSize: 14, color: colors.gold, letterSpacing: 0.5 },
+  challengeBack: { flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 10, height: 32, borderRadius: radius.sm, backgroundColor: colors.night3 },
+  challengeBackText: { fontSize: 13, fontWeight: '800', color: '#FFFFFF' },
   settingsText: { fontSize: 15, fontWeight: '500', color: colors.ink2, lineHeight: 21 },
   disclaimer: { fontSize: 11, fontWeight: '500', color: colors.muted, lineHeight: 16, marginTop: 8 },
 });

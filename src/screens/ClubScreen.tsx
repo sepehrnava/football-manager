@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 
 import { cupProgress } from '../game/cups';
 import {
@@ -26,13 +26,12 @@ import {
   OddsBar,
   Section,
   Sheet,
-  StatTile,
   Text,
   type IconName,
 } from '../ui/components';
 import { FadeIn } from '../ui/motion';
 import { DISPLAY } from '../ui/text';
-import { colors, formatFans, formatMoney, ordinal, seasonLabel } from '../ui/theme';
+import { colors, formatFans, formatMoney, ordinal, radius, seasonLabel } from '../ui/theme';
 import { ChallengeBanner, DailyCard } from './Challenge';
 import type { Tab } from './MainScreen';
 import { MatchSheet } from './MatchSheet';
@@ -70,22 +69,23 @@ export function ClubScreen({
         <NextUp onPlay={() => onPlay()} onPreview={() => setSheetRound(state.round)} onTransfers={() => onTab('transfers')} />
       </FadeIn>
 
-      <FadeIn delay={80} style={s.tiles}>
-        <StatTile
-          icon="podium"
-          label="League"
-          value={myRow.played ? ordinal(position) : '–'}
-          sub={`${myRow.points} pts`}
-          onPress={() => onTab('league')}
-        />
-        <StatTile
-          icon="account-group"
-          label="Fans"
-          value={formatFans(state.fans)}
-          sub={`Wages ${formatMoney(wageBill(state.squad))}`}
-          onPress={() => onTab('transfers')}
-        />
-        <StatTile icon="shield-half-full" label="Team" value={String(power)} sub="Power" onPress={() => onTab('squad')} />
+      <FadeIn delay={80}>
+        <Card style={s.strip}>
+          <StripCell
+            label="Position"
+            value={myRow.played ? ordinal(position) : '–'}
+            sub={`${myRow.points} pts`}
+            onPress={() => onTab('league')}
+          />
+          <StripCell label="Power" value={String(power)} sub="Starting XI" onPress={() => onTab('squad')} />
+          <StripCell
+            label="Fans"
+            value={formatFans(state.fans)}
+            sub={`Wages ${formatMoney(wageBill(state.squad))}`}
+            onPress={() => onTab('transfers')}
+            last
+          />
+        </Card>
       </FadeIn>
 
       <FadeIn delay={120}>
@@ -153,7 +153,7 @@ function NextUp({ onPlay, onPreview, onTransfers }: { onPlay: () => void; onPrev
       <View style={s.nextTop}>
         {inWindow ? (
           <View style={s.windowPill}>
-            <Icon name="swap-horizontal-bold" size={14} color={colors.night} />
+            <View style={s.liveDot} />
             <Text style={s.windowPillText}>{state.window === 'pre' ? 'PRE-SEASON WINDOW' : 'MID-SEASON WINDOW'}</Text>
           </View>
         ) : (
@@ -185,9 +185,6 @@ function NextUp({ onPlay, onPreview, onTransfers }: { onPlay: () => void; onPrev
 
       <OddsBar {...insight.odds} dark />
 
-      {inWindow ? (
-        <Text style={s.nextHint}>Sign and sell players now. The window closes when you kick off.</Text>
-      ) : null}
       <View style={s.nextButtons}>
         {inWindow ? (
           <Button label="Transfers" icon="swap-horizontal" variant="secondary" style={s.flex} onPress={onTransfers} />
@@ -262,11 +259,7 @@ function ToDo({ onTab }: { onTab: (tab: Tab) => void }) {
       {items.map((it, i) => (
         <ListRow
           key={it.title}
-          left={
-            <View style={[s.todoIcon, { backgroundColor: `${it.color}1F` }]}>
-              <Icon name={it.icon} size={18} color={it.color} />
-            </View>
-          }
+          left={<View style={[s.todoMark, { backgroundColor: it.color }]} />}
           title={it.title}
           subtitle={it.sub}
           onPress={() => onTab(it.tab)}
@@ -297,11 +290,7 @@ function NewsLine({ item, showWhen, last }: { item: NewsItem; showWhen?: boolean
   const look = NEWS_ICONS[item.icon] ?? { icon: 'newspaper-variant' as IconName, color: colors.muted };
   return (
     <ListRow
-      left={
-        <View style={[s.todoIcon, { backgroundColor: `${look.color}1A` }]}>
-          <Icon name={look.icon} size={17} color={look.color} />
-        </View>
-      }
+      left={<Icon name={look.icon} size={20} color={look.color} />}
       title={
         <Text style={s.newsText} numberOfLines={2}>
           {item.text}
@@ -313,33 +302,62 @@ function NewsLine({ item, showWhen, last }: { item: NewsItem; showWhen?: boolean
   );
 }
 
+/** One number in the club strip under the next match. */
+function StripCell({
+  label,
+  value,
+  sub,
+  onPress,
+  last,
+}: {
+  label: string;
+  value: string;
+  sub: string;
+  onPress: () => void;
+  last?: boolean;
+}) {
+  return (
+    <Pressable
+      onPress={onPress}
+      accessibilityRole="button"
+      accessibilityLabel={`${label} ${value}`}
+      style={({ pressed }) => [s.cell, !last && s.cellRule, pressed && { backgroundColor: colors.inset }]}
+    >
+      <Text style={s.cellLabel}>{label}</Text>
+      <Text style={s.cellValue} numberOfLines={1}>
+        {value}
+      </Text>
+      <Text style={s.cellSub} numberOfLines={1}>
+        {sub}
+      </Text>
+    </Pressable>
+  );
+}
+
 const s = StyleSheet.create({
   content: { padding: 16, paddingBottom: 32, gap: 12 },
   flex: { flex: 1 },
-  next: { padding: 16, gap: 12 },
+  next: { padding: 16, gap: 14, borderRadius: radius.lg },
   nextTop: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  nextKicker: { fontSize: 12, fontWeight: '800', letterSpacing: 1.2, color: colors.nightMuted },
+  nextKicker: { fontSize: 15, fontFamily: DISPLAY, fontWeight: '800', letterSpacing: 0.8, color: colors.nightMuted },
   nextMeta: { fontSize: 13, fontWeight: '700', color: colors.nightMuted },
-  windowPill: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 5,
-    backgroundColor: '#7EE2A0',
-    borderRadius: 999,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-  },
-  windowPillText: { fontSize: 11, fontWeight: '800', color: colors.night, letterSpacing: 0.6 },
+  windowPill: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  liveDot: { width: 8, height: 8, borderRadius: 4, backgroundColor: '#5BE38B' },
+  windowPillText: { fontSize: 15, fontFamily: DISPLAY, fontWeight: '800', color: '#5BE38B', letterSpacing: 0.8 },
   vs: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 28 },
   side: { alignItems: 'center', gap: 6, width: 80 },
-  sideName: { fontSize: 22, fontFamily: DISPLAY, fontWeight: '800', color: '#FFFFFF', letterSpacing: 1 },
+  sideName: { fontSize: 24, fontFamily: DISPLAY, fontWeight: '800', color: '#FFFFFF', letterSpacing: 1 },
   vsText: { fontSize: 30, fontFamily: DISPLAY, fontStyle: 'italic', color: colors.nightMuted },
   oppName: { textAlign: 'center', fontSize: 14, fontWeight: '600', color: colors.nightMuted, marginTop: -6 },
-  nextHint: { fontSize: 13, fontWeight: '500', color: colors.nightMuted, textAlign: 'center' },
   nextButtons: { flexDirection: 'row', gap: 10 },
-  tiles: { flexDirection: 'row', gap: 10 },
+  strip: { flexDirection: 'row', padding: 0, overflow: 'hidden' },
+  cell: { flex: 1, paddingVertical: 10, paddingHorizontal: 12 },
+  cellRule: { borderRightWidth: 1, borderRightColor: colors.faint },
+  cellLabel: { fontSize: 11, fontWeight: '700', color: colors.muted, textTransform: 'uppercase', letterSpacing: 0.5 },
+  cellValue: { fontSize: 28, fontFamily: DISPLAY, fontWeight: '800', color: colors.ink, marginTop: -1 },
+  cellSub: { fontSize: 11, fontWeight: '600', color: colors.muted, marginTop: -3 },
   todo: { padding: 0, overflow: 'hidden' },
-  todoIcon: { width: 34, height: 34, borderRadius: 17, alignItems: 'center', justifyContent: 'center' },
+  todoMark: { width: 4, alignSelf: 'stretch', borderRadius: 2, marginVertical: 2 },
   roadCard: { paddingHorizontal: 0, paddingTop: 14, paddingBottom: 10, gap: 10, marginTop: 10 },
   roadHead: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 16, gap: 8 },
   roadTitle: { flex: 1, fontSize: 15, fontWeight: '800', color: colors.ink },

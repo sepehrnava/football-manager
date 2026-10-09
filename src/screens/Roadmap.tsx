@@ -208,7 +208,7 @@ const s = StyleSheet.create({
   window: {
     width: NODE,
     height: NODE,
-    borderRadius: 14,
+    borderRadius: 8,
     borderWidth: 2.5,
     borderColor: colors.border,
     backgroundColor: colors.card,

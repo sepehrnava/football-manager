@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 
-import { Text } from '../ui/text';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { clubCrest, clubEconomy } from '../game/game';
@@ -19,9 +18,23 @@ import {
 } from '../game/leagues';
 import type { CrestPattern } from '../game/types';
 import { useGame } from '../state/GameContext';
+import {
+  Button,
+  Card,
+  Chip,
+  ChipScroll,
+  Crest,
+  Icon,
+  ListRow,
+  Section,
+  Sheet,
+  Text,
+  type IconName,
+} from '../ui/components';
+import { FadeIn, stagger } from '../ui/motion';
+import { DISPLAY } from '../ui/text';
+import { colors, CREST_COLORS, formatMoney, radius } from '../ui/theme';
 import { DailyCard } from './Challenge';
-import { Button, Card, Crest, Pill, SectionTitle, Sheet } from '../ui/components';
-import { colors, CREST_COLORS, formatMoney } from '../ui/theme';
 
 const PATTERNS: { id: CrestPattern; label: string }[] = [
   { id: 'solid', label: 'Solid' },
@@ -77,157 +90,164 @@ export function NewClubScreen() {
       keyboardShouldPersistTaps="handled"
     >
       {mode === null ? (
-        <>
+        <FadeIn from="scale" duration={420}>
           <Text style={s.logo}>POCKET{'\n'}MANAGER</Text>
+          <View style={s.logoRule} />
           <Text style={s.tagline}>Build your XI. Trade smart. Keep the board happy.</Text>
-        </>
+        </FadeIn>
       ) : (
         <Text style={s.logoSmall}>POCKET MANAGER</Text>
       )}
 
       {mode === null ? (
         <View style={s.choices}>
-          <ModeCard
-            icon="🏗️"
-            title="Create your club"
-            text="Pick a name and crest. Start small with a modest squad and build a legend."
-            onPress={() => setMode('create')}
-          />
-          <ModeCard
-            icon="🏟️"
-            title="Manage a club"
-            text={`Take over one of ${LEAGUE.clubs.length} clubs in ${COMPS.length} leagues, from title favourites to underdogs.`}
-            onPress={() => setMode('manage')}
-          />
-          <DailyCard />
+          <FadeIn delay={120}>
+            <ModeCard
+              icon="shield-plus-outline"
+              title="Create your club"
+              text="Name it, design a crest, start at the bottom."
+              onPress={() => setMode('create')}
+            />
+          </FadeIn>
+          <FadeIn delay={180}>
+            <ModeCard
+              icon="stadium-variant"
+              title="Manage a club"
+              text={`${LEAGUE.clubs.length} clubs in ${COMPS.length} leagues, favourites to underdogs.`}
+              onPress={() => setMode('manage')}
+            />
+          </FadeIn>
+          <FadeIn delay={240}>
+            <DailyCard />
+          </FadeIn>
         </View>
       ) : (
-        <Text
-          style={s.back}
+        <Pressable
           onPress={() => {
             if (mode === 'manage' && comp !== null && COMPS.length > 1) {
               setComp(null);
               setPicked(null);
             } else setMode(null);
           }}
+          accessibilityRole="button"
+          accessibilityLabel="Back"
+          style={({ pressed }) => [s.back, pressed && { opacity: 0.6 }]}
         >
-          ‹ Back
-        </Text>
+          <Icon name="chevron-left" size={22} color={colors.ink2} />
+          <Text style={s.backText}>Back</Text>
+        </Pressable>
       )}
 
       {mode === 'manage' && comp === null ? (
-        <>
-          <SectionTitle>CHOOSE A LEAGUE</SectionTitle>
-          {COUNTRIES.map((country) => (
-            <View key={country.id} style={s.country}>
-              <View style={s.countryHead}>
-                <Text style={s.countryFlag}>{country.flag}</Text>
-                <Text style={s.countryName}>{country.name}</Text>
-              </View>
-              {COMPS.filter((c2) => c2.country === country.id).map((c2) => {
-                const d = c2.division;
-                const clubs = LEAGUE.clubs.filter((c) => c.country === c2.country && c.division === d);
-                const budgets = clubs.map((c) => clubEconomy(c.level).money);
-                return (
-                  <Pressable
-                    key={compKey(c2)}
-                    onPress={() => setComp(c2)}
-                    accessibilityRole="button"
-                    accessibilityLabel={`League ${compName(c2)}`}
-                    style={({ pressed }) => [s.league, pressed && { opacity: 0.85 }]}
-                  >
-                    <View style={[s.divisionBadge, d === 1 ? s.divisionTop : s.divisionLower]}>
-                      <Text style={[s.divisionNumber, d === 1 && { color: colors.ink }]}>{d}</Text>
-                      <Text style={[s.divisionLabel, d === 1 && { color: colors.ink }]}>DIV</Text>
-                    </View>
-                    <View style={s.clubMain}>
-                      <Text style={s.leagueName}>{compName(c2)}</Text>
-                      <Text style={s.leagueMeta}>
-                        {clubs.length} clubs · {formatMoney(Math.min(...budgets))}–{formatMoney(Math.max(...budgets))}
-                      </Text>
-                      <Text style={s.leagueMeta}>
-                        {d === 1 ? 'Win the title' : `Fight for promotion to Division ${d - 1}`}
-                      </Text>
-                      <View style={s.leagueCrests}>
-                        {clubs.slice(0, 5).map((c) => (
-                          <Crest key={c.short} crest={clubCrest(LEAGUE.clubs.indexOf(c))} short={c.short} size={26} />
-                        ))}
-                      </View>
-                    </View>
-                    <Text style={s.modeArrow}>›</Text>
-                  </Pressable>
-                );
-              })}
-            </View>
+        <FadeIn key="leagues" from="right" distance={14} style={s.step}>
+          <Text style={s.stepTitle}>Choose a league</Text>
+          {COUNTRIES.map((country, ci) => (
+            <FadeIn key={country.id} delay={stagger(ci, 40)} style={s.country}>
+              <Text style={s.countryName}>
+                {country.flag} {country.name}
+              </Text>
+              <Card style={s.list}>
+                {COMPS.filter((c2) => c2.country === country.id).map((c2, i, all) => {
+                  const d = c2.division;
+                  const clubs = LEAGUE.clubs.filter((c) => c.country === c2.country && c.division === d);
+                  const budgets = clubs.map((c) => clubEconomy(c.level).money);
+                  return (
+                    <ListRow
+                      key={compKey(c2)}
+                      onPress={() => setComp(c2)}
+                      accessibilityLabel={`League ${compName(c2)}`}
+                      left={
+                        <View style={[s.divisionBadge, d === 1 && s.divisionTop]}>
+                          <Text style={[s.divisionNumber, d === 1 && { color: colors.ink }]}>{d}</Text>
+                        </View>
+                      }
+                      title={compName(c2)}
+                      subtitle={`${clubs.length} clubs · ${formatMoney(Math.min(...budgets))}–${formatMoney(Math.max(...budgets))} · ${d === 1 ? 'title' : 'promotion'}`}
+                      right={
+                        <View style={s.leagueCrests}>
+                          {clubs.slice(0, 3).map((c) => (
+                            <Crest key={c.short} crest={clubCrest(LEAGUE.clubs.indexOf(c))} size={18} />
+                          ))}
+                        </View>
+                      }
+                      chevron
+                      last={i === all.length - 1}
+                    />
+                  );
+                })}
+              </Card>
+            </FadeIn>
           ))}
-        </>
+        </FadeIn>
       ) : null}
 
       {mode === 'manage' && comp !== null ? (
-        <>
-          <SectionTitle>{`${flagOf(comp.country)} ${compName(comp).toUpperCase()} · CHOOSE YOUR CLUB`}</SectionTitle>
-          <Text style={s.hint}>Ranked by squad strength: where each club is expected to finish.</Text>
-          {LEAGUE.clubs
-            .map((c, i) => ({ c, i }))
-            .filter(({ c }) => c.country === comp.country && c.division === comp.division)
-            .map(({ c, i }, rank) => {
-              const eco = clubEconomy(c.level);
-              const tier = clubTier(i);
-              return (
-                <Pressable
-                  key={c.short}
-                  onPress={() => setPicked(i)}
-                  accessibilityRole="button"
-                  accessibilityLabel={`Manage ${c.name}`}
-                  accessibilityState={{ selected: picked === i }}
-                  style={[s.clubRow, picked === i && s.clubRowOn]}
-                >
-                  <Text style={s.rank}>{rank + 1}</Text>
-                  <Crest crest={clubCrest(i)} short={c.short} size={40} />
-                  <View style={s.clubMain}>
-                    <Text style={s.clubName} numberOfLines={1}>
-                      {c.name}
-                    </Text>
-                    <Text style={s.clubMeta}>
-                      {'★'.repeat(tier.stars)}
-                      <Text style={s.starsOff}>{'★'.repeat(5 - tier.stars)}</Text>
-                    </Text>
-                    <Text style={s.clubTier}>{tier.label}</Text>
-                  </View>
-                  <View style={s.clubRight}>
-                    <Text style={s.clubBudget}>{formatMoney(eco.money)}</Text>
-                    <Text style={[s.clubDifficulty, { color: tier.color }]}>{tier.difficulty}</Text>
-                  </View>
-                </Pressable>
-              );
-            })}
-          <Text style={s.hint}>
-            Big clubs have stars, more money and sponsors, but big wages too: they must keep winning to pay
-            the bills. Underdogs are cheap and poor.
+        <FadeIn key={compKey(comp)} from="right" distance={14} style={s.step}>
+          <Text style={s.stepTitle}>
+            {flagOf(comp.country)} {compName(comp)}
           </Text>
+          <Text style={s.hint}>Ranked by squad strength. Big clubs have money and stars, but big wages too.</Text>
+          <Card style={s.list}>
+            {LEAGUE.clubs
+              .map((c, i) => ({ c, i }))
+              .filter(({ c }) => c.country === comp.country && c.division === comp.division)
+              .map(({ c, i }, rank, all) => {
+                const eco = clubEconomy(c.level);
+                const tier = clubTier(i);
+                return (
+                  <ListRow
+                    key={c.short}
+                    onPress={() => setPicked(i)}
+                    accessibilityLabel={`Manage ${c.name}`}
+                    selected={picked === i}
+                    left={
+                      <View style={s.clubLeft}>
+                        <Text style={s.rank}>{rank + 1}</Text>
+                        <Crest crest={clubCrest(i)} short={c.short} size={32} />
+                      </View>
+                    }
+                    title={c.name}
+                    subtitle={
+                      <Text style={s.clubMeta}>
+                        {'★'.repeat(tier.stars)}
+                        <Text style={s.starsOff}>{'★'.repeat(5 - tier.stars)}</Text>
+                        <Text style={s.clubTier}>  {tier.label}</Text>
+                      </Text>
+                    }
+                    right={
+                      <View style={s.clubRight}>
+                        <Text style={s.clubBudget}>{formatMoney(eco.money)}</Text>
+                        <Text style={[s.clubDifficulty, { color: tier.color }]}>{tier.difficulty}</Text>
+                      </View>
+                    }
+                    last={rank === all.length - 1}
+                  />
+                );
+              })}
+          </Card>
           {picked !== null ? (
             <Sheet visible title={LEAGUE.clubs[picked].name} onClose={() => setPicked(null)}>
               <PickedClub index={picked} />
               <Button
-                label={`MANAGE ${LEAGUE.clubs[picked].name.toUpperCase()}`}
-                variant="green"
+                label={`Manage ${LEAGUE.clubs[picked].name}`}
+                size="lg"
                 onPress={() =>
                   dispatch({ type: 'new', name: '', short: '', crest, seed: seed(), takeOver: picked })
                 }
               />
             </Sheet>
           ) : null}
-        </>
+        </FadeIn>
       ) : null}
 
       {mode === 'create' ? (
-      <>
+      <FadeIn key="create" from="right" distance={14}>
       <View style={s.preview}>
         <Crest crest={crest} short={shortCode || '???'} size={110} />
         <Text style={s.previewName}>{name.trim() || 'Your club'}</Text>
       </View>
 
-      <SectionTitle>CLUB NAME</SectionTitle>
+      <Section title="Club name" style={s.gapTop} />
       <TextInput
         value={name}
         onChangeText={setName}
@@ -252,19 +272,19 @@ export function NewClubScreen() {
 
       {COUNTRIES.length > 1 ? (
         <>
-          <SectionTitle>COUNTRY</SectionTitle>
-          <View style={s.wrap}>
+          <Section title="Country" style={s.gapTop} />
+          <ChipScroll style={s.chips}>
             {COUNTRIES.map((c) => (
-              <Pill key={c.id} label={`${c.flag} ${c.name}`} active={country === c.id} onPress={() => setCountry(c.id)} />
+              <Chip key={c.id} label={`${c.flag} ${c.name}`} active={country === c.id} onPress={() => setCountry(c.id)} />
             ))}
-          </View>
+          </ChipScroll>
         </>
       ) : null}
 
-      <SectionTitle>CREST</SectionTitle>
-      <View style={s.wrap}>
+      <Section title="Crest" style={s.gapTop} />
+      <View style={[s.wrap, s.chips]}>
         {PATTERNS.map((p) => (
-          <Pill key={p.id} label={p.label} active={pattern === p.id} onPress={() => setPattern(p.id)} />
+          <Chip key={p.id} label={p.label} active={pattern === p.id} onPress={() => setPattern(p.id)} />
         ))}
       </View>
       <Text style={s.label}>Main colour</Text>
@@ -272,8 +292,11 @@ export function NewClubScreen() {
       <Text style={s.label}>Second colour</Text>
       <Swatches value={secondary} onChange={setSecondary} />
 
-      <Card style={s.info}>
-        <Text style={s.infoTitle}>Your situation</Text>
+      <Card tone="inset" style={s.info}>
+        <View style={s.infoHead}>
+          <Icon name="information-outline" size={18} color={colors.ink2} />
+          <Text style={s.infoTitle}>Your situation</Text>
+        </View>
         <Text style={s.infoText}>
           Your new club starts in the {compName({ country, division: divisionsIn(country) })} with a modest
           squad and a founding investment. Develop young players, sell at the right time and climb
@@ -283,13 +306,15 @@ export function NewClubScreen() {
       </Card>
 
       <Button
-        label="START CAREER"
+        label="Start career"
+        icon="whistle"
+        size="lg"
         disabled={!name.trim()}
         onPress={() =>
           dispatch({ type: 'new', name, short: shortCode, crest, seed: seed(), country })
         }
       />
-      </>
+      </FadeIn>
       ) : null}
 
       {DISCLAIMER ? <Text style={s.disclaimer}>{DISCLAIMER}</Text> : null}
@@ -297,16 +322,18 @@ export function NewClubScreen() {
   );
 }
 
-function ModeCard({ icon, title, text, onPress }: { icon: string; title: string; text: string; onPress: () => void }) {
+function ModeCard({ icon, title, text, onPress }: { icon: IconName; title: string; text: string; onPress: () => void }) {
   return (
-    <Pressable onPress={onPress} accessibilityRole="button" style={({ pressed }) => [s.mode, pressed && { opacity: 0.85 }]}>
-      <Text style={s.modeIcon}>{icon}</Text>
+    <Card onPress={onPress} accessibilityLabel={title} style={s.mode}>
+      <View style={s.modeIcon}>
+        <Icon name={icon} size={26} color="#FFFFFF" />
+      </View>
       <View style={s.clubMain}>
         <Text style={s.modeTitle}>{title}</Text>
         <Text style={s.modeText}>{text}</Text>
       </View>
-      <Text style={s.modeArrow}>›</Text>
-    </Pressable>
+      <Icon name="chevron-right" size={24} color={colors.borderDark} />
+    </Card>
   );
 }
 
@@ -318,7 +345,9 @@ function PickedClub({ index }: { index: number }) {
   const comp = { country: c.country, division: c.division };
   return (
     <View style={s.picked}>
-      <Crest crest={clubCrest(index)} short={c.short} size={72} />
+      <FadeIn from="scale">
+        <Crest crest={clubCrest(index)} short={c.short} size={72} />
+      </FadeIn>
       <Text style={s.pickedMeta}>
         {flagOf(c.country)} {compName(comp)}
       </Text>
@@ -383,136 +412,103 @@ function Swatches({ value, onChange }: { value: string; onChange: (c: string) =>
 }
 
 const s = StyleSheet.create({
-  choices: { gap: 12, marginTop: 8 },
-  mode: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 14,
-    backgroundColor: colors.card,
-    borderRadius: 22,
-    borderWidth: 2,
-    borderColor: colors.border,
-    borderBottomWidth: 5,
-    borderBottomColor: colors.borderDark,
-    padding: 18,
-  },
-  modeIcon: { fontSize: 40 },
-  modeTitle: { fontSize: 20, fontWeight: '900', color: colors.ink },
-  modeText: { fontSize: 14, fontWeight: '600', color: colors.muted, marginTop: 2 },
-  modeArrow: { fontSize: 32, fontWeight: '900', color: colors.muted },
-  back: { fontSize: 16, fontWeight: '800', color: colors.muted, paddingVertical: 8 },
-  league: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    backgroundColor: colors.card,
-    borderRadius: 22,
-    borderWidth: 2,
-    borderColor: colors.border,
-    borderBottomWidth: 5,
-    borderBottomColor: colors.borderDark,
-    padding: 18,
-    marginBottom: 12,
-  },
-  country: { marginBottom: 6 },
-  countryHead: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 8, marginBottom: 8 },
-  countryFlag: { fontSize: 26 },
-  countryName: { fontSize: 15, fontWeight: '900', letterSpacing: 1.5, color: colors.muted, textTransform: 'uppercase' },
-  divisionBadge: { width: 52, height: 62, borderRadius: 16, alignItems: 'center', justifyContent: 'center' },
-  divisionTop: { backgroundColor: colors.gold },
-  divisionLower: { backgroundColor: colors.ink },
-  divisionNumber: { fontSize: 28, fontWeight: '900', color: '#FFFFFF', lineHeight: 30 },
-  divisionLabel: { fontSize: 10, fontWeight: '900', letterSpacing: 1, color: '#BDBDB6' },
-  leagueName: { fontSize: 21, fontWeight: '900', color: colors.ink },
-  leagueMeta: { fontSize: 14, fontWeight: '700', color: colors.muted, marginTop: 2 },
-  leagueCrests: { flexDirection: 'row', gap: 6, marginTop: 10 },
-  rank: { width: 24, fontSize: 16, fontWeight: '900', color: colors.muted, textAlign: 'center' },
-  clubRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    backgroundColor: colors.card,
-    borderRadius: 18,
-    borderWidth: 2,
-    borderColor: colors.border,
-    borderBottomWidth: 4,
-    borderBottomColor: colors.borderDark,
-    padding: 12,
-    marginBottom: 8,
-  },
-  clubRowOn: { borderColor: colors.ink, borderBottomColor: colors.ink, backgroundColor: '#FFF8E6' },
-  clubMain: { flex: 1 },
-  clubName: { fontSize: 16, fontWeight: '900', color: colors.ink },
-  clubMeta: { fontSize: 13, fontWeight: '800', color: colors.gold, marginTop: 2 },
-  starsOff: { color: colors.border },
-  clubTier: { fontSize: 12, fontWeight: '800', color: colors.muted, marginTop: 1 },
-  logoSmall: {
-    fontSize: 16,
-    fontWeight: '900',
+  content: { paddingHorizontal: 16, maxWidth: 560, width: '100%', alignSelf: 'center' },
+  logo: {
+    fontSize: 64,
+    lineHeight: 60,
+    fontFamily: DISPLAY,
     fontStyle: 'italic',
     textAlign: 'center',
     color: colors.ink,
-    letterSpacing: 2,
+    marginTop: 24,
   },
-  picked: { alignItems: 'center', gap: 6, marginBottom: 18 },
-  pickedMeta: { fontSize: 15, fontWeight: '800', color: colors.muted, marginTop: 4 },
-  pickedStats: { flexDirection: 'row', gap: 8, marginTop: 10, alignSelf: 'stretch' },
-  pickedStat: {
-    flex: 1,
-    alignItems: 'center',
-    backgroundColor: colors.card,
-    borderRadius: 16,
-    borderWidth: 2,
-    borderColor: colors.border,
-    paddingVertical: 10,
-    paddingHorizontal: 4,
-    gap: 2,
-  },
-  pickedValue: { fontSize: 15, fontWeight: '900', color: colors.ink, textAlign: 'center' },
-  pickedLabel: { fontSize: 9, fontWeight: '900', color: colors.muted, letterSpacing: 1 },
-  clubRight: { alignItems: 'flex-end' },
-  clubBudget: { fontSize: 15, fontWeight: '900', color: colors.ink },
-  clubDifficulty: { fontSize: 12, fontWeight: '900' },
-  disclaimer: { fontSize: 11, fontWeight: '600', color: colors.muted, lineHeight: 15, marginTop: 28, textAlign: 'center' },
-  hint: { fontSize: 13, fontWeight: '600', color: colors.muted, marginVertical: 12, lineHeight: 18 },
-  content: { paddingHorizontal: 20, maxWidth: 560, width: '100%', alignSelf: 'center' },
-  logo: {
-    fontSize: 40,
-    lineHeight: 42,
-    fontWeight: '900',
+  logoRule: { alignSelf: 'center', width: 56, height: 4, backgroundColor: colors.green, marginTop: 10, borderRadius: 1 },
+  tagline: { textAlign: 'center', color: colors.muted, fontWeight: '600', marginTop: 10 },
+  logoSmall: {
+    fontSize: 20,
+    fontFamily: DISPLAY,
     fontStyle: 'italic',
     textAlign: 'center',
     color: colors.ink,
     letterSpacing: 1,
   },
-  tagline: { textAlign: 'center', color: colors.muted, fontWeight: '700', marginTop: 8 },
-  preview: { alignItems: 'center', marginTop: 24, gap: 12 },
-  previewName: { fontSize: 22, fontWeight: '900', color: colors.ink },
+  choices: { gap: 10, marginTop: 28 },
+  mode: { flexDirection: 'row', alignItems: 'center', gap: 14, paddingVertical: 16 },
+  modeIcon: {
+    width: 48,
+    height: 48,
+    borderRadius: radius.md,
+    backgroundColor: colors.ink,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  modeTitle: { fontSize: 24, fontFamily: DISPLAY, fontWeight: '800', color: colors.ink, textTransform: 'uppercase' },
+  modeText: { fontSize: 14, fontWeight: '500', color: colors.muted, marginTop: 1 },
+  back: { flexDirection: 'row', alignItems: 'center', alignSelf: 'flex-start', paddingVertical: 8, marginLeft: -6 },
+  backText: { fontSize: 15, fontWeight: '700', color: colors.ink2 },
+  step: { gap: 10 },
+  stepTitle: { fontSize: 30, fontFamily: DISPLAY, fontWeight: '800', color: colors.ink },
+  list: { padding: 0, overflow: 'hidden' },
+  country: { gap: 6 },
+  countryName: { fontSize: 13, fontWeight: '800', color: colors.ink2 },
+  divisionBadge: {
+    width: 32,
+    height: 32,
+    borderRadius: radius.sm,
+    backgroundColor: colors.ink,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  divisionTop: { backgroundColor: colors.gold },
+  divisionNumber: { fontSize: 20, fontFamily: DISPLAY, fontWeight: '800', color: '#FFFFFF' },
+  leagueCrests: { flexDirection: 'row', gap: 3 },
+  clubLeft: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  rank: { width: 20, fontSize: 17, fontFamily: DISPLAY, fontWeight: '800', color: colors.muted, textAlign: 'center' },
+  clubMain: { flex: 1 },
+  clubMeta: { fontSize: 12, fontWeight: '700', color: colors.goldDark },
+  starsOff: { color: colors.border },
+  clubTier: { fontSize: 12, fontWeight: '600', color: colors.muted },
+  clubRight: { alignItems: 'flex-end' },
+  clubBudget: { fontSize: 18, fontFamily: DISPLAY, fontWeight: '800', color: colors.ink },
+  clubDifficulty: { fontSize: 12, fontWeight: '800' },
+  picked: { alignItems: 'center', gap: 6, marginBottom: 6 },
+  pickedMeta: { fontSize: 14, fontWeight: '700', color: colors.muted, marginTop: 4 },
+  pickedStats: {
+    flexDirection: 'row',
+    marginTop: 10,
+    alignSelf: 'stretch',
+    backgroundColor: colors.card,
+    borderRadius: radius.lg,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  pickedStat: { flex: 1, alignItems: 'center', paddingVertical: 10, paddingHorizontal: 4, gap: 1 },
+  pickedValue: { fontSize: 18, fontFamily: DISPLAY, fontWeight: '800', color: colors.ink, textAlign: 'center' },
+  pickedLabel: { fontSize: 10, fontWeight: '700', color: colors.muted, letterSpacing: 0.8 },
+  disclaimer: { fontSize: 11, fontWeight: '500', color: colors.muted, lineHeight: 15, marginTop: 28, textAlign: 'center' },
+  hint: { fontSize: 13, fontWeight: '500', color: colors.muted, lineHeight: 18, marginTop: -6 },
+  preview: { alignItems: 'center', marginTop: 16, gap: 10 },
+  previewName: { fontSize: 30, fontFamily: DISPLAY, fontWeight: '800', color: colors.ink },
+  gapTop: { marginTop: 18, marginBottom: 8 },
+  chips: { marginTop: 0 },
   input: {
     backgroundColor: colors.card,
-    borderWidth: 2,
-    borderColor: colors.border,
-    borderBottomWidth: 4,
-    borderBottomColor: colors.borderDark,
-    borderRadius: 16,
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    fontSize: 18,
-    fontWeight: '800',
+    borderWidth: 1,
+    borderColor: colors.borderDark,
+    borderRadius: radius.md,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    fontSize: 17,
+    fontWeight: '700',
     color: colors.ink,
   },
-  shortInput: { marginTop: 10, width: 110, textAlign: 'center', letterSpacing: 3 },
-  wrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
-  label: { marginTop: 16, marginBottom: 8, fontWeight: '800', color: colors.ink },
-  swatch: {
-    width: 38,
-    height: 38,
-    borderRadius: 19,
-    borderWidth: 2,
-    borderColor: colors.borderDark,
-  },
-  swatchActive: { borderWidth: 4, borderColor: colors.ink, transform: [{ scale: 1.1 }] },
-  info: { marginTop: 24, marginBottom: 20 },
-  infoTitle: { fontSize: 16, fontWeight: '900', color: colors.ink, marginBottom: 6 },
-  infoText: { fontSize: 15, lineHeight: 21, color: colors.muted, fontWeight: '600' },
+  shortInput: { marginTop: 8, width: 100, textAlign: 'center', letterSpacing: 3 },
+  wrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+  label: { marginTop: 14, marginBottom: 8, fontSize: 12, fontWeight: '700', color: colors.muted, textTransform: 'uppercase', letterSpacing: 0.5 },
+  swatch: { width: 36, height: 36, borderRadius: radius.md, borderWidth: 1, borderColor: colors.borderDark },
+  swatchActive: { borderWidth: 3, borderColor: colors.ink, transform: [{ scale: 1.08 }] },
+  info: { marginTop: 22, marginBottom: 16, gap: 4 },
+  infoHead: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  infoTitle: { fontSize: 15, fontWeight: '800', color: colors.ink },
+  infoText: { fontSize: 14, lineHeight: 20, color: colors.ink2, fontWeight: '500' },
 });

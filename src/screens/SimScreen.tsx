@@ -1,17 +1,17 @@
+import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
-import { Modal, Pressable, ScrollView, StyleSheet, View } from 'react-native';
-
-import { Text } from '../ui/text';
+import { Modal, ScrollView, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { clubById, compTable, seasonRounds, USER_ID, userComp } from '../game/game';
+import { clubById, compTable, midWindowRound, seasonRounds, USER_ID, userComp } from '../game/game';
 import { zoneOf } from '../game/leagues';
 import { playerValue, surname } from '../game/players';
 import type { Fixture } from '../game/types';
 import { useCareer } from '../state/GameContext';
-import { Bar, Button, Card, ClubCrest } from '../ui/components';
-import { animateNextLayout, FadeIn } from '../ui/motion';
-import { colors, formatMoney } from '../ui/theme';
+import { Bar, Button, ClubCrest, Icon, IconButton, Text } from '../ui/components';
+import { animateNextLayout, FadeIn, Pop } from '../ui/motion';
+import { DISPLAY } from '../ui/text';
+import { colors, formatMoney, radius } from '../ui/theme';
 import { AchievementToast } from './Honours';
 
 /** Names with a long single word (e.g. "Wolverhampton") need a smaller size to avoid breaking mid-word. */
@@ -81,26 +81,19 @@ export function SimScreen({ until: initialUntil, onClose }: { until?: number; on
         ? 'Season finished'
         : null;
 
+  const skipLabel = state.round < midWindowRound(state) ? 'Skip to the window' : 'Skip to the end';
+
   return (
     <Modal visible animationType="slide" onRequestClose={onClose}>
+      <StatusBar style="light" />
       <View style={[s.root, { paddingTop: insets.top + 8, paddingBottom: insets.bottom + 12 }]}>
         <View style={s.header}>
-          <Pressable onPress={onClose} style={s.close} accessibilityLabel="Close">
-            <Text style={s.closeText}>✕</Text>
-          </Pressable>
+          <IconButton icon="close" label="Close" onPress={onClose} dark size={40} />
           <View style={s.headerMid}>
-            <Text style={s.md}>
-              {played === 0 ? 'Kick-off' : `Matchday ${played} / ${rounds}`}
-            </Text>
-            <Bar value={(played / rounds) * 100} color={colors.ink} />
+            <Text style={s.md}>{played === 0 ? 'Kick-off' : `Matchday ${played} / ${rounds}`}</Text>
+            <Bar value={(played / rounds) * 100} color={colors.gold} track={colors.night3} height={4} />
           </View>
-          {stopText ? (
-            <View style={s.spacer} />
-          ) : (
-            <Pressable onPress={skip} style={s.close} accessibilityLabel="Skip to the end">
-              <Text style={s.closeText}>⏭</Text>
-            </Pressable>
-          )}
+          <View style={s.spacer} />
         </View>
 
         <ScrollView contentContainerStyle={s.content}>
@@ -115,54 +108,60 @@ export function SimScreen({ until: initialUntil, onClose }: { until?: number; on
           )}
 
           {others.length ? (
-            <FadeIn key={`o${lastRound}`} delay={80}>
-              <Card style={s.others}>
-                {others.map((f, i) => (
-                  <ResultLine key={i} fixture={f} />
-                ))}
-              </Card>
+            <FadeIn key={`o${lastRound}`} delay={80} style={s.panel}>
+              {others.map((f, i) => (
+                <ResultLine key={i} fixture={f} last={i === others.length - 1} />
+              ))}
             </FadeIn>
           ) : null}
 
-          <Card style={s.table}>
+          <View style={[s.panel, s.table]}>
             {table.map((r, i) => {
               const c = clubById(state, r.clubId);
               const me = r.clubId === USER_ID;
+              const zone = zoneOf(i, table.length, comp);
               return (
                 <View key={r.clubId} style={[s.tr, me && s.me]}>
-                  <Text
+                  <View
                     style={[
-                      s.pos,
-                      zoneOf(i, table.length, comp) === 'up' && { color: colors.green },
-                      zoneOf(i, table.length, comp) === 'down' && { color: colors.red },
+                      s.zone,
+                      zone === 'up' && { backgroundColor: colors.green },
+                      zone === 'down' && { backgroundColor: colors.red },
                     ]}
-                  >
-                    {i + 1}
-                  </Text>
+                  />
+                  <Text style={s.pos}>{i + 1}</Text>
                   <ClubCrest club={c} size={16} />
                   <Text style={[s.tname, me && s.bold]} numberOfLines={1}>
                     {c.name}
                   </Text>
-                  <Text style={s.gd}>{r.gf - r.ga > 0 ? '+' : ''}{r.gf - r.ga}</Text>
-                  <Text style={s.pts}>{r.points}</Text>
+                  <Text style={s.gd}>
+                    {r.gf - r.ga > 0 ? '+' : ''}
+                    {r.gf - r.ga}
+                  </Text>
+                  <Text style={[s.pts, me && { color: colors.gold }]}>{r.points}</Text>
                 </View>
               );
             })}
-          </Card>
+          </View>
         </ScrollView>
 
         <View style={s.controls}>
           {stopText ? (
             <>
               <Text style={s.stop}>{stopText}</Text>
-              <Button label="CONTINUE" variant="green" onPress={onClose} />
+              <Button label="Continue" icon="arrow-right" size="lg" onPress={onClose} />
             </>
           ) : reached ? (
-            <Button label="DONE" variant="green" onPress={onClose} />
-          ) : active ? (
-            <Button label="⏸  PAUSE" variant="light" onPress={() => setRunning(false)} />
+            <Button label="Done" icon="check" size="lg" onPress={onClose} />
           ) : (
-            <Button label="▶  CONTINUE" variant="green" onPress={playOn} />
+            <View style={s.controlRow}>
+              {active ? (
+                <Button label="Pause" icon="pause" variant="secondary" style={s.pause} onPress={() => setRunning(false)} />
+              ) : (
+                <Button label="Play on" icon="play" style={s.pause} onPress={playOn} />
+              )}
+              <Button label={skipLabel} icon="fast-forward" variant="gold" style={s.flex} onPress={skip} />
+            </View>
           )}
         </View>
       </View>
@@ -192,23 +191,22 @@ function OfferCard({ offerId }: { offerId: string }) {
         </View>
         <Text style={s.offerFee}>{formatMoney(o.fee)}</Text>
         <Text style={s.momentText}>
-          Rated {p.rating}, age {p.age}, worth about {formatMoney(value)}. This offer is{' '}
+          Rated {p.rating}, age {p.age}, worth about {formatMoney(value)}:{' '}
           <Text style={{ color: diff >= 0 ? '#7EE2A0' : '#FF9A9D' }}>
             {diff >= 0 ? `${formatMoney(diff)} above` : `${formatMoney(-diff)} below`}
           </Text>{' '}
-          that.
+          value.
         </Text>
         <View style={s.offerButtons}>
           <Button
-            label="KEEP"
-            variant="light"
-            style={s.offerButton}
+            label="Keep"
+            variant="secondary"
+            style={s.flex}
             onPress={() => dispatch({ type: 'rejectOffer', offerId: o.id })}
           />
           <Button
-            label={`SELL ${formatMoney(o.fee)}`}
-            variant="green"
-            style={s.offerButton}
+            label={`Sell ${formatMoney(o.fee)}`}
+            style={s.flex}
             onPress={() => {
               animateNextLayout();
               dispatch({ type: 'acceptOffer', offerId: o.id });
@@ -230,7 +228,7 @@ function MyMatch({ fixture }: { fixture: Fixture }) {
   const verdict = us > them ? 'WIN' : us < them ? 'LOSS' : 'DRAW';
   const color = us > them ? colors.green : us < them ? colors.red : colors.draw;
   return (
-    <Card style={s.myMatch}>
+    <View style={[s.panel, s.myMatch, { borderTopColor: color }]}>
       <View style={[s.verdict, { backgroundColor: color }]}>
         <Text style={s.verdictText}>{verdict}</Text>
       </View>
@@ -241,9 +239,11 @@ function MyMatch({ fixture }: { fixture: Fixture }) {
             {home.name}
           </Text>
         </View>
-        <Text style={s.score}>
-          {r.home} – {r.away}
-        </Text>
+        <Pop trigger={`${r.home}-${r.away}`} style={s.scoreBox}>
+          <Text style={s.score}>{r.home}</Text>
+          <Text style={s.scoreDash}>–</Text>
+          <Text style={s.score}>{r.away}</Text>
+        </Pop>
         <View style={s.team}>
           <ClubCrest club={away} size={52} />
           <Text style={[s.teamName, longWord(away.name) && s.teamNameLong]} numberOfLines={2}>
@@ -252,23 +252,26 @@ function MyMatch({ fixture }: { fixture: Fixture }) {
         </View>
       </View>
       {r.scorers?.length ? (
-        <Text style={s.scorers}>⚽ {r.scorers.map(surname).join(', ')}</Text>
+        <View style={s.scorersLine}>
+          <Icon name="soccer" size={14} color={colors.nightMuted} />
+          <Text style={s.scorers}>{r.scorers.map(surname).join(', ')}</Text>
+        </View>
       ) : null}
-    </Card>
+    </View>
   );
 }
 
-function ResultLine({ fixture }: { fixture: Fixture }) {
+function ResultLine({ fixture, last }: { fixture: Fixture; last: boolean }) {
   const { state } = useCareer();
   const h = clubById(state, fixture.homeId);
   const a = clubById(state, fixture.awayId);
   return (
-    <View style={s.result}>
+    <View style={[s.result, !last && s.rule]}>
       <Text style={[s.rname, s.right]} numberOfLines={1}>
         {h.name}
       </Text>
       <Text style={s.rscore}>
-        {fixture.result?.home} – {fixture.result?.away}
+        {fixture.result?.home}–{fixture.result?.away}
       </Text>
       <Text style={s.rname} numberOfLines={1}>
         {a.name}
@@ -278,54 +281,50 @@ function ResultLine({ fixture }: { fixture: Fixture }) {
 }
 
 const s = StyleSheet.create({
-  root: { flex: 1, backgroundColor: colors.bg, paddingHorizontal: 16 },
+  root: { flex: 1, backgroundColor: colors.night, paddingHorizontal: 16 },
+  flex: { flex: 1 },
   header: { flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 12 },
   headerMid: { flex: 1, gap: 6 },
-  md: { fontSize: 18, fontWeight: '900', color: colors.ink, textAlign: 'center' },
-  spacer: { width: 42, height: 42 },
-  teamNameLong: { fontSize: 12 },
-  close: {
-    width: 42,
-    height: 42,
-    borderRadius: 21,
-    borderWidth: 2,
-    borderColor: colors.border,
-    backgroundColor: colors.card,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  closeText: { fontSize: 15, fontWeight: '900', color: colors.muted },
-  content: { gap: 12, paddingBottom: 12 },
-  offer: { backgroundColor: colors.ink, borderRadius: 20, padding: 16, gap: 8 },
+  md: { fontSize: 22, fontFamily: DISPLAY, fontWeight: '800', color: '#FFFFFF', textAlign: 'center', letterSpacing: 0.5, textTransform: 'uppercase' },
+  spacer: { width: 40, height: 40 },
+  content: { gap: 10, paddingBottom: 12 },
+  panel: { backgroundColor: colors.night2, borderRadius: radius.lg, borderWidth: 1, borderColor: colors.nightLine, overflow: 'hidden' },
+  offer: { backgroundColor: colors.night2, borderRadius: radius.lg, borderWidth: 1, borderColor: colors.gold, padding: 16, gap: 8 },
   offerTop: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  offerTitle: { flex: 1, color: '#FFFFFF', fontWeight: '900', fontSize: 19 },
-  offerFee: { color: colors.gold, fontWeight: '900', fontSize: 34 },
+  offerTitle: { flex: 1, color: '#FFFFFF', fontWeight: '800', fontSize: 18 },
+  offerFee: { color: colors.gold, fontFamily: DISPLAY, fontWeight: '800', fontSize: 44, marginVertical: -4 },
   offerButtons: { flexDirection: 'row', gap: 10, marginTop: 4 },
-  offerButton: { flex: 1 },
-  momentKicker: { color: colors.gold, fontWeight: '900', fontSize: 12, letterSpacing: 1.5 },
-  momentText: { color: '#CFCFC8', fontWeight: '600', fontSize: 14 },
-  wait: { textAlign: 'center', fontSize: 18, fontWeight: '800', color: colors.muted, marginVertical: 40 },
-  myMatch: { alignItems: 'center', gap: 10 },
-  verdict: { paddingHorizontal: 14, paddingVertical: 4, borderRadius: 10 },
-  verdictText: { color: '#FFFFFF', fontWeight: '900', letterSpacing: 2 },
+  momentKicker: { color: colors.gold, fontFamily: DISPLAY, fontWeight: '800', fontSize: 15, letterSpacing: 1 },
+  momentText: { color: colors.nightMuted, fontWeight: '600', fontSize: 14 },
+  wait: { textAlign: 'center', fontSize: 28, fontFamily: DISPLAY, fontWeight: '800', color: colors.nightMuted, marginVertical: 40 },
+  myMatch: { alignItems: 'center', gap: 8, paddingVertical: 14, paddingHorizontal: 10, borderTopWidth: 3 },
+  verdict: { paddingHorizontal: 10, paddingVertical: 1, borderRadius: radius.sm },
+  verdictText: { color: '#FFFFFF', fontFamily: DISPLAY, fontWeight: '800', fontSize: 16, letterSpacing: 2 },
   scoreRow: { flexDirection: 'row', alignItems: 'center', width: '100%' },
   team: { flex: 1, alignItems: 'center', gap: 6 },
-  teamName: { fontSize: 14, fontWeight: '800', color: colors.ink, textAlign: 'center' },
-  score: { fontSize: 40, fontWeight: '900', color: colors.ink, paddingHorizontal: 8 },
-  scorers: { fontSize: 13, fontWeight: '700', color: colors.muted, textAlign: 'center' },
-  others: { paddingVertical: 8, gap: 2 },
-  result: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 3 },
-  rname: { flex: 1, fontSize: 13, fontWeight: '700', color: colors.ink },
+  teamName: { fontSize: 14, fontWeight: '700', color: '#FFFFFF', textAlign: 'center' },
+  teamNameLong: { fontSize: 12 },
+  scoreBox: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 6 },
+  score: { fontSize: 64, fontFamily: DISPLAY, fontWeight: '800', color: '#FFFFFF', minWidth: 30, textAlign: 'center' },
+  scoreDash: { fontSize: 40, fontFamily: DISPLAY, color: colors.nightMuted },
+  scorersLine: { flexDirection: 'row', alignItems: 'center', gap: 5, paddingHorizontal: 12 },
+  scorers: { fontSize: 13, fontWeight: '600', color: colors.nightMuted, textAlign: 'center', flexShrink: 1 },
+  result: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 6, paddingHorizontal: 12 },
+  rule: { borderBottomWidth: 1, borderBottomColor: colors.nightLine },
+  rname: { flex: 1, fontSize: 13, fontWeight: '600', color: '#DDE5DF' },
   right: { textAlign: 'right' },
-  rscore: { width: 50, textAlign: 'center', fontWeight: '900', color: colors.ink },
-  table: { paddingVertical: 6, paddingHorizontal: 10 },
-  tr: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingVertical: 5, paddingHorizontal: 4 },
-  me: { backgroundColor: colors.faint, borderRadius: 8, borderWidth: 2, borderColor: colors.ink },
-  pos: { width: 20, fontWeight: '900', color: colors.ink },
-  tname: { flex: 1, fontSize: 13, fontWeight: '700', color: colors.ink },
-  bold: { fontWeight: '900' },
-  gd: { width: 34, textAlign: 'right', fontSize: 12, fontWeight: '700', color: colors.muted },
-  pts: { width: 28, textAlign: 'right', fontWeight: '900', color: colors.ink },
-  controls: { gap: 8, paddingTop: 8 },
-  stop: { textAlign: 'center', fontSize: 16, fontWeight: '900', color: colors.ink },
+  rscore: { width: 44, textAlign: 'center', fontSize: 18, fontFamily: DISPLAY, fontWeight: '800', color: '#FFFFFF' },
+  table: { paddingVertical: 4 },
+  tr: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingVertical: 5, paddingRight: 12 },
+  me: { backgroundColor: colors.night3 },
+  zone: { width: 3, alignSelf: 'stretch', backgroundColor: 'transparent' },
+  pos: { width: 20, fontSize: 15, fontFamily: DISPLAY, fontWeight: '800', color: colors.nightMuted },
+  tname: { flex: 1, fontSize: 13, fontWeight: '600', color: '#DDE5DF' },
+  bold: { fontWeight: '800', color: '#FFFFFF' },
+  gd: { width: 34, textAlign: 'right', fontSize: 12, fontWeight: '600', color: colors.nightMuted },
+  pts: { width: 28, textAlign: 'right', fontSize: 17, fontFamily: DISPLAY, fontWeight: '800', color: '#FFFFFF' },
+  controls: { gap: 8, paddingTop: 10 },
+  controlRow: { flexDirection: 'row', gap: 10 },
+  pause: { width: 128 },
+  stop: { textAlign: 'center', fontSize: 20, fontFamily: DISPLAY, fontWeight: '800', color: '#FFFFFF', textTransform: 'uppercase', letterSpacing: 0.5 },
 });

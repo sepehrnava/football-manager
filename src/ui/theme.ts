@@ -1,14 +1,15 @@
 import type { Line } from '../game/types';
 
 /**
- * Design tokens. Light, calm surfaces; green is the one action colour; gold marks
- * quality and rewards; the live match screen uses the dark "night" set.
+ * Design tokens. A matchday-programme look: flat paper surfaces with hairline
+ * rules, tight corners, condensed caps for headings. Green is the one action
+ * colour; gold marks quality and rewards; the live match uses the dark "night" set.
  */
 export const colors = {
-  bg: '#F2F3EF',
+  bg: '#EDEEEA',
   card: '#FFFFFF',
   inset: '#F6F7F3',
-  border: '#E3E5DF',
+  border: '#DFE1DB',
   borderDark: '#CDD1C8',
   ink: '#121614',
   ink2: '#3A423C',
@@ -43,19 +44,13 @@ export const colors = {
   pitchLine: 'rgba(255,255,255,0.65)',
 };
 
-export const radius = { sm: 10, md: 14, lg: 18, xl: 24 };
+export const radius = { sm: 4, md: 6, lg: 8, xl: 12 };
 
 export const space = { xs: 4, sm: 8, md: 12, lg: 16, xl: 24 };
 
-/** Soft elevation for cards and floating elements. */
+/** Surfaces are flat; only things that float over the page (toasts, sheets) cast a shadow. */
 export const shadow = {
-  card: {
-    shadowColor: '#1B2A20',
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
-    shadowOffset: { width: 0, height: 2 },
-    elevation: 1,
-  },
+  card: {},
   float: {
     shadowColor: '#0B140F',
     shadowOpacity: 0.18,

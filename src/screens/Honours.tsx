@@ -1,15 +1,36 @@
 import { Pressable, StyleSheet, View } from 'react-native';
-
-import { Text } from '../ui/text';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ACHIEVEMENTS, trophies } from '../game/achievements';
 import { todayKey } from '../game/challenge';
 import { currentStreak } from '../game/meta';
 import { useGame } from '../state/GameContext';
-import { Card, SectionTitle, Sheet } from '../ui/components';
-import { FadeIn } from '../ui/motion';
-import { colors, seasonLabel } from '../ui/theme';
+import { Card, EmptyState, Icon, ListRow, Section, Sheet, Tag, Text, type IconName } from '../ui/components';
+import { FadeIn, stagger } from '../ui/motion';
+import { DISPLAY } from '../ui/text';
+import { colors, radius, seasonLabel, shadow } from '../ui/theme';
+
+/** Achievements store an emoji for sharing; the UI shows an icon. */
+const ACHIEVEMENT_ICONS: Record<string, IconName> = {
+  first_win: 'soccer',
+  signing: 'draw-pen',
+  big_sale: 'cash-multiple',
+  elite_coach: 'clipboard-text',
+  wonderkid: 'star-shooting',
+  profit: 'chart-line',
+  promoted: 'arrow-up-bold',
+  champion: 'trophy',
+  cup: 'earth',
+  five_seasons: 'calendar-check',
+  daily_win: 'target',
+  streak_7: 'fire',
+};
+
+const TROPHY_ICONS: Record<string, { icon: IconName; color: string }> = {
+  '🏆': { icon: 'trophy', color: colors.goldDark },
+  '⬆️': { icon: 'arrow-up-bold-circle', color: colors.green },
+  '🌍': { icon: 'earth', color: colors.blue },
+};
 
 /** Trophy cabinet for this career, plus achievements and daily stats. */
 export function HonoursSheet({ visible, onClose }: { visible: boolean; onClose: () => void }) {
@@ -21,53 +42,65 @@ export function HonoursSheet({ visible, onClose }: { visible: boolean; onClose: 
     <Sheet visible title="Honours" onClose={onClose}>
       {state && !state.challenge ? (
         <>
-          <SectionTitle>TROPHY CABINET</SectionTitle>
-          <Card style={s.cabinet}>
+          <Section title="Trophy cabinet" />
+          <Card style={s.list}>
             {won.length === 0 ? (
-              <Text style={s.empty}>No trophies yet. Win a title, promotion or cup to fill this shelf.</Text>
+              <EmptyState icon="trophy-outline" title="An empty shelf" text="Win a title, promotion or cup to fill it." />
             ) : (
-              won.map((t, i) => (
-                <View key={`${t.season}-${t.title}`} style={[s.trophy, i > 0 && s.divider]}>
-                  <Text style={s.trophyIcon}>{t.icon}</Text>
-                  <Text style={s.trophyTitle}>{t.title}</Text>
-                  <Text style={s.trophySeason}>{seasonLabel(t.season)}</Text>
-                </View>
-              ))
+              won.map((t, i) => {
+                const look = TROPHY_ICONS[t.icon] ?? { icon: 'trophy' as IconName, color: colors.goldDark };
+                return (
+                  <ListRow
+                    key={`${t.season}-${t.title}`}
+                    left={<Icon name={look.icon} size={24} color={look.color} />}
+                    title={t.title}
+                    right={<Text style={s.season}>{seasonLabel(t.season)}</Text>}
+                    last={i === won.length - 1}
+                  />
+                );
+              })
             )}
           </Card>
         </>
       ) : null}
 
-      <SectionTitle>{`ACHIEVEMENTS · ${earned}/${ACHIEVEMENTS.length}`}</SectionTitle>
+      <Section title={`Achievements · ${earned}/${ACHIEVEMENTS.length}`} />
       <View style={s.grid}>
-        {ACHIEVEMENTS.map((a) => {
+        {ACHIEVEMENTS.map((a, i) => {
           const got = Boolean(meta.achievements[a.id]);
           return (
-            <View key={a.id} style={[s.badge, got ? s.badgeGot : s.badgeLocked]}>
-              <Text style={[s.badgeIcon, !got && s.locked]}>{got ? a.icon : '🔒'}</Text>
-              <Text style={s.badgeTitle}>{a.title}</Text>
-              <Text style={s.badgeText}>{a.text}</Text>
-            </View>
+            <FadeIn key={a.id} delay={stagger(i, 25, 12)} style={s.cell}>
+              <Card tone={got ? 'gold' : 'default'} style={s.badge}>
+                <View style={[s.badgeIcon, got ? s.badgeIconGot : s.badgeIconLocked]}>
+                  <Icon name={got ? (ACHIEVEMENT_ICONS[a.id] ?? 'star') : 'lock'} size={18} color={got ? colors.ink : colors.muted} />
+                </View>
+                <Text style={[s.badgeTitle, !got && s.locked]}>{a.title}</Text>
+                <Text style={s.badgeText}>{a.text}</Text>
+              </Card>
+            </FadeIn>
           );
         })}
       </View>
 
-      <SectionTitle>DAILY CHALLENGE</SectionTitle>
-      <View style={s.stats}>
-        <MiniStat value={`🔥 ${currentStreak(meta, todayKey())}`} label="STREAK" />
-        <MiniStat value={String(meta.best)} label="BEST STREAK" />
-        <MiniStat value={`${meta.wins}/${meta.played}`} label="WON" />
-      </View>
+      <Section title="Daily challenge" />
+      <Card style={s.stats}>
+        <MiniStat value={currentStreak(meta, todayKey())} label="Streak" icon="fire" />
+        <MiniStat value={meta.best} label="Best streak" />
+        <MiniStat value={`${meta.wins}/${meta.played}`} label="Won" last />
+      </Card>
     </Sheet>
   );
 }
 
-function MiniStat({ value, label }: { value: string; label: string }) {
+function MiniStat({ value, label, icon, last }: { value: string | number; label: string; icon?: IconName; last?: boolean }) {
   return (
-    <Card style={s.stat}>
-      <Text style={s.statValue}>{value}</Text>
+    <View style={[s.stat, !last && s.statRule]}>
+      <View style={s.statLine}>
+        {icon ? <Icon name={icon} size={18} color={colors.orange} /> : null}
+        <Text style={s.statValue}>{value}</Text>
+      </View>
       <Text style={s.statLabel}>{label}</Text>
-    </Card>
+    </View>
   );
 }
 
@@ -82,11 +115,13 @@ export function AchievementToast() {
   if (!a) return null;
   return (
     <View pointerEvents="box-none" style={[s.toastWrap, { top: insets.top + 8 }]}>
-      <FadeIn key={a.id} from="scale" duration={300}>
+      <FadeIn key={a.id} from="up" distance={-24} duration={320}>
         <Pressable onPress={seenAchievement} style={s.toast} accessibilityRole="alert">
-          <Text style={s.toastIcon}>{a.icon}</Text>
+          <View style={s.toastIcon}>
+            <Icon name={ACHIEVEMENT_ICONS[a.id] ?? 'star'} size={22} color={colors.night} />
+          </View>
           <View style={s.toastMain}>
-            <Text style={s.toastKicker}>ACHIEVEMENT UNLOCKED</Text>
+            <Tag label="Achievement unlocked" tone="gold" />
             <Text style={s.toastTitle}>{a.title}</Text>
           </View>
         </Pressable>
@@ -96,42 +131,45 @@ export function AchievementToast() {
 }
 
 const s = StyleSheet.create({
-  cabinet: { paddingVertical: 6 },
-  empty: { fontSize: 14, fontWeight: '700', color: colors.muted, paddingVertical: 8 },
-  trophy: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 10 },
-  divider: { borderTopWidth: 2, borderTopColor: colors.faint },
-  trophyIcon: { fontSize: 24 },
-  trophyTitle: { flex: 1, fontSize: 15, fontWeight: '900', color: colors.ink },
-  trophySeason: { fontSize: 13, fontWeight: '800', color: colors.muted },
+  list: { padding: 0, overflow: 'hidden' },
+  season: { fontSize: 18, fontFamily: DISPLAY, fontWeight: '800', color: colors.muted },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-  badge: { width: '48.5%', borderRadius: 16, borderWidth: 2, padding: 10, gap: 2 },
-  badgeGot: { backgroundColor: '#FFF6E0', borderColor: '#F6DFA6' },
-  badgeLocked: { backgroundColor: colors.card, borderColor: colors.border },
-  badgeIcon: { fontSize: 22 },
-  locked: { opacity: 0.4 },
-  badgeTitle: { fontSize: 14, fontWeight: '900', color: colors.ink },
-  badgeText: { fontSize: 12, fontWeight: '600', color: colors.muted },
-  stats: { flexDirection: 'row', gap: 8 },
-  stat: { flex: 1, alignItems: 'center', paddingVertical: 10, gap: 2 },
-  statValue: { fontSize: 18, fontWeight: '900', color: colors.ink },
-  statLabel: { fontSize: 9, fontWeight: '900', color: colors.muted, letterSpacing: 1 },
+  cell: { width: '48.5%', flexGrow: 1 },
+  badge: { gap: 3, padding: 12, flex: 1 },
+  badgeIcon: { width: 32, height: 32, borderRadius: radius.md, alignItems: 'center', justifyContent: 'center', marginBottom: 4 },
+  badgeIconGot: { backgroundColor: colors.gold },
+  badgeIconLocked: { backgroundColor: colors.faint },
+  badgeTitle: { fontSize: 18, fontFamily: DISPLAY, fontWeight: '800', color: colors.ink },
+  locked: { color: colors.muted },
+  badgeText: { fontSize: 12, fontWeight: '500', color: colors.muted },
+  stats: { flexDirection: 'row', padding: 0 },
+  stat: { flex: 1, alignItems: 'center', paddingVertical: 10 },
+  statRule: { borderRightWidth: 1, borderRightColor: colors.faint },
+  statLine: { flexDirection: 'row', alignItems: 'center', gap: 2 },
+  statValue: { fontSize: 28, fontFamily: DISPLAY, fontWeight: '800', color: colors.ink },
+  statLabel: { fontSize: 10, fontWeight: '700', color: colors.muted, letterSpacing: 0.6, textTransform: 'uppercase' },
   toastWrap: { position: 'absolute', left: 16, right: 16, alignItems: 'center' },
   toast: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10,
-    backgroundColor: colors.ink,
-    borderRadius: 18,
-    paddingHorizontal: 16,
+    backgroundColor: colors.night,
+    borderRadius: radius.lg,
+    borderWidth: 1,
+    borderColor: colors.gold,
+    paddingLeft: 10,
+    paddingRight: 18,
     paddingVertical: 10,
-    shadowColor: '#000',
-    shadowOpacity: 0.25,
-    shadowRadius: 12,
-    shadowOffset: { width: 0, height: 4 },
-    elevation: 8,
+    ...shadow.float,
   },
-  toastIcon: { fontSize: 26 },
-  toastMain: { gap: 1 },
-  toastKicker: { fontSize: 10, fontWeight: '900', color: colors.gold, letterSpacing: 1 },
-  toastTitle: { fontSize: 16, fontWeight: '900', color: '#FFFFFF' },
+  toastIcon: {
+    width: 38,
+    height: 38,
+    borderRadius: radius.md,
+    backgroundColor: colors.gold,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  toastMain: { gap: 3, alignItems: 'flex-start' },
+  toastTitle: { fontSize: 20, fontFamily: DISPLAY, fontWeight: '800', color: '#FFFFFF' },
 });

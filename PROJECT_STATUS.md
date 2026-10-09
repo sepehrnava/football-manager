@@ -24,7 +24,10 @@ Updated: 2026-10-09. Replace outdated entries; keep this as a snapshot.
 - Staff (head coach, youth coach, chief scout), a Daily Challenge with streak and share,
   a trophy cabinet with 12 achievements, and a short news feed (S010). The challenge and
   the cross-career meta are saved apart from the career.
-- Game rules in src/game (pure TypeScript); screens in src/screens; theme in src/ui.
+- UI redesign (S011): flat matchday-programme look, condensed display font, vector icons,
+  haptics, sliding indicators and cross-fades; Daily Challenge preview and a visible way back
+  to the career.
+- Game rules in src/game (pure TypeScript); screens in src/screens; design kit in src/ui.
 - npm lockfile, lint configuration, and setup instructions in README.md.
 - Spec-driven documentation and selective context-reading workflow.
 
@@ -37,14 +40,16 @@ Updated: 2026-10-09. Replace outdated entries; keep this as a snapshot.
 - S004 web flows (scout, reject, counter, sign, free agent, renew, offers): no errors.
 - S005 balance, 30 careers × 6 seasons: frugal/rescue never sacked, reckless sacked
   2/30, smart trading climbs to ~4th. Simplified screens checked in Chrome.
-- Android display not yet observed (S001-AC03, S002-AC08, S003-AC06, S004-AC09, S005-AC08).
+- Android display not yet observed (S001-AC03, S002-AC08, S003-AC06, S004-AC09, S005-AC08, S011-AC09).
 - Save format v2: careers saved before S004 start over.
 - 2026-10-09 S010: 12 leagues × 3 clubs with staff wages, 0 sacked; 30 daily challenges
   generated in ~70 ms each; web flows for hiring, challenge, toast, honours, news.
+- 2026-10-09 S011: tsc and lint pass; headless Chrome full season, challenge round trip and
+  reload with no console errors. expo-doctor network checks could not run in the cloud sandbox.
 
 ## Limits and next step
 
-- Next: confirm on Android (T007); optional display font and onboarding tips.
+- Next: confirm on Android in Expo Go (T007), including fonts, icons and haptics (S011-AC09).
 - Developed on macOS; README setup steps still describe the original Windows setup.
 - Initial npm audit: 23 warnings (7 moderate, 16 high). Historical result, not a fresh audit.
 - Work queue: [TASKS.md](TASKS.md). Product scope: [SPECS.md](SPECS.md).

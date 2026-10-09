@@ -18,7 +18,7 @@ import { LINE_OF } from '../game/constants';
 import type { Club, Crest as CrestData, Position } from '../game/types';
 import { haptic, NATIVE, usePressScale } from './motion';
 import { DISPLAY, Text } from './text';
-import { colors, lineColors, radius, ratingTier, shadow } from './theme';
+import { colors, lineColors, radius, ratingTier } from './theme';
 
 export { Text } from './text';
 
@@ -56,7 +56,7 @@ export function Card({
   accessibilityLabel?: string;
 }) {
   const t = TONES[tone];
-  const base = [styles.card, { backgroundColor: t.bg, borderColor: t.border }, tone === 'default' && shadow.card];
+  const base = [styles.card, { backgroundColor: t.bg, borderColor: t.border }];
   if (!onPress) return <View style={[base, style]}>{children}</View>;
   return (
     <Pressable
@@ -110,7 +110,7 @@ export function Button({
   const v = BUTTONS[(LEGACY as Record<string, Variant>)[variant] ?? (variant as Variant)];
   const sz = small ? 'sm' : size;
   const press = usePressScale(0.97);
-  const textSize = sz === 'lg' ? 17 : sz === 'md' ? 15 : 13;
+  const textSize = sz === 'lg' ? 21 : sz === 'md' ? 18 : 15;
   return (
     <Animated.View style={[press.style, style]}>
       <Pressable
@@ -126,17 +126,12 @@ export function Button({
         style={({ pressed }) => [
           styles.button,
           styles[`button_${sz}`],
-          {
-            backgroundColor: v.bg,
-            borderColor: v.border,
-            borderBottomColor: v.edge,
-            borderBottomWidth: variant === 'ghost' ? 0 : sz === 'sm' ? 3 : 4,
-          },
-          pressed && styles.buttonPressed,
+          { backgroundColor: pressed ? v.edge : v.bg, borderColor: pressed ? v.edge : v.border },
+          v === BUTTONS.secondary && pressed && { backgroundColor: colors.faint },
           disabled && styles.disabled,
         ]}
       >
-        {icon ? <Icon name={icon} size={textSize + 3} color={v.text} /> : null}
+        {icon ? <Icon name={icon} size={textSize} color={v.text} /> : null}
         <Text style={[styles.buttonText, { fontSize: textSize, color: v.text }]} numberOfLines={1}>
           {label}
         </Text>
@@ -169,7 +164,7 @@ export function IconButton({
       hitSlop={6}
       style={({ pressed }) => [
         styles.iconButton,
-        { width: size, height: size, borderRadius: size / 2 },
+        { width: size, height: size, borderRadius: radius.md },
         dark && styles.iconButtonDark,
         pressed && { opacity: 0.6 },
         style,
@@ -182,7 +177,7 @@ export function IconButton({
 
 /* ---------------------------------------------------------------- selection */
 
-/** Tabs inside a screen: a pill track with the selected option raised. */
+/** Tabs inside a screen: condensed caps with an underline that slides to the selected tab. */
 export function Segmented<T extends string>({
   options,
   value,
@@ -196,11 +191,22 @@ export function Segmented<T extends string>({
   dark?: boolean;
   style?: StyleProp<ViewStyle>;
 }) {
+  const [width, setWidth] = useState(0);
+  const index = Math.max(0, options.findIndex((o) => o.id === value));
+  const [x] = useState(() => new Animated.Value(index));
+  useEffect(() => {
+    Animated.spring(x, { toValue: index, useNativeDriver: NATIVE, speed: 22, bounciness: 4 }).start();
+  }, [x, index]);
+  const cell = width / options.length;
   return (
-    <View style={[styles.segTrack, dark && styles.segTrackDark, style]} accessibilityRole="tablist">
+    <View
+      style={[styles.segTrack, dark && styles.segTrackDark, style]}
+      accessibilityRole="tablist"
+      onLayout={(e) => setWidth(e.nativeEvent.layout.width)}
+    >
       {options.map((o) => {
         const on = o.id === value;
-        const color = on ? (dark ? colors.ink : colors.ink) : dark ? colors.nightMuted : colors.muted;
+        const color = on ? (dark ? '#FFFFFF' : colors.ink) : dark ? colors.nightMuted : colors.muted;
         return (
           <Pressable
             key={o.id}
@@ -211,9 +217,9 @@ export function Segmented<T extends string>({
             accessibilityRole="tab"
             accessibilityState={{ selected: on }}
             accessibilityLabel={o.label}
-            style={[styles.seg, on && styles.segOn]}
+            style={({ pressed }) => [styles.seg, pressed && { opacity: 0.6 }]}
           >
-            {o.icon ? <Icon name={o.icon} size={16} color={color} /> : null}
+            {o.icon ? <Icon name={o.icon} size={17} color={color} /> : null}
             <Text style={[styles.segText, { color }]} numberOfLines={1}>
               {o.label}
             </Text>
@@ -225,6 +231,16 @@ export function Segmented<T extends string>({
           </Pressable>
         );
       })}
+      {width ? (
+        <Animated.View
+          pointerEvents="none"
+          style={[
+            styles.segLine,
+            dark && { backgroundColor: colors.gold },
+            { width: cell - 16, transform: [{ translateX: Animated.add(Animated.multiply(x, cell), 8) }] },
+          ]}
+        />
+      ) : null}
     </View>
   );
 }
@@ -289,7 +305,10 @@ export function Section({
 }) {
   return (
     <View style={[styles.section, style]}>
-      <Text style={styles.sectionText}>{title}</Text>
+      <View style={styles.sectionTitle}>
+        <View style={styles.sectionMark} />
+        <Text style={styles.sectionText}>{title}</Text>
+      </View>
       {action ? (
         <Text style={styles.sectionAction} onPress={action.onPress} accessibilityRole="button">
           {action.label}
@@ -425,7 +444,7 @@ export function RatingBadge({
         {
           width: size,
           height: size,
-          borderRadius: size * 0.32,
+          borderRadius: size * 0.16,
           backgroundColor: override ?? tier.bg,
           borderColor: override ? '#FFFFFF' : tier.ring,
         },
@@ -442,7 +461,7 @@ export function RatingBadge({
 export function RangeBadge({ range, size = 34 }: { range: [number, number]; size?: number }) {
   if (range[0] === range[1]) return <RatingBadge value={range[0]} size={size} />;
   return (
-    <View style={[styles.range, { height: size, borderRadius: size * 0.32, minWidth: size * 1.6 }]}>
+    <View style={[styles.range, { height: size, borderRadius: size * 0.16, minWidth: size * 1.6 }]}>
       <Text style={[styles.rangeText, { fontSize: size * 0.46 }]}>
         {range[0]}–{range[1]}
       </Text>
@@ -709,23 +728,30 @@ export const styles = StyleSheet.create({
   card: {
     borderRadius: radius.lg,
     borderWidth: 1,
-    padding: 16,
+    padding: 14,
   },
-  cardPressed: { opacity: 0.85, transform: [{ scale: 0.99 }] },
+  cardPressed: { opacity: 0.8 },
   button: {
     flexDirection: 'row',
-    gap: 8,
+    gap: 7,
     borderRadius: radius.md,
-    borderWidth: 1.5,
+    borderWidth: 1,
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 14,
   },
-  button_lg: { minHeight: 56, borderRadius: radius.lg },
+  button_lg: { minHeight: 54 },
   button_md: { minHeight: 48 },
-  button_sm: { minHeight: 38, borderRadius: 12, paddingHorizontal: 12 },
-  buttonText: { fontWeight: '800', letterSpacing: 0.2, textAlign: 'center', flexShrink: 1 },
-  buttonPressed: { transform: [{ translateY: 2 }] },
+  button_sm: { minHeight: 36, paddingHorizontal: 12 },
+  buttonText: {
+    fontFamily: DISPLAY,
+    fontWeight: '800',
+    letterSpacing: 0.6,
+    textTransform: 'uppercase',
+    textAlign: 'center',
+    flexShrink: 1,
+    marginTop: 1,
+  },
   disabled: { opacity: 0.38 },
   iconButton: {
     alignItems: 'center',
@@ -737,24 +763,21 @@ export const styles = StyleSheet.create({
   iconButtonDark: { backgroundColor: colors.night3, borderColor: colors.nightLine },
   segTrack: {
     flexDirection: 'row',
-    backgroundColor: colors.faint,
-    borderRadius: radius.md,
-    padding: 3,
-    gap: 3,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
   },
-  segTrackDark: { backgroundColor: colors.night3 },
+  segTrackDark: { borderBottomColor: colors.nightLine },
   seg: {
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: 5,
-    minHeight: 38,
-    borderRadius: 11,
-    paddingHorizontal: 6,
+    minHeight: 42,
+    paddingHorizontal: 4,
   },
-  segOn: { backgroundColor: colors.card, ...shadow.card },
-  segText: { fontSize: 14, fontWeight: '700' },
+  segLine: { position: 'absolute', left: 0, bottom: -1, height: 3, borderRadius: 2, backgroundColor: colors.ink },
+  segText: { fontSize: 17, fontFamily: DISPLAY, fontWeight: '800', letterSpacing: 0.5, textTransform: 'uppercase' },
   segBadge: {
     minWidth: 18,
     height: 18,
@@ -768,27 +791,27 @@ export const styles = StyleSheet.create({
   chip: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
-    minHeight: 36,
-    paddingHorizontal: 14,
-    borderRadius: 999,
+    gap: 5,
+    minHeight: 34,
+    paddingHorizontal: 12,
+    borderRadius: radius.md,
     borderWidth: 1,
-    borderColor: colors.border,
-    backgroundColor: colors.card,
+    borderColor: colors.borderDark,
   },
   chipOn: { backgroundColor: colors.ink, borderColor: colors.ink },
-  chipText: { fontSize: 14, fontWeight: '700' },
+  chipText: { fontSize: 13, fontWeight: '700' },
   chipScrollOuter: { flexGrow: 0, marginHorizontal: -16 },
   chipScroll: { gap: 8, paddingHorizontal: 16 },
   section: {
     flexDirection: 'row',
-    alignItems: 'baseline',
+    alignItems: 'center',
     justifyContent: 'space-between',
-    marginTop: 10,
-    marginBottom: -2,
-    paddingHorizontal: 2,
+    marginTop: 12,
+    marginBottom: -4,
   },
-  sectionText: { fontSize: 12, fontWeight: '800', letterSpacing: 1.2, color: colors.muted, textTransform: 'uppercase' },
+  sectionText: { fontSize: 18, fontFamily: DISPLAY, fontWeight: '800', letterSpacing: 0.4, color: colors.ink, textTransform: 'uppercase' },
+  sectionTitle: { flexDirection: 'row', alignItems: 'center', gap: 7, flexShrink: 1 },
+  sectionMark: { width: 4, height: 15, borderRadius: 1, backgroundColor: colors.green },
   sectionAction: { fontSize: 14, fontWeight: '700', color: colors.green },
   listRow: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 11, paddingHorizontal: 14 },
   listRowBorder: { borderBottomWidth: 1, borderBottomColor: colors.faint },
@@ -799,9 +822,9 @@ export const styles = StyleSheet.create({
   listSub: { fontSize: 13, fontWeight: '500', color: colors.muted },
   empty: { alignItems: 'center', paddingVertical: 28, paddingHorizontal: 24, gap: 6 },
   emptyIcon: {
-    width: 52,
-    height: 52,
-    borderRadius: 26,
+    width: 48,
+    height: 48,
+    borderRadius: radius.lg,
     backgroundColor: colors.faint,
     alignItems: 'center',
     justifyContent: 'center',
@@ -809,8 +832,8 @@ export const styles = StyleSheet.create({
   },
   emptyTitle: { fontSize: 16, fontWeight: '800', color: colors.ink, textAlign: 'center' },
   emptyText: { fontSize: 14, fontWeight: '500', color: colors.muted, textAlign: 'center', lineHeight: 20 },
-  tag: { borderRadius: 6, paddingHorizontal: 6, paddingVertical: 2 },
-  tagText: { fontSize: 10, fontWeight: '800', letterSpacing: 0.5 },
+  tag: { borderRadius: 3, paddingHorizontal: 5, paddingVertical: 1 },
+  tagText: { fontSize: 12, fontFamily: DISPLAY, fontWeight: '800', letterSpacing: 0.5, textTransform: 'uppercase' },
   count: {
     minWidth: 18,
     height: 18,
@@ -838,7 +861,7 @@ export const styles = StyleSheet.create({
   trend: { flexDirection: 'row', alignItems: 'center', gap: 3 },
   trendText: { fontWeight: '800', letterSpacing: 0.4 },
   tags: { flexDirection: 'row', gap: 4 },
-  pos: { borderRadius: 6, paddingHorizontal: 5, paddingVertical: 1 },
+  pos: { borderRadius: 3, paddingHorizontal: 4, paddingVertical: 1 },
   posText: { fontWeight: '800' },
   crest: { overflow: 'hidden', borderColor: '#141414', alignItems: 'center', justifyContent: 'center' },
   crestOutline: {
@@ -851,9 +874,9 @@ export const styles = StyleSheet.create({
   stat: { alignItems: 'center', flex: 1 },
   statValue: { fontSize: 28, fontFamily: DISPLAY, fontWeight: '800', color: colors.ink },
   statLabel: { fontSize: 10, fontWeight: '800', letterSpacing: 1, color: colors.muted },
-  statTile: { flex: 1, paddingVertical: 12, paddingHorizontal: 12, gap: 2 },
+  statTile: { flex: 1, paddingVertical: 10, paddingHorizontal: 12, gap: 1 },
   statTileHead: { flexDirection: 'row', alignItems: 'center', gap: 4 },
-  statTileLabel: { fontSize: 11, fontWeight: '700', color: colors.muted, flexShrink: 1 },
+  statTileLabel: { fontSize: 11, fontWeight: '700', color: colors.muted, flexShrink: 1, textTransform: 'uppercase', letterSpacing: 0.4 },
   statTileValue: { fontSize: 26, fontFamily: DISPLAY, fontWeight: '800', color: colors.ink },
   statTileSub: { fontSize: 11, fontWeight: '600', color: colors.muted, marginTop: -2 },
   kv: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingVertical: 7 },
@@ -863,14 +886,14 @@ export const styles = StyleSheet.create({
   bar: { overflow: 'hidden', width: '100%' },
   barFill: {},
   odds: { gap: 6 },
-  oddsBar: { flexDirection: 'row', height: 10, borderRadius: 5, overflow: 'hidden', gap: 2 },
+  oddsBar: { flexDirection: 'row', height: 6, borderRadius: 1, overflow: 'hidden', gap: 2 },
   oddsLabels: { flexDirection: 'row', justifyContent: 'space-between' },
   oddsText: { fontWeight: '800', fontSize: 13 },
-  backdrop: { flex: 1, backgroundColor: 'rgba(8,14,10,0.45)', justifyContent: 'flex-end' },
+  backdrop: { flex: 1, backgroundColor: 'rgba(8,14,10,0.5)', justifyContent: 'flex-end' },
   sheet: {
     backgroundColor: colors.bg,
-    borderTopLeftRadius: 28,
-    borderTopRightRadius: 28,
+    borderTopLeftRadius: 16,
+    borderTopRightRadius: 16,
     paddingHorizontal: 16,
     paddingTop: 8,
     maxHeight: '90%',
@@ -878,10 +901,10 @@ export const styles = StyleSheet.create({
     maxWidth: 640,
     alignSelf: 'center',
   },
-  grabber: { alignSelf: 'center', width: 40, height: 5, borderRadius: 3, backgroundColor: colors.borderDark, marginBottom: 8 },
+  grabber: { alignSelf: 'center', width: 36, height: 4, borderRadius: 2, backgroundColor: colors.borderDark, marginBottom: 8 },
   sheetHeader: { flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 12 },
   sheetTitles: { flex: 1 },
-  sheetTitle: { fontSize: 22, fontWeight: '800', color: colors.ink },
+  sheetTitle: { fontSize: 28, fontFamily: DISPLAY, fontWeight: '800', color: colors.ink, letterSpacing: 0.2 },
   sheetSubtitle: { fontSize: 14, fontWeight: '600', color: colors.muted, marginTop: 1 },
   sheetBody: { flexGrow: 0 },
   sheetContent: { paddingBottom: 8, gap: 12 },

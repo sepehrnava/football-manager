@@ -28,6 +28,7 @@ or hosting. These are not approved features.
 | S008 | [Divisions](specs/008-divisions.md) | Implemented; device observation pending |
 | S009 | [Six leagues and two cups](specs/009-world-leagues-and-cups.md) | Implemented; player data partial |
 | S010 | [Staff, daily challenge, honours and news](specs/010-staff-daily-honours-news.md) | Implemented; device observation pending |
+| S011 | [UI redesign](specs/011-ui-redesign.md) | Implemented; device observation pending |
 
 Use [the template](specs/_template.md) for the next feature. Number specs sequentially.
 Keep IDs stable; criteria use S002-AC01 style IDs referenced by tasks and evidence.
