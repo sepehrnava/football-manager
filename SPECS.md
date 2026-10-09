@@ -32,6 +32,7 @@ or hosting. These are not approved features.
 | S012 | [Easier swaps](specs/012-easier-swaps.md) | Implemented; device observation pending |
 | S013 | [Build your squad (new club)](specs/013-build-your-squad.md) | Implemented; device observation pending |
 | S014 | [League stats](specs/014-league-stats.md) | Implemented; device observation pending |
+| S015 | [Match highlights (2D)](specs/015-match-highlights.md) | Draft; demo built |
 
 Use [the template](specs/_template.md) for the next feature. Number specs sequentially.
 Keep IDs stable; criteria use S002-AC01 style IDs referenced by tasks and evidence.

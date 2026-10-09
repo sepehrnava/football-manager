@@ -11,6 +11,7 @@ import { Bar, Button, Card, ClubCrest } from '../ui/components';
 import { animateNextLayout, FadeIn } from '../ui/motion';
 import { colors, formatMoney } from '../ui/theme';
 import { AchievementToast } from './Honours';
+import { MatchViewer } from './MatchViewer';
 
 /** Names with a long single word (e.g. "Wolverhampton") need a smaller size to avoid breaking mid-word. */
 function longWord(name: string) {
@@ -29,6 +30,7 @@ export function SimScreen({ until: initialUntil, onClose }: { until?: number; on
   const { state, dispatch } = useCareer();
   const insets = useSafeAreaInsets();
   const [running, setRunning] = useState(true);
+  const [watching, setWatching] = useState<Fixture | null>(null);
   const [until, setUntil] = useState(initialUntil);
   const [startRound] = useState(state.round);
   const inSeason = state.phase === 'season';
@@ -106,7 +108,13 @@ export function SimScreen({ until: initialUntil, onClose }: { until?: number; on
 
           {mine ? (
             <FadeIn key={`r${lastRound}`} from="scale" duration={220}>
-              <MyMatch fixture={mine} />
+              <MyMatch
+                fixture={mine}
+                onWatch={() => {
+                  setRunning(false);
+                  setWatching(mine);
+                }}
+              />
             </FadeIn>
           ) : (
             <Text style={s.wait}>Kick-off…</Text>
@@ -165,6 +173,7 @@ export function SimScreen({ until: initialUntil, onClose }: { until?: number; on
         </View>
       </View>
       <AchievementToast />
+      {watching ? <MatchViewer fixture={watching} onClose={() => setWatching(null)} /> : null}
     </Modal>
   );
 }
@@ -218,7 +227,7 @@ function OfferCard({ offerId }: { offerId: string }) {
   );
 }
 
-function MyMatch({ fixture }: { fixture: Fixture }) {
+function MyMatch({ fixture, onWatch }: { fixture: Fixture; onWatch: () => void }) {
   const { state } = useCareer();
   const home = clubById(state, fixture.homeId);
   const away = clubById(state, fixture.awayId);
@@ -252,6 +261,7 @@ function MyMatch({ fixture }: { fixture: Fixture }) {
       {r.scorers?.length ? (
         <Text style={s.scorers}>⚽ {r.scorers.map(surname).join(', ')}</Text>
       ) : null}
+      <Button label="▶  WATCH HIGHLIGHTS (DEMO)" variant="light" small onPress={onWatch} />
     </Card>
   );
 }
