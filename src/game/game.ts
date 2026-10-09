@@ -25,10 +25,12 @@ import {
   topUpClubs,
   USER_ID,
 } from './market';
-import { compKey, DEFAULT_COUNTRY, divisionsIn, econRating, LEAGUE, PROMOTION_SPOTS, type Comp } from './leagues';
+import { roundNews, withNews } from './news';
+import { hireStaff, staffMarket, staffWages, startingStaff, youthBoostChance } from './staff';
+import { compKey, compName, DEFAULT_COUNTRY, divisionsIn, econRating, LEAGUE, PROMOTION_SPOTS, type Comp } from './leagues';
 import { develop, makePlayer, markRetirements } from './players';
 import { createRng, type Rng } from './rng';
-import { autoPick, remapLineup, teamStrength, userStrength, wageBill } from './team';
+import { autoPick, remapLineup, userStrength, userTeam, wageBill } from './team';
 import type {
   BoardStatus,
   Club,
@@ -73,6 +75,7 @@ export type Action =
   | { type: 'autoPick' }
   | { type: 'captain'; playerId: string }
   | { type: 'watch'; playerId: string }
+  | { type: 'hireStaff'; staffId: string }
   | { type: 'scoutPlayer'; playerId: string }
   | { type: 'bid'; playerId: string; fee: number; years: number }
   | { type: 'acceptOffer'; offerId: string }
@@ -357,6 +360,10 @@ export function createGame(action: Extract<Action, { type: 'new' }>): GameState 
     history: [],
   };
   state = { ...state, squad: markRetirements(rng, state.squad), world: markRetirements(rng, state.world) };
+  let staffNext = state.nextId;
+  const staffId = () => `s${staffNext++}`;
+  state = { ...state, staff: startingStaff(rng, staffId), staffMarket: staffMarket(rng, staffId) };
+  state = { ...state, nextId: staffNext };
   state = refreshClubs(state);
   state = withCups(state, rng, topRankings(state, false));
   state = makeOffers(state, rng);
@@ -386,7 +393,7 @@ export function counterEffect(tactic: Tactic, style: Club['style']) {
 /** The user's attack/defense for a round, including the tactic counter. */
 export function userSideFor(state: GameState, round: number, opponent: Club) {
   const tactic = tacticFor(state, round);
-  const s = teamStrength(state.squad, state.lineup, state.formation, tactic, state.captainId);
+  const s = userTeam(state, tactic);
   const c = counterEffect(tactic, opponent.style);
   return { attack: s.attack + c, defense: s.defense + c };
 }
@@ -437,13 +444,22 @@ function playRound(state: GameState, rng: Rng): GameState {
     );
     next = { ...next, cups, cupEarnings: cupMoney(cups) };
   }
+  const position = (st: GameState) => compTable(st).findIndex((r) => r.clubId === USER_ID) + 1;
+  const mineNow = fixtures.find((f) => f.round === s.round && (f.homeId === USER_ID || f.awayId === USER_ID) && sameComp(fixtureComp(f), userComp(s)));
+  const oppId = mineNow ? (mineNow.homeId === USER_ID ? mineNow.awayId : mineNow.homeId) : null;
+  next = withNews(
+    next,
+    roundNews(userClub(s), mineNow, oppId ? clubById(s, oppId) : undefined, position(s), position(next), s.cups ?? [], next.cups ?? [], round),
+  );
   if (round === midWindowRound(next)) next = openWindow({ ...next, window: 'mid' }, rng);
   else if (round === seasonRounds(next)) next = endSeason(next, rng);
   return next;
 }
 
 function openWindow(state: GameState, rng: Rng): GameState {
-  let s: GameState = { ...state, phase: 'window', talks: {} };
+  let nextId = state.nextId;
+  const market = staffMarket(rng, () => `s${nextId++}`);
+  let s: GameState = { ...state, phase: 'window', talks: {}, staffMarket: market, nextId };
   s = makeOffers(s, rng);
   return s;
 }
@@ -458,8 +474,9 @@ export function projectedPosition(state: GameState) {
 
 export function seasonCosts(state: GameState) {
   const wages = wageBill(state.squad);
+  const staff = staffWages(state.staff);
   const fixedCosts = Math.round(ECONOMY.runningCostBase + state.fans * ECONOMY.runningCostPerFan);
-  return { wages, fixedCosts, total: wages + fixedCosts };
+  return { wages, staff, fixedCosts, total: wages + staff + fixedCosts };
 }
 
 /** Stakeholders share in profit only, so a loss is never made worse by them. */
@@ -546,6 +563,7 @@ function endSeason(state: GameState, rng: Rng): GameState {
   const moves = movements(state);
   const newDivision = moves.get(USER_ID)!;
   const movement = newDivision < division ? 'promoted' : newDivision > division ? 'relegated' : null;
+  const cupsWon = (state.cups ?? []).filter((c) => cupProgress(c, USER_ID)?.champion).map((c) => c.name);
   const costs = seasonCosts(state);
   const income = seasonIncome(
     position,
@@ -574,14 +592,14 @@ function endSeason(state: GameState, rng: Rng): GameState {
   // Raises reflect this season's finish, so count it before renewing.
   const withResult = {
     ...state,
-    history: [...state.history, { season: state.season, position, division, country: comp.country }],
+    history: [...state.history, { season: state.season, position, division, country: comp.country, cups: cupsWon }],
   };
   for (const p of state.squad) {
     if (p.retiring) {
       retired.push(p.name);
       continue;
     }
-    const grown = develop(rng, p);
+    const grown = develop(rng, p, youthBoostChance(state.staff));
     if (grown.rating !== p.rating) changes.push({ name: p.name, from: p.rating, to: grown.rating });
     // Contracts renew automatically; the player's (possibly higher) demand applies.
     const years = p.contract.years - 1;
@@ -608,6 +626,7 @@ function endSeason(state: GameState, rng: Rng): GameState {
     cupPrize: income.cups,
     cupResults: cupResults(state.cups ?? []),
     wages: costs.wages,
+    staffWages: costs.staff,
     fixedCosts: costs.fixedCosts,
     stakeholder,
     bonuses,
@@ -623,6 +642,7 @@ function endSeason(state: GameState, rng: Rng): GameState {
     division,
     country: comp.country,
     movement,
+    points: table[position - 1].points,
   };
   const keep = new Set(squad.map((p) => p.id));
   const scouting = { ...state.scouting };
@@ -641,13 +661,29 @@ function endSeason(state: GameState, rng: Rng): GameState {
     scouting,
     summary,
     plans: {},
-    history: [...state.history, { season: state.season, position, division, country: comp.country }],
+    history: [...state.history, { season: state.season, position, division, country: comp.country, cups: cupsWon }],
     // Next season's cup places come from this season's final tables.
     cupRankings: Object.fromEntries(topRankings(state, true)),
     clubs: state.clubs.map((c) => ({ ...c, division: moves.get(c.id) })),
   };
+  const headlines = [
+    {
+      round: state.round,
+      icon: position === 1 ? '🏆' : '🏁',
+      text: position === 1 ? `${userClub(state).name} are champions!` : `${champion.name} win the ${compName(comp)}`,
+    },
+    ...(movement === 'promoted' ? [{ round: state.round, icon: '⬆️', text: `${userClub(state).name} win promotion` }] : []),
+    ...(movement === 'relegated' ? [{ round: state.round, icon: '⬇️', text: `${userClub(state).name} are relegated` }] : []),
+    ...(state.cups ?? []).flatMap((cup) => {
+      const winner = cup.stages.at(-1)?.ties[0]?.winnerId;
+      return winner && winner !== USER_ID
+        ? [{ round: state.round, icon: '🌍', text: `${clubById(state, winner).name} win the ${cup.name}` }]
+        : [];
+    }),
+    ...retired.map((name) => ({ round: state.round, icon: '👋', text: `${name} retires` })),
+  ];
   // The rest of the world ages too.
-  return advanceWorld(next, rng);
+  return advanceWorld(withNews(next, headlines), rng);
 }
 
 function nextSeason(state: GameState, rng: Rng): GameState {
@@ -699,6 +735,8 @@ export function reducer(state: GameState | null, action: Action): GameState | nu
       return { ...state, lineup: autoPick(state.squad, state.formation) };
     case 'captain':
       return { ...state, captainId: action.playerId };
+    case 'hireStaff':
+      return hireStaff(state, action.staffId);
     case 'watch': {
       const watch = state.watch ?? [];
       return {

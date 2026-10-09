@@ -95,6 +95,20 @@ export interface Fixture {
   result?: MatchResult;
 }
 
+export type StaffRole = 'coach' | 'youth' | 'scout';
+
+export interface Staff {
+  id: string;
+  name: string;
+  flag: string;
+  role: StaffRole;
+  /** 1–5 stars. */
+  stars: number;
+  /** Head coaches only. */
+  style?: 'attacking' | 'defensive' | 'balanced';
+  wage: number;
+}
+
 export type CupId = 'champions' | 'europa';
 
 export interface CupTie {
@@ -154,6 +168,8 @@ export interface SeasonSummary {
   cupPrize?: number;
   cupResults?: { name: string; result: string }[];
   wages: number;
+  /** Staff wages. Missing in older saves. */
+  staffWages?: number;
   fixedCosts: number;
   /** Stakeholders' share of the profit (0 in a loss-making season). */
   stakeholder: number;
@@ -172,6 +188,33 @@ export interface SeasonSummary {
   division?: number;
   country?: string;
   movement?: 'promoted' | 'relegated' | null;
+  /** League points this season. Missing in older saves. */
+  points?: number;
+}
+
+/** A headline in the club's news feed. */
+export interface NewsItem {
+  season: number;
+  /** The user's matchday it happened after (rounds played). */
+  round: number;
+  icon: string;
+  text: string;
+}
+
+/** What a Daily Challenge asks for: finish at `target` or better. */
+export interface ChallengeGoal {
+  kind: 'survive' | 'promote' | 'title' | 'climb';
+  target: number;
+  title: string;
+  text: string;
+}
+
+/** A Daily Challenge game: one club, half a season, one goal. */
+export interface Challenge extends ChallengeGoal {
+  /** Calendar day it belongs to, e.g. "2026-10-09". */
+  day: string;
+  startPosition: number;
+  league: string;
 }
 
 /** ok: money ≥ 0 · debt: below 0 · warning: final warning · sacked: game over. */
@@ -209,7 +252,17 @@ export interface GameState {
   plans: Record<number, Tactic>;
   nextId: number;
   summary: SeasonSummary | null;
-  history: { season: number; position: number; division?: number; country?: string }[];
+  history: {
+    season: number;
+    position: number;
+    division?: number;
+    country?: string;
+    /** European cups won that season. */
+    cups?: string[];
+  }[];
+  /** The user's staff and the candidates available this window. Missing in older saves. */
+  staff?: Partial<Record<StaffRole, Staff>>;
+  staffMarket?: Staff[];
   /** This season's European cups. Missing in older saves. */
   cups?: Cup[];
   /** Cup prize money earned this season, paid at the season end. */
@@ -218,4 +271,8 @@ export interface GameState {
   cupRankings?: Record<string, string[]>;
   /** Money at the season end that earned a final warning; null when there is none. */
   warning?: number | null;
+  /** Latest headlines, newest first. Missing in older saves. */
+  news?: NewsItem[];
+  /** Set only in a Daily Challenge game. */
+  challenge?: Challenge;
 }

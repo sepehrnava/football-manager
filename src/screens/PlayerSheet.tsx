@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
-import { MARKET, SQUAD_MAX } from '../game/constants';
+import { SQUAD_MAX } from '../game/constants';
 import { canTrade, clubById } from '../game/game';
+import { scoutCost } from '../game/staff';
 import { askingPrice, needsCover, quickSalePrice, releaseBlocker } from '../game/market';
 import {
   chemistry,
@@ -149,10 +150,10 @@ function MarketView({ player: p, onClose }: { player: Player; onClose: () => voi
           <View style={s.scoutRow}>
             <Text style={[s.hint, s.flex]}>The rating is a guess. Scout to see exactly how good the player is.</Text>
             <Button
-              label={`SCOUT ${formatMoney(MARKET.scoutCost)}`}
+              label={`SCOUT ${formatMoney(scoutCost(state))}`}
               variant="light"
               small
-              disabled={MARKET.scoutCost > state.money}
+              disabled={scoutCost(state) > state.money}
               onPress={() => dispatch({ type: 'scoutPlayer', playerId: p.id })}
             />
           </View>

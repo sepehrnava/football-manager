@@ -70,7 +70,8 @@ export function SeasonEndScreen() {
         {sum.tv ? <Row label="TV money" value={`+${formatMoney(sum.tv)}`} color={colors.green} /> : null}
         {sum.cupPrize ? <Row label="Cup prize money" value={`+${formatMoney(sum.cupPrize)}`} color={colors.green} /> : null}
         {sum.sponsor ? <Row label="Sponsors" value={`+${formatMoney(sum.sponsor)}`} color={colors.green} /> : null}
-        <Row label="Wages" value={`-${formatMoney(sum.wages)}`} color={colors.red} />
+        <Row label="Player wages" value={`-${formatMoney(sum.wages)}`} color={colors.red} />
+        {sum.staffWages ? <Row label="Staff wages" value={`-${formatMoney(sum.staffWages)}`} color={colors.red} /> : null}
         <Row label="Running the club" value={`-${formatMoney(sum.fixedCosts)}`} color={colors.red} />
         {sum.stakeholder ? (
           <Row label="Owners' share of profit" value={`-${formatMoney(sum.stakeholder)}`} color={colors.red} />

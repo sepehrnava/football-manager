@@ -21,6 +21,7 @@ import {
 import { animateNextLayout, FadeIn } from '../ui/motion';
 import { colors, lineColors } from '../ui/theme';
 import { PlayerSheet } from './PlayerSheet';
+import { StaffCard, StaffSheet } from './StaffSheet';
 
 const LINE_ORDER = { GK: 0, DF: 1, MD: 2, AT: 3 };
 
@@ -35,6 +36,7 @@ export function SquadScreen() {
   const { state, dispatch } = useCareer();
   const [sel, setSel] = useState<Selection>(null);
   const [detail, setDetail] = useState<string | null>(null);
+  const [staffOpen, setStaffOpen] = useState(false);
 
   const strength = userStrength(state);
   const xi = starters(state.squad, state.lineup);
@@ -116,6 +118,8 @@ export function SquadScreen() {
           <Stat label="DEFENSE" value={strength.defense} color={lineColors.DF} />
           <Stat label="CHEMISTRY" value={strength.chemistry} color={colors.green} />
         </Card>
+
+        <StaffCard onPress={() => setStaffOpen(true)} />
 
         <View style={s.pitch}>
           <View style={s.boxTop} />
@@ -242,6 +246,7 @@ export function SquadScreen() {
       ) : null}
 
       <PlayerSheet playerId={detail} mode="squad" onClose={() => setDetail(null)} />
+      <StaffSheet visible={staffOpen} onClose={() => setStaffOpen(false)} />
     </View>
   );
 }

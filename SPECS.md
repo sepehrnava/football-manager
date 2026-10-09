@@ -27,6 +27,7 @@ or hosting. These are not approved features.
 | S007 | [Real league data](specs/007-real-league-data.md) | Implemented |
 | S008 | [Divisions](specs/008-divisions.md) | Implemented; device observation pending |
 | S009 | [Six leagues and two cups](specs/009-world-leagues-and-cups.md) | Implemented; player data partial |
+| S010 | [Staff, daily challenge, honours and news](specs/010-staff-daily-honours-news.md) | Implemented; device observation pending |
 
 Use [the template](specs/_template.md) for the next feature. Number specs sequentially.
 Keep IDs stable; criteria use S002-AC01 style IDs referenced by tasks and evidence.
@@ -38,5 +39,6 @@ Superseded specs name their replacement. Status labels alone are not evidence.
 ## Next product questions
 
 Product direction (user, 2026-10-08/09): the challenge is managing squad and money, not
-match play. Keep it very simple to play. No divisions, levels or fatigue. Candidate next features: a continental cup
-for top finishers, choice of league, and a real player database.
+match play. Keep it very simple to play: no fatigue, no level grinding, no energy bar.
+Next: a full UI/UX pass over every screen. Monetization later (rewarded ads, remove-ads,
+cosmetics), which needs a development build.

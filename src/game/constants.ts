@@ -22,7 +22,8 @@ export const ECONOMY = {
   startMoney: 10_000_000,
   startFans: 400_000,
   /** Running the club costs a base amount plus a little per fan: bigger clubs cost more. */
-  runningCostBase: 2_000_000,
+  // Starting staff wages (about $0.9M) are part of running a club, so the base is lower.
+  runningCostBase: 1_100_000,
   runningCostPerFan: 8,
   /** Stakeholders take this share of a season's profit, and nothing in a loss. */
   stakeholderShare: 0.25,

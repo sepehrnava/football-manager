@@ -15,9 +15,11 @@ import { compName, flagOf } from '../game/leagues';
 import { cupProgress } from '../game/cups';
 import { matchInsight, percent, userFixture } from '../game/insights';
 import { useCareer } from '../state/GameContext';
-import { Card, ClubCrest } from '../ui/components';
+import { Card, ClubCrest, Sheet } from '../ui/components';
 import { FadeIn } from '../ui/motion';
 import { colors, ordinal, seasonLabel } from '../ui/theme';
+import { ChallengeBanner, DailyCard } from './Challenge';
+import type { NewsItem } from '../game/types';
 import { MatchSheet } from './MatchSheet';
 import { Roadmap } from './Roadmap';
 
@@ -36,6 +38,8 @@ export function ClubScreen({
 }) {
   const { state } = useCareer();
   const [sheetRound, setSheetRound] = useState<number | null>(null);
+  const [allNews, setAllNews] = useState(false);
+  const news = state.news ?? [];
 
   const club = userClub(state);
   const table = compTable(state);
@@ -97,6 +101,12 @@ export function ClubScreen({
         </View>
       </FadeIn>
 
+      {state.challenge ? (
+        <FadeIn delay={30}>
+          <ChallengeBanner />
+        </FadeIn>
+      ) : null}
+
       <FadeIn delay={60}>
         <Card style={s.roadCard}>
           <View style={s.roadHead}>
@@ -129,8 +139,53 @@ export function ClubScreen({
         </FadeIn>
       ))}
 
+      {news.length ? (
+        <FadeIn delay={180}>
+          <Card style={s.news}>
+            <View style={s.newsHead}>
+              <Text style={s.newsTitle}>📰 Latest</Text>
+              {news.length > 3 ? (
+                <Text style={s.newsMore} onPress={() => setAllNews(true)}>
+                  See all ›
+                </Text>
+              ) : null}
+            </View>
+            {news.slice(0, 3).map((n, i) => (
+              <NewsLine key={`${n.season}-${n.round}-${i}`} item={n} />
+            ))}
+          </Card>
+        </FadeIn>
+      ) : null}
+
+      {!state.challenge ? (
+        <FadeIn delay={200}>
+          <DailyCard />
+        </FadeIn>
+      ) : null}
+
       <MatchSheet round={sheetRound} onClose={() => setSheetRound(null)} onPlayTo={onPlay} />
+      {allNews ? (
+        <Sheet visible title="News" onClose={() => setAllNews(false)}>
+          {news.map((n, i) => (
+            <NewsLine key={`${n.season}-${n.round}-${i}`} item={n} showWhen />
+          ))}
+        </Sheet>
+      ) : null}
     </ScrollView>
+  );
+}
+
+function NewsLine({ item, showWhen }: { item: NewsItem; showWhen?: boolean }) {
+  return (
+    <View style={s.newsLine}>
+      <Text style={s.newsIcon}>{item.icon}</Text>
+      <Text style={s.newsText}>{item.text}</Text>
+      {showWhen ? (
+        <Text style={s.newsWhen}>
+          {seasonLabel(item.season)} · MD{item.round}
+        </Text>
+      ) : null}
+    </View>
   );
 }
 
@@ -158,5 +213,13 @@ const s = StyleSheet.create({
   actionTitle: { fontSize: 18, fontWeight: '900', color: colors.ink },
   actionText: { fontSize: 14, fontWeight: '700', color: colors.ink },
   actionHint: { fontSize: 13, fontWeight: '600', color: colors.muted },
+  news: { gap: 8 },
+  newsHead: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline' },
+  newsTitle: { fontSize: 15, fontWeight: '900', color: colors.ink },
+  newsMore: { fontSize: 13, fontWeight: '800', color: colors.blue },
+  newsLine: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingVertical: 2 },
+  newsIcon: { fontSize: 16, width: 22, textAlign: 'center' },
+  newsText: { flex: 1, fontSize: 14, fontWeight: '700', color: colors.ink },
+  newsWhen: { fontSize: 11, fontWeight: '800', color: colors.muted },
   note: { fontSize: 14, fontWeight: '800', color: colors.ink, paddingHorizontal: 6 },
 });

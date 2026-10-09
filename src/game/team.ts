@@ -1,5 +1,6 @@
 import { FORMATIONS, SLOT_WEIGHTS, TACTICS } from './constants';
 import { chemistry, clamp, ratingAt } from './players';
+import { coachBonus } from './staff';
 import type { FormationId, GameState, Player, Position, Tactic } from './types';
 
 export interface TeamStrength {
@@ -59,8 +60,17 @@ export function teamStrength(
   };
 }
 
+/** The user's team: squad strength plus the head coach's effect. */
+export function userTeam(state: GameState, tactic: Tactic = state.tactic): TeamStrength {
+  const s = teamStrength(state.squad, state.lineup, state.formation, tactic, state.captainId);
+  const c = coachBonus(state.staff);
+  const attack = s.attack + c.attack;
+  const defense = s.defense + c.defense;
+  return { ...s, attack, defense, power: Math.round((attack + defense) / 2) };
+}
+
 export function userStrength(state: GameState) {
-  return teamStrength(state.squad, state.lineup, state.formation, state.tactic, state.captainId);
+  return userTeam(state);
 }
 
 /** Small bonus so a natural-position player wins a tie on rating. */

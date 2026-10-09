@@ -172,9 +172,19 @@ export function PosTags({ positions, size = 13 }: { positions: Position[]; size?
   );
 }
 
+/** True for colours where dark text reads better than white. */
+function isLight(hex: string) {
+  const n = parseInt(hex.replace('#', '').padEnd(6, '0').slice(0, 6), 16);
+  const [r, g, b] = [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+  return 0.299 * r + 0.587 * g + 0.114 * b > 170;
+}
+
 export function Crest({ crest, short, size = 40 }: { crest: CrestData; short?: string; size?: number }) {
   const h = size * 1.15;
-  const light = crest.primary === '#FFFFFF' || crest.primary === '#F2B544';
+  // The initials sit on the band, or on the main colour; mixed patterns get an outline.
+  const behind = crest.pattern === 'band' ? crest.secondary : crest.primary;
+  const plain = crest.pattern === 'solid' || crest.pattern === 'band';
+  const dark = plain && isLight(behind);
   return (
     <View
       style={[
@@ -221,8 +231,9 @@ export function Crest({ crest, short, size = 40 }: { crest: CrestData; short?: s
             styles.crestText,
             {
               fontSize: size * 0.3,
-              color: light && crest.pattern === 'solid' ? colors.ink : '#FFFFFF',
+              color: dark ? colors.ink : '#FFFFFF',
             },
+            !dark && styles.crestOutline,
           ]}
         >
           {short}
@@ -383,12 +394,12 @@ export const styles = StyleSheet.create({
   trend: { fontWeight: '900', letterSpacing: 0.3 },
   tag: { fontWeight: '800' },
   crest: { overflow: 'hidden', borderColor: '#141414', alignItems: 'center', justifyContent: 'center' },
-  crestText: {
-    fontWeight: '900',
-    textShadowColor: 'rgba(0,0,0,0.55)',
+  crestOutline: {
+    textShadowColor: 'rgba(0,0,0,0.85)',
     textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 2,
+    textShadowRadius: 3,
   },
+  crestText: { fontWeight: '900' },
   row: { flexDirection: 'row' },
   stat: { alignItems: 'center', flex: 1 },
   statValue: { fontSize: 22, fontWeight: '900', color: colors.ink },

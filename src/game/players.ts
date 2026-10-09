@@ -93,6 +93,12 @@ export interface PlayerSpec {
 /** Names of real players in the league data: generated players never get these. */
 const REAL_NAMES = new Set(LEAGUE.players.map((p) => p.name.toLowerCase()));
 
+/** A fictional person: name and flag (used for generated players and staff). */
+export function randomName(rng: Rng) {
+  const nation = rng.pick(NATIONS);
+  return { name: generatedName(rng, nation), flag: nation.flag };
+}
+
 function generatedName(rng: Rng, nation: (typeof NATIONS)[number]) {
   for (let i = 0; i < 10; i++) {
     const name = `${rng.pick(nation.first)} ${rng.pick(nation.last)}`;
@@ -182,7 +188,7 @@ export function positionsForLine(line: Line | 'ALL'): Position[] {
  * Season-end development: players grow toward their potential until 26, hold
  * their peak until 30, then decline gently, faster from 33.
  */
-export function develop(rng: Rng, p: Player): Player {
+export function develop(rng: Rng, p: Player, youthBoost = 0): Player {
   const age = p.age + 1;
   let delta: number;
   if (age <= 21) delta = rng.int(2, 4);
@@ -190,6 +196,8 @@ export function develop(rng: Rng, p: Player): Player {
   else if (age <= 30) delta = rng.int(-1, 1);
   else if (age <= 32) delta = rng.int(-2, -1);
   else delta = rng.int(-3, -2);
+  // A good youth coach sometimes adds a point for young players who are growing.
+  if (delta > 0 && age <= 23 && youthBoost > 0 && rng.chance(youthBoost)) delta += 1;
   const rating = delta > 0 ? Math.min(p.potential, p.rating + delta) : Math.max(40, p.rating + delta);
   return {
     ...p,

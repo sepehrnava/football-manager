@@ -8,7 +8,9 @@ import { useCareer, useGame } from '../state/GameContext';
 import { Button, ClubCrest, Sheet } from '../ui/components';
 import { FadeIn } from '../ui/motion';
 import { colors, formatMoney, seasonLabel } from '../ui/theme';
+import { ChallengeEndScreen } from './Challenge';
 import { ClubScreen } from './ClubScreen';
+import { HonoursSheet } from './Honours';
 import { LeagueScreen } from './LeagueScreen';
 import { SeasonEndScreen } from './SeasonEndScreen';
 import { SimScreen } from './SimScreen';
@@ -38,9 +40,10 @@ export function MainScreen() {
   };
   const [sim, setSim] = useState<{ until?: number } | null>(null);
   const [settings, setSettings] = useState(false);
+  const [honours, setHonours] = useState(false);
 
   if (!sim && (state.phase === 'summary' || state.phase === 'gameover')) {
-    return <SeasonEndScreen />;
+    return state.challenge ? <ChallengeEndScreen /> : <SeasonEndScreen />;
   }
 
   const play = (until?: number) => {
@@ -52,10 +55,16 @@ export function MainScreen() {
   return (
     <View style={[s.root, { paddingTop: insets.top }]}>
       <View style={s.top}>
-        <View style={s.chip}>
+        <Pressable
+          onPress={() => setHonours(true)}
+          style={({ pressed }) => [s.chip, pressed && { opacity: 0.8 }]}
+          accessibilityRole="button"
+          accessibilityLabel="Honours"
+        >
           <ClubCrest club={club} size={22} />
           <Text style={s.chipText}>{club.short}</Text>
-        </View>
+          <Text style={s.chipCup}>🏆</Text>
+        </Pressable>
         <View style={s.chip}>
           <Text style={[s.chipText, state.money < 0 && { color: colors.red }]}>
             💵 {formatMoney(state.money)}
@@ -63,7 +72,11 @@ export function MainScreen() {
         </View>
         <View style={[s.chip, state.phase === 'window' && s.chipOpen]}>
           <Text style={s.chipText}>
-            {state.phase === 'window' ? '🔁 Window' : `📅 ${seasonLabel(state.season)}`}
+            {state.challenge
+              ? '🎯 Daily'
+              : state.phase === 'window'
+                ? '🔁 Window'
+                : `📅 ${seasonLabel(state.season)}`}
           </Text>
         </View>
         <View style={s.spacer} />
@@ -106,19 +119,31 @@ export function MainScreen() {
 
       {sim ? <SimScreen until={sim.until} onClose={() => setSim(null)} /> : null}
       <SettingsSheet visible={settings} onClose={() => setSettings(false)} />
+      <HonoursSheet visible={honours} onClose={() => setHonours(false)} />
     </View>
   );
 }
 
 /** Rarely used options, kept out of the way. */
 function SettingsSheet({ visible, onClose }: { visible: boolean; onClose: () => void }) {
-  const { resetCareer } = useGame();
+  const { resetCareer, slot, leaveChallenge } = useGame();
   const [confirm, setConfirm] = useState(false);
   if (!visible) return null;
   const close = () => {
     setConfirm(false);
     onClose();
   };
+  if (slot === 'challenge') {
+    return (
+      <Sheet visible title="Daily challenge" onClose={close}>
+        <Text style={s.settingsText}>
+          Your challenge is saved. Come back any time today to finish it.
+        </Text>
+        <Button label="BACK TO MY CAREER" variant="light" onPress={() => leaveChallenge()} />
+        {DISCLAIMER ? <Text style={s.disclaimer}>{DISCLAIMER}</Text> : null}
+      </Sheet>
+    );
+  }
   return (
     <Sheet visible title="Settings" onClose={close}>
       <Text style={s.settingsText}>
@@ -160,7 +185,7 @@ function TabButton({
 
 const s = StyleSheet.create({
   root: { flex: 1, backgroundColor: colors.bg },
-  top: { flexDirection: 'row', gap: 8, paddingHorizontal: 16, paddingVertical: 8 },
+  top: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 12, paddingVertical: 8 },
   chip: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -171,14 +196,16 @@ const s = StyleSheet.create({
     borderColor: colors.border,
     borderBottomWidth: 4,
     borderBottomColor: colors.borderDark,
-    paddingHorizontal: 10,
+    paddingHorizontal: 9,
     paddingVertical: 6,
+    flexShrink: 1,
   },
   chipOpen: { backgroundColor: colors.greenSoft, borderColor: '#BFE6CC', borderBottomColor: '#9ED6B1' },
-  chipText: { fontWeight: '900', fontSize: 15, color: colors.ink },
+  chipText: { fontWeight: '900', fontSize: 14, color: colors.ink },
+  chipCup: { fontSize: 12 },
   body: { flex: 1 },
   spacer: { flex: 1 },
-  gear: { width: 38, height: 38, alignItems: 'center', justifyContent: 'center' },
+  gear: { width: 34, height: 38, alignItems: 'center', justifyContent: 'center' },
   gearText: { fontSize: 20, opacity: 0.6 },
   play: {
     flex: 1.15,

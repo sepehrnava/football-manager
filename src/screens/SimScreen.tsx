@@ -10,6 +10,12 @@ import { useCareer } from '../state/GameContext';
 import { Bar, Button, Card, ClubCrest } from '../ui/components';
 import { animateNextLayout, FadeIn } from '../ui/motion';
 import { colors, formatMoney } from '../ui/theme';
+import { AchievementToast } from './Honours';
+
+/** Names with a long single word (e.g. "Wolverhampton") need a smaller size to avoid breaking mid-word. */
+function longWord(name: string) {
+  return name.split(' ').some((w) => w.length > 11);
+}
 
 /** Time between matchdays: quick, but slow enough to follow the table. */
 const STEP_MS = 650;
@@ -57,7 +63,10 @@ export function SimScreen({ until: initialUntil, onClose }: { until?: number; on
   const lastRound = played - 1;
   const roundFixtures = state.fixtures.filter((f) => f.round === lastRound);
   const mine = roundFixtures.find((f) => f.homeId === USER_ID || f.awayId === USER_ID);
-  const others = roundFixtures.filter((f) => f !== mine);
+  // Only the user's own league (other leagues share round numbers).
+  const others = roundFixtures.filter(
+    (f) => f !== mine && f.country === mine?.country && f.division === mine?.division,
+  );
   const table = compTable(state);
   const comp = userComp(state);
 
@@ -84,7 +93,7 @@ export function SimScreen({ until: initialUntil, onClose }: { until?: number; on
             <Bar value={(played / rounds) * 100} color={colors.ink} />
           </View>
           {stopText ? (
-            <View style={s.close} />
+            <View style={s.spacer} />
           ) : (
             <Pressable onPress={skip} style={s.close} accessibilityLabel="Skip to the end">
               <Text style={s.closeText}>⏭</Text>
@@ -155,6 +164,7 @@ export function SimScreen({ until: initialUntil, onClose }: { until?: number; on
           )}
         </View>
       </View>
+      <AchievementToast />
     </Modal>
   );
 }
@@ -225,7 +235,7 @@ function MyMatch({ fixture }: { fixture: Fixture }) {
       <View style={s.scoreRow}>
         <View style={s.team}>
           <ClubCrest club={home} size={52} />
-          <Text style={s.teamName} numberOfLines={2}>
+          <Text style={[s.teamName, longWord(home.name) && s.teamNameLong]} numberOfLines={2}>
             {home.name}
           </Text>
         </View>
@@ -234,7 +244,7 @@ function MyMatch({ fixture }: { fixture: Fixture }) {
         </Text>
         <View style={s.team}>
           <ClubCrest club={away} size={52} />
-          <Text style={s.teamName} numberOfLines={2}>
+          <Text style={[s.teamName, longWord(away.name) && s.teamNameLong]} numberOfLines={2}>
             {away.name}
           </Text>
         </View>
@@ -270,6 +280,8 @@ const s = StyleSheet.create({
   header: { flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 12 },
   headerMid: { flex: 1, gap: 6 },
   md: { fontSize: 18, fontWeight: '900', color: colors.ink, textAlign: 'center' },
+  spacer: { width: 42, height: 42 },
+  teamNameLong: { fontSize: 12 },
   close: {
     width: 42,
     height: 42,

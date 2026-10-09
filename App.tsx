@@ -2,6 +2,7 @@ import { StatusBar } from 'expo-status-bar';
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
+import { AchievementToast } from './src/screens/Honours';
 import { MainScreen } from './src/screens/MainScreen';
 import { NewClubScreen } from './src/screens/NewClubScreen';
 import { GameProvider, useGame } from './src/state/GameContext';
@@ -25,6 +26,7 @@ export default function App() {
       <GameProvider>
         <View style={styles.app}>
           <Root />
+          <AchievementToast />
         </View>
         <StatusBar style="dark" />
       </GameProvider>

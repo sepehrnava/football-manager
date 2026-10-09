@@ -1,6 +1,6 @@
 import { counterEffect, tacticFor, USER_ID } from './game';
 import { expectedGoals } from './league';
-import { teamStrength } from './team';
+import { userTeam } from './team';
 import type { Fixture, GameState, Style, Tactic } from './types';
 
 export function userFixture(state: GameState, round: number): Fixture | undefined {
@@ -59,7 +59,7 @@ export function matchInsight(state: GameState, fixture: Fixture): MatchInsight {
   const tactic = tacticFor(state, fixture.round);
   const known = state.knownStyles.includes(opp.id);
   const effect = known ? counterEffect(tactic, opp.style) : 0;
-  const base = teamStrength(state.squad, state.lineup, state.formation, tactic, state.captainId);
+  const base = userTeam(state, tactic);
   const us = { attack: base.attack + effect, defense: base.defense + effect };
   return {
     opponentId: opp.id,

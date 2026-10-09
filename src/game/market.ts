@@ -10,6 +10,7 @@ import {
   wageDemand,
 } from './players';
 import { DEFAULT_COUNTRY, packPlayersFor, type PackPlayer } from './leagues';
+import { scoutCost } from './staff';
 import type { Rng } from './rng';
 import { autoPick, teamStrength } from './team';
 import type { Club, GameState, Line, Offer, Player, Position, Style } from './types';
@@ -192,10 +193,11 @@ export function renewalDemand(state: GameState, p: Player) {
 
 
 export function scoutPlayer(state: GameState, playerId: string): GameState {
-  if ((state.scouting[playerId] ?? 0) >= 1 || MARKET.scoutCost > state.money) return state;
+  const cost = scoutCost(state);
+  if ((state.scouting[playerId] ?? 0) >= 1 || cost > state.money) return state;
   return {
     ...state,
-    money: state.money - MARKET.scoutCost,
+    money: state.money - cost,
     scouting: { ...state.scouting, [playerId]: 1 },
   };
 }

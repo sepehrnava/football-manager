@@ -4,7 +4,7 @@ import { STYLES, TACTICS } from '../game/constants';
 import { clubById, midWindowRound, USER_ID, userClub } from '../game/game';
 import { matchInsight, percent, userFixture } from '../game/insights';
 import { surname } from '../game/players';
-import { teamStrength } from '../game/team';
+import { userTeam } from '../game/team';
 import type { Fixture, Tactic } from '../game/types';
 import { useCareer } from '../state/GameContext';
 import { Button, Card, ClubCrest, Sheet } from '../ui/components';
@@ -128,7 +128,7 @@ export function MatchPreview({ fixture, compact }: { fixture: Fixture; compact?:
   const report = matchInsight(state, fixture);
   const opp = clubById(state, report.opponentId);
   const me = userClub(state);
-  const base = teamStrength(state.squad, state.lineup, state.formation, report.tactic, state.captainId);
+  const base = userTeam(state, report.tactic);
   const mine = { attack: base.attack + report.effect, defense: base.defense + report.effect };
   const style = report.style ? STYLES[report.style] : null;
   const { win, draw, loss } = report.odds;

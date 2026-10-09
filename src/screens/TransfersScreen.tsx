@@ -126,7 +126,10 @@ export function TransfersScreen() {
                     <ClubCrest club={club} size={34} />
                     <View style={s.main}>
                       <Text style={s.name} numberOfLines={1}>
-                        {club.name} want {p.name}
+                        {p.name}
+                      </Text>
+                      <Text style={s.small} numberOfLines={1}>
+                        Wanted by {club.name}
                       </Text>
                       <Text style={s.small}>
                         Value {formatMoney(playerValue(p))} ·{' '}

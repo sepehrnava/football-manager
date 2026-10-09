@@ -11,10 +11,10 @@ Keep current work and a short completed baseline; avoid session logs.
 | T004: Publish SDD documents | User's documentation request | In progress | Commit documents and verify the corresponding remote commit |
 | T005: Specify first football feature | S002 | Done | specs/002-pocket-manager-mockup.md |
 | T006: Build pocket manager mockup | S002-AC01–AC07 | Done | tsc, lint, web export; web flow and reload observed; 40 headless seasons |
-| T007: Confirm mockup on Android | S002-AC08, S003-AC06, S004-AC09, S005-AC08, S006-AC05 | Todo | Run `npm run android` (BlueStacks) or Expo Go and play one season |
+| T007: Confirm mockup on Android | S002-AC08, S003-AC06, S004-AC09, S005-AC08, S006-AC05, S010-AC07 | Todo | Run `npm run android` (BlueStacks) or Expo Go and play one season |
 | T008: Season roadmap, smart sim, motion | S003-AC01–AC05 | Done | tsc, lint, web flow screenshots; 60 headless seasons |
-| T009: Transfer market, contracts, counters | S004-AC01–AC08, AC10 | Done |
-| T010: Simplify play and make money fair | S005-AC01–AC07, AC09–AC14 | Done |
+| T009: Transfer market, contracts, counters | S004-AC01–AC08, AC10 | Done | tsc, lint, web flow; 6 strategies × 30 careers |
+| T010: Simplify play and make money fair | S005-AC01–AC07, AC09–AC14 | Done | tsc, lint, web flows; 3 strategies × 30 careers × 5 seasons |
 | T011: Club choice, transfer list, simpler home | S006-AC01–AC04 | Done | tsc, lint, web flows; per-club headless careers |
 | T012: Real-name league from editable data | S007-AC01–AC05 | Done | Converter validation, web English league, headless economy |
 | T013: Fill English player data | S007-AC06 | Done | 400 players added; user to verify recent transfers and ratings |
@@ -25,7 +25,9 @@ Keep current work and a short completed baseline; avoid session logs.
 | T018: Six leagues | S009-AC01–AC06 | Done | Converter, picker, headless per-league economy |
 | T020: Second divisions, flags, chunked saves | S009-AC09 | Done | Converter, headless 12 leagues, web picker and reload |
 | T021: Player finder and star prices | S009-AC10, AC11 | Done | Headless honesty check, web finder flow |
-| T019: Fill remaining player data | S009-AC07 | Todo | Real players for the other clubs of the five new leagues and the Second Division | tsc, lint, web flow; 6 strategies × 30 careers | tsc, lint, web flows; 3 strategies × 30 careers × 5 seasons |
+| T019: Fill remaining player data | S009-AC07 | Todo | Real players for the other clubs of the five new leagues and the Second Division |
+| T022: Staff, daily challenge, honours, news | S010-AC01–AC06 | Done | tsc, lint, headless sims, web flows |
+| T023: UI/UX pass over every screen | User request 2026-10-09 | Done (first pass) | 26-screen web audit: readable crests, top bar fits, club confirm sheet, compact staff row, offers lead with player, sim fixes |
 
 New implementation tasks reference one spec, relevant acceptance IDs, and a concrete check.
 Split work by observable behavior. Candidate ideas do not become authorized tasks automatically.
