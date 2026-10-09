@@ -2,7 +2,9 @@ import { useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { SQUAD_MIN } from '../game/constants';
 import { userClub } from '../game/game';
+import { squadNeeds } from '../game/market';
 import { DISCLAIMER } from '../game/leagues';
 import { useCareer, useGame } from '../state/GameContext';
 import { Button, ClubCrest, Sheet } from '../ui/components';
@@ -30,10 +32,12 @@ export function MainScreen() {
   const { state, dispatch } = useCareer();
   const insets = useSafeAreaInsets();
   // New tabs slide in from the side they sit on in the tab bar.
-  const [{ tab, from }, setNav] = useState<{ tab: Tab; from: 'left' | 'right' }>({
-    tab: 'club',
+  // A new club with no players yet starts on the Squad tab, where it builds its team.
+  const ready = squadNeeds(state.squad).ready;
+  const [{ tab, from }, setNav] = useState<{ tab: Tab; from: 'left' | 'right' }>(() => ({
+    tab: ready ? 'club' : 'squad',
     from: 'right',
-  });
+  }));
   const setTab = (next: Tab) => {
     const order = TABS.map((t) => t.id);
     setNav({ tab: next, from: order.indexOf(next) < order.indexOf(tab) ? 'left' : 'right' });
@@ -47,6 +51,7 @@ export function MainScreen() {
   }
 
   const play = (until?: number) => {
+    if (state.phase === 'window' && !ready) return setTab('squad');
     if (state.phase === 'window') dispatch({ type: 'startSeason' });
     setSim({ until });
   };
@@ -94,7 +99,7 @@ export function MainScreen() {
             onOpenSquad={() => setTab('squad')}
           />
         )}
-        {tab === 'squad' && <SquadScreen />}
+        {tab === 'squad' && <SquadScreen onFindPlayers={() => setTab('transfers')} />}
         {tab === 'transfers' && <TransfersScreen />}
         {tab === 'league' && <LeagueScreen />}
       </FadeIn>
@@ -105,12 +110,14 @@ export function MainScreen() {
         ))}
         <Pressable
           onPress={() => play()}
-          style={({ pressed }) => [s.play, pressed && { opacity: 0.85 }]}
+          style={({ pressed }) => [s.play, !ready && state.phase === 'window' && s.playLocked, pressed && { opacity: 0.85 }]}
           accessibilityRole="button"
           accessibilityLabel={state.phase === 'window' ? 'Kick off' : 'Play'}
         >
           <Text style={s.playIcon}>▶</Text>
-          <Text style={s.playText}>{state.phase === 'window' ? 'KICK OFF' : 'PLAY'}</Text>
+          <Text style={s.playText}>
+            {state.phase !== 'window' ? 'PLAY' : ready ? 'KICK OFF' : `${state.squad.length}/${SQUAD_MIN}`}
+          </Text>
         </Pressable>
         {TABS.slice(2).map((t) => (
           <TabButton key={t.id} {...t} active={tab === t.id} onPress={() => setTab(t.id)} />
@@ -184,6 +191,7 @@ function TabButton({
 }
 
 const s = StyleSheet.create({
+  playLocked: { backgroundColor: colors.borderDark },
   root: { flex: 1, backgroundColor: colors.bg },
   top: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 12, paddingVertical: 8 },
   chip: {

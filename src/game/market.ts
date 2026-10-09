@@ -279,6 +279,19 @@ export function academyFill(squad: Player[], rng: Rng, startId: number, atLeast 
   return { players, nextId };
 }
 
+/** What a squad still lacks before it can play: 18 players and the minimum per line. */
+export function squadNeeds(squad: Player[]) {
+  const lines = (Object.keys(LINE_MIN) as Line[]).map((line) => {
+    const have = squad.filter((p) => LINE_OF[p.positions[0]] === line).length;
+    return { line, have, need: LINE_MIN[line] };
+  });
+  const missing = Math.max(
+    SQUAD_MIN - squad.length,
+    lines.reduce((sum, l) => sum + Math.max(0, l.need - l.have), 0),
+  );
+  return { lines, missing, ready: missing === 0 };
+}
+
 // ---------------------------------------------------------------- selling
 
 /**

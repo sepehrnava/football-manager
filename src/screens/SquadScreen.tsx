@@ -20,6 +20,7 @@ import {
 } from '../ui/components';
 import { animateNextLayout, usePulse } from '../ui/motion';
 import { colors, lineColors } from '../ui/theme';
+import { BuildSquadCard } from './BuildSquad';
 import { ChemistrySheet, LinkLines } from './Chemistry';
 import { PlayerSheet } from './PlayerSheet';
 import { StaffCard, StaffSheet } from './StaffSheet';
@@ -33,7 +34,7 @@ function fitColor(drop: number) {
   return drop <= 0 ? colors.green : penaltyTone(drop) === 'red' ? colors.red : colors.orange;
 }
 
-export function SquadScreen() {
+export function SquadScreen({ onFindPlayers }: { onFindPlayers: () => void }) {
   const { state, dispatch } = useCareer();
   const [sel, setSel] = useState<Selection>(null);
   const [detail, setDetail] = useState<string | null>(null);
@@ -107,6 +108,7 @@ export function SquadScreen() {
         onScroll={(e) => (view.current.y = e.nativeEvent.contentOffset.y)}
         scrollEventThrottle={32}
       >
+        <BuildSquadCard onFindPlayers={onFindPlayers} />
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.pills}>
           {FORMATION_IDS.map((id) => (
             <Pill

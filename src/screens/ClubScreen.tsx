@@ -21,6 +21,7 @@ import { colors, ordinal, seasonLabel } from '../ui/theme';
 import { ChallengeBanner, DailyCard } from './Challenge';
 import type { NewsItem } from '../game/types';
 import { MatchSheet } from './MatchSheet';
+import { BuildSquadCard } from './BuildSquad';
 import { Roadmap } from './Roadmap';
 
 /** Home: the club, the season roadmap, and one card that says what to do next. */
@@ -84,6 +85,7 @@ export function ClubScreen({
 
   return (
     <ScrollView contentContainerStyle={s.content}>
+      <BuildSquadCard onFindPlayers={onOpenTransfers} />
       <FadeIn style={s.hero}>
         <ClubCrest club={club} size={56} />
         <View style={s.heroText}>

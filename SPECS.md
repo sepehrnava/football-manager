@@ -30,6 +30,8 @@ or hosting. These are not approved features.
 | S010 | [Staff, daily challenge, honours and news](specs/010-staff-daily-honours-news.md) | Implemented; device observation pending |
 | S011 | [Chemistry links](specs/011-chemistry-links.md) | Implemented; device observation pending |
 | S012 | [Easier swaps](specs/012-easier-swaps.md) | Implemented; device observation pending |
+| S013 | [Build your squad (new club)](specs/013-build-your-squad.md) | Implemented; device observation pending |
+| S014 | [League stats](specs/014-league-stats.md) | Implemented; device observation pending |
 
 Use [the template](specs/_template.md) for the next feature. Number specs sequentially.
 Keep IDs stable; criteria use S002-AC01 style IDs referenced by tasks and evidence.

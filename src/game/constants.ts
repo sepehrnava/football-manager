@@ -50,6 +50,8 @@ export const ECONOMY = {
   newClubBelowWeakest: 1,
   /** A new club's founding investment, as a multiple of the weakest club's budget. */
   newClubInvestment: 1.5,
+  /** A new club's player budget: the old ready-made squad's value times this (market prices, no chemistry yet). */
+  newClubMarketFactor: 1.6,
   /** Prize money by final position, 1st first (fallback for a 10-club league). */
   prize: [20, 15, 12, 10, 9, 8, 7, 6, 5, 4].map((m) => m * 1_000_000),
   /** Prize money curve: champion and last place for a league of reference strength. */

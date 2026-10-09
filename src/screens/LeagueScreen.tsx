@@ -3,7 +3,8 @@ import { ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { clubById, compTable, USER_ID, userComp } from '../game/game';
 import { compKey, compName, COMPS, divisionsIn, flagOf, PROMOTION_SPOTS, zoneOf, type Comp } from '../game/leagues';
-import type { Fixture } from '../game/types';
+import { leagueStats } from '../game/stats';
+import type { Club, Fixture } from '../game/types';
 import { useCareer } from '../state/GameContext';
 import { Card, ClubCrest, Pill, SectionTitle } from '../ui/components';
 import { CupCard } from './CupCard';
@@ -17,7 +18,6 @@ export function LeagueScreen() {
   const isMine = compKey(comp) === compKey(myComp);
   const deepest = divisionsIn(comp.country);
   const mine = state.fixtures.filter((f) => f.homeId === USER_ID || f.awayId === USER_ID);
-  const scorers = state.squad.filter((p) => p.goals > 0).sort((a, b) => b.goals - a.goals).slice(0, 5);
 
   return (
     <ScrollView contentContainerStyle={s.content}>
@@ -87,6 +87,8 @@ export function LeagueScreen() {
         })}
       </Card>
 
+      {isMine ? <LeagueStats /> : null}
+
       {isMine ? (
         <>
           <SectionTitle>YOUR MATCHES</SectionTitle>
@@ -107,22 +109,88 @@ export function LeagueScreen() {
         </>
       ) : null}
 
-      {scorers.length ? (
+    </ScrollView>
+  );
+}
+
+/** Top scorers across the league and the season's team records. */
+function LeagueStats() {
+  const { state } = useCareer();
+  const st = leagueStats(state);
+  if (!st.scorers.length && !st.attack) {
+    return (
+      <>
+        <SectionTitle>LEAGUE STATS</SectionTitle>
+        <Text style={s.statsEmpty}>Stats appear once the season starts.</Text>
+      </>
+    );
+  }
+  return (
+    <>
+      <SectionTitle>LEAGUE STATS</SectionTitle>
+      <View style={s.records}>
+        {st.attack ? <Record label="BEST ATTACK" club={st.attack.club} value={`${st.attack.value} goals`} /> : null}
+        {st.defence ? (
+          <Record label="BEST DEFENCE" club={st.defence.club} value={`${st.defence.value} conceded`} />
+        ) : null}
+        {st.wins ? <Record label="MOST WINS" club={st.wins.club} value={`${st.wins.value} wins`} /> : null}
+      </View>
+      {st.biggest ? (
+        <Card style={s.biggest}>
+          <Text style={s.recordLabel}>BIGGEST WIN</Text>
+          <View style={s.biggestRow}>
+            <ClubCrest club={st.biggest.home} size={22} />
+            <Text style={s.biggestName} numberOfLines={1}>
+              {st.biggest.home.name}
+            </Text>
+            <Text style={s.biggestScore}>{st.biggest.score}</Text>
+            <Text style={[s.biggestName, s.right]} numberOfLines={1}>
+              {st.biggest.away.name}
+            </Text>
+            <ClubCrest club={st.biggest.away} size={22} />
+          </View>
+          <Text style={s.statsEmpty}>{st.goalsPerGame.toFixed(1)} goals per game this season</Text>
+        </Card>
+      ) : null}
+      {st.scorers.length ? (
         <>
           <SectionTitle>TOP SCORERS</SectionTitle>
           <Card style={s.list}>
-            {scorers.map((p) => (
-              <View key={p.id} style={s.fixture}>
-                <Text style={s.fname}>
-                  {p.flag} {p.name}
-                </Text>
-                <Text style={s.goals}>{p.goals} ⚽</Text>
-              </View>
-            ))}
+            {st.scorers.map(({ player, club }, i) => {
+              const ours = club.id === USER_ID;
+              return (
+                <View key={player.id} style={[s.fixture, ours && s.ours]}>
+                  <Text style={s.rank}>{i + 1}</Text>
+                  <ClubCrest club={club} size={20} />
+                  <View style={s.flexText}>
+                    <Text style={[s.fname, ours && s.bold]} numberOfLines={1}>
+                      {player.flag} {player.name}
+                    </Text>
+                    <Text style={s.scorerClub} numberOfLines={1}>
+                      {club.name}
+                    </Text>
+                  </View>
+                  <Text style={s.goals}>{player.goals}</Text>
+                </View>
+              );
+            })}
           </Card>
         </>
       ) : null}
-    </ScrollView>
+    </>
+  );
+}
+
+function Record({ label, club, value }: { label: string; club: Club; value: string }) {
+  return (
+    <Card style={s.record}>
+      <Text style={s.recordLabel}>{label}</Text>
+      <ClubCrest club={club} size={30} />
+      <Text style={s.recordClub} numberOfLines={1}>
+        {club.short}
+      </Text>
+      <Text style={s.recordValue}>{value}</Text>
+    </Card>
   );
 }
 
@@ -190,5 +258,20 @@ const s = StyleSheet.create({
   tag: { minWidth: 26, height: 24, borderRadius: 8, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 5 },
   tagSpace: { width: 26 },
   tagText: { color: '#FFFFFF', fontWeight: '900', fontSize: 11 },
-  goals: { fontWeight: '900', color: colors.ink, fontSize: 15 },
+  goals: { fontWeight: '900', color: colors.ink, fontSize: 18, minWidth: 24, textAlign: 'right' },
+  rank: { width: 20, fontSize: 14, fontWeight: '900', color: colors.muted },
+  flexText: { flex: 1, minWidth: 0 },
+  scorerClub: { fontSize: 12, fontWeight: '600', color: colors.muted },
+  ours: { backgroundColor: '#FFF8E6', borderRadius: 10, marginHorizontal: -6, paddingHorizontal: 6 },
+  statsEmpty: { fontSize: 13, fontWeight: '600', color: colors.muted },
+  records: { flexDirection: 'row', gap: 8 },
+  record: { flex: 1, alignItems: 'center', gap: 4, paddingVertical: 12, paddingHorizontal: 6 },
+  recordLabel: { fontSize: 10, fontWeight: '900', letterSpacing: 1, color: colors.muted },
+  recordClub: { fontSize: 15, fontWeight: '900', color: colors.ink },
+  recordValue: { fontSize: 12, fontWeight: '700', color: colors.muted },
+  biggest: { gap: 8 },
+  biggestRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  biggestName: { flex: 1, fontSize: 14, fontWeight: '800', color: colors.ink },
+  right: { textAlign: 'right' },
+  biggestScore: { fontSize: 20, fontWeight: '900', color: colors.ink },
 });

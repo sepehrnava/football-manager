@@ -273,8 +273,8 @@ export function NewClubScreen() {
       <Card style={s.info}>
         <Text style={s.infoTitle}>Your situation</Text>
         <Text style={s.infoText}>
-          Your new club starts in the {compName({ country, division: divisionsIn(country) })} with a modest
-          squad and a founding investment. Develop young players, sell at the right time and climb
+          Your new club starts in the {compName({ country, division: divisionsIn(country) })} with no players and
+          a budget: build your squad in the transfer window. Develop young players, sell at the right time and climb
           {divisionsIn(country) > 1 ? ' all the way to the top' : ' the table'}. Spend too much and the board
           sacks you.
         </Text>
