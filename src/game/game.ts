@@ -34,7 +34,7 @@ import {
 import { roundNews, withNews } from './news';
 import { hireStaff, staffMarket, staffWages, startingStaff, youthBoostChance } from './staff';
 import { compKey, compName, DEFAULT_COUNTRY, divisionsIn, econRating, LEAGUE, PROMOTION_SPOTS, type Comp } from './leagues';
-import { develop, makePlayer, markRetirements, playerValue, roundMoney } from './players';
+import { develop, makePlayer, markRetirements, playerValue, roundMoney, withExtraPositions } from './players';
 import { createRng, type Rng } from './rng';
 import { autoPick, benchFor, remapLineup, userStrength, userTeam, wageBill } from './team';
 import type {
@@ -143,6 +143,19 @@ function withCrestShapes(state: GameState): GameState {
       c.id === USER_ID || c.crest.shape ? c : { ...c, crest: { ...c.crest, shape: crestShapeFor(c.short) } },
     ),
   };
+}
+
+/** Saves from before extra positions: give one-position players theirs (same rule as new players). */
+function withPositions(state: GameState): GameState {
+  const fix = (p: Player) => {
+    if (p.positions.length > 1) return p;
+    const positions = withExtraPositions(p.positions, p.name);
+    return positions.length > 1 ? { ...p, positions } : p;
+  };
+  const squad = state.squad.map(fix);
+  const world = state.world.map(fix);
+  if (squad.every((p, i) => p === state.squad[i]) && world.every((p, i) => p === state.world[i])) return state;
+  return { ...state, squad, world };
 }
 
 export function divisionOf(club: Pick<Club, 'division'>) {
@@ -872,7 +885,7 @@ export function reducer(state: GameState | null, action: Action): GameState | nu
 
 function step(state: GameState | null, action: Action): GameState | null {
   if (action.type === 'new') return createGame(action);
-  if (action.type === 'load') return withCrestShapes(action.state);
+  if (action.type === 'load') return withPositions(withCrestShapes(action.state));
   if (action.type === 'reset') return null;
   if (!state) return state;
   const rng = createRng(state.seed);

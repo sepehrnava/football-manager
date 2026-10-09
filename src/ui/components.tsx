@@ -130,6 +130,34 @@ export function RatingBadge({
   );
 }
 
+/**
+ * A rating badge with the player's potential under it ("▲84"), shown only when there are at
+ * least 3 points of growth left. A range (unscouted) is shown in grey.
+ */
+export function RatingWithPotential({
+  badge,
+  rating,
+  potential,
+}: {
+  badge: ReactNode;
+  /** The (highest possible) current rating. */
+  rating: number;
+  potential: [number, number] | null;
+}) {
+  const grows = potential && potential[1] - rating >= 3;
+  const exact = potential && potential[0] === potential[1];
+  return (
+    <View style={styles.withPotential}>
+      {badge}
+      {grows ? (
+        <Text style={[styles.potential, !exact && styles.potentialRange]} numberOfLines={1}>
+          ▲{exact ? potential[1] : `${potential[0]}–${potential[1]}`}
+        </Text>
+      ) : null}
+    </View>
+  );
+}
+
 /** A scouted rating: exact badge when known, a soft range pill when not. */
 export function RangeBadge({ range, size = 34 }: { range: [number, number]; size?: number }) {
   if (range[0] === range[1]) return <RatingBadge value={range[0]} size={size} />;
@@ -263,11 +291,24 @@ export function ClubCrest({ club, size }: { club: Club; size?: number }) {
   return <Crest crest={club.crest} short={club.short} size={size} />;
 }
 
-export function Stat({ label, value, color }: { label: string; value: string | number; color?: string }) {
+export function Stat({
+  label,
+  value,
+  color,
+  compact,
+}: {
+  label: string;
+  value: string | number;
+  color?: string;
+  /** Smaller, for rows of five. */
+  compact?: boolean;
+}) {
   return (
     <View style={styles.stat}>
-      <Text style={[styles.statValue, color ? { color } : null]}>{value}</Text>
-      <Text style={styles.statLabel}>{label}</Text>
+      <Text style={[styles.statValue, compact && styles.statValueCompact, color ? { color } : null]}>{value}</Text>
+      <Text style={[styles.statLabel, compact && styles.statLabelCompact]} numberOfLines={1}>
+        {label}
+      </Text>
     </View>
   );
 }
@@ -490,6 +531,11 @@ export const styles = StyleSheet.create({
   stat: { alignItems: 'center', flex: 1 },
   statValue: { fontSize: 22, fontWeight: '900', color: colors.ink },
   statLabel: { fontSize: 11, fontWeight: '800', letterSpacing: 1.2, color: colors.muted, marginTop: 2 },
+  statValueCompact: { fontSize: 20 },
+  withPotential: { alignItems: 'center', minWidth: 40 },
+  potential: { fontSize: 11, fontWeight: '900', color: colors.green, marginTop: 2 },
+  potentialRange: { color: colors.muted },
+  statLabelCompact: { fontSize: 9, letterSpacing: 0.6 },
   kv: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 6 },
   kvLabel: { fontSize: 15, color: colors.muted, fontWeight: '600', flexShrink: 1 },
   kvValue: { fontSize: 15, color: colors.ink, fontWeight: '800' },

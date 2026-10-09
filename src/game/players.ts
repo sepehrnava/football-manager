@@ -78,6 +78,23 @@ const SECOND_POSITION: Partial<Record<Position, Position[]>> = {
   ST: ['CAM', 'LW', 'RW'],
 };
 
+/**
+ * Realistic extra positions next to a player's main one: about 70% of outfield players can play
+ * one more, a quarter of those two more (from SECOND_POSITION). Worked out from `key` (the
+ * player's name), so a player always has the same positions. Goalkeepers stay goalkeepers.
+ */
+export function withExtraPositions(positions: Position[], key: string): Position[] {
+  const main = positions[0];
+  const options = (SECOND_POSITION[main] ?? []).filter((p) => !positions.includes(p));
+  if (main === 'GK' || positions.length >= 3 || !options.length) return positions;
+  const hash = [...key].reduce((h, ch) => (h * 33 + ch.charCodeAt(0)) >>> 0, 5381);
+  if (positions.length >= 2 || hash % 100 >= 70) return positions;
+  const first = options[hash % options.length];
+  const rest = options.filter((p) => p !== first);
+  const second = (hash >>> 8) % 100 < 25 && rest.length ? [rest[(hash >>> 16) % rest.length]] : [];
+  return [...positions, first, ...second];
+}
+
 export interface PlayerSpec {
   position: Position;
   rating: number;
@@ -105,17 +122,15 @@ function generatedName(rng: Rng, nation: (typeof NATIONS)[number]) {
 
 export function makePlayer(rng: Rng, id: string, spec: PlayerSpec): Player {
   const nation = rng.pick(NATIONS);
-  const positions: Position[] = [spec.position];
-  const extra = SECOND_POSITION[spec.position];
-  if (extra && rng.chance(0.45)) positions.push(rng.pick(extra));
   const rating = clamp(Math.round(spec.rating), 40, 95);
   const headroom = spec.age <= 21 ? 18 : spec.age <= 24 ? 10 : spec.age <= 27 ? 4 : 0;
+  const name = generatedName(rng, nation);
   return {
     id,
-    name: generatedName(rng, nation),
+    name,
     flag: nation.flag,
     age: spec.age,
-    positions,
+    positions: withExtraPositions([spec.position], name),
     rating,
     // Generated players rarely become world class: real stars stay special.
     potential: clamp(rating + rng.int(0, headroom), rating, Math.max(rating, 90)),

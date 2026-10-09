@@ -14,7 +14,7 @@ import {
 import { askingPrice } from '../game/market';
 import { DEFAULT_FINDER, findPlayers, type Finder, type FinderTab } from '../game/finder';
 import { COUNTRIES } from '../game/leagues';
-import { playerValue, ratingRange, trend, wageDemand } from '../game/players';
+import { playerValue, potentialRange, ratingRange, trend, wageDemand } from '../game/players';
 import type { Player, Position } from '../game/types';
 import { useAds } from '../ads/AdsContext';
 import { useCareer } from '../state/GameContext';
@@ -26,6 +26,7 @@ import {
   PosTags,
   RangeBadge,
   RatingBadge,
+  RatingWithPotential,
   SectionTitle,
   TrendTag,
 } from '../ui/components';
@@ -298,7 +299,11 @@ function MarketRow({ player: p, note, onPress }: { player: Player; note?: string
         <Text style={[s.priceText, fee > state.money && { color: colors.red }]}>{formatMoney(fee)}</Text>
         <Text style={s.small}>{formatMoney(wageDemand(p))}/yr</Text>
       </View>
-      <RangeBadge range={ratingRange(p, level)} size={36} />
+      <RatingWithPotential
+        badge={<RangeBadge range={ratingRange(p, level)} size={36} />}
+        rating={ratingRange(p, level)[1]}
+        potential={potentialRange(p, level)}
+      />
     </Pressable>
   );
 }

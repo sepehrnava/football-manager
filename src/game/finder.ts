@@ -93,10 +93,8 @@ export function findPlayers(state: GameState, f: Finder): Found[] {
     return priced
       .filter(({ p }) => p.age <= 21 && potFloor(p) >= p.rating + 4)
       .sort((a, b) => potFloor(b.p) - potFloor(a.p) || a.fee - b.fee)
-      .map(({ p }) => {
-        const [lo, hi] = potentialRange(p, state.scouting[p.id] ?? 0) ?? [p.potential, p.potential];
-        return { player: p, note: lo === hi ? `Potential ${lo}` : `Potential ${lo}–${hi}` };
-      });
+      // The potential shows under each rating badge ("▲"), so no extra note here.
+      .map(({ p }) => ({ player: p }));
   }
 
   if (f.tab === 'experienced') {

@@ -13,6 +13,7 @@ import {
   PickerButton,
   PosTags,
   RatingBadge,
+  RatingWithPotential,
   SectionTitle,
   Stat,
   TrendTag,
@@ -150,30 +151,45 @@ export function SquadScreen({ onFindPlayers }: { onFindPlayers: () => void }) {
         />
 
         <View style={s.stats}>
-          <Stat label="POWER" value={strength.power} />
-          <Stat label="ATTACK" value={strength.attack} color={lineColors.AT} />
-          <Stat label="DEFENSE" value={strength.defense} color={lineColors.DF} />
+          <Stat compact label="POWER" value={strength.power} />
+          <Stat compact label="ATTACK" value={strength.attack} color={lineColors.AT} />
+          <Stat compact label="DEFENSE" value={strength.defense} color={lineColors.DF} />
           <Pressable
             onPress={() => setChemOpen(true)}
             style={({ pressed }) => [s.chemStat, pressed && { opacity: 0.6 }]}
             accessibilityRole="button"
             accessibilityLabel="How chemistry works"
           >
-            <Stat label="CHEMISTRY" value={strength.chemistry} color={colors.green} />
+            <Stat compact label="CHEMISTRY" value={strength.chemistry} color={colors.green} />
             <Text style={s.chemHow}>
               {chemBonus >= 0 ? '+' : ''}
               {chemBonus} power ›
             </Text>
           </Pressable>
+          <View style={s.chemStat}>
+            <Stat compact label="BENCH" value={depth.rating} color={colors.blue} />
+            <Text style={[s.chemHow, { color: depth.bonus < 0 ? colors.red : colors.blue }]}>
+              {depth.bonus >= 0 ? '+' : ''}
+              {depth.bonus} power
+            </Text>
+          </View>
         </View>
         <ChemistrySheet visible={chemOpen} onClose={() => setChemOpen(false)} />
 
         <View style={s.pitchWrap} onLayout={(e) => (view.current.wrap = e.nativeEvent.layout)}>
         <View style={s.pitch} onLayout={(e) => setPitch({ w: e.nativeEvent.layout.width, h: e.nativeEvent.layout.height })}>
-          <View style={s.boxTop} />
-          <View style={s.halfway} />
-          <View style={s.circle} />
-          <View style={s.boxBottom} />
+          {/* Empty grass: a tap clears the selection. Players sit above it and get their own taps. */}
+          <Pressable
+            style={StyleSheet.absoluteFill}
+            onPress={() => setSel(null)}
+            disabled={!sel}
+            accessibilityElementsHidden
+            importantForAccessibility="no-hide-descendants"
+          />
+          <View pointerEvents="none" style={s.boxTop} />
+          <View pointerEvents="none" style={s.halfway} />
+          <View pointerEvents="none" style={s.circle} />
+          <View pointerEvents="none" style={s.boxBottom} />
           <LinkLines xi={xi} formation={state.formation} width={pitch.w} height={pitch.h} />
           {formation.slots.map((sl, i) => {
             const p = xi[i];
@@ -423,7 +439,11 @@ function BenchRow({
         accessibilityState={{ selected: !!selected }}
         style={({ pressed }) => [s.benchRowMain, pressed && s.rowPressed]}
       >
-        <RatingBadge value={player.rating} size={34} />
+        <RatingWithPotential
+          badge={<RatingBadge value={player.rating} size={34} />}
+          rating={player.rating}
+          potential={[player.potential, player.potential]}
+        />
         <View style={s.rowMain}>
           <Text style={s.benchName} numberOfLines={1}>
             {player.flag} {player.name}
@@ -463,7 +483,7 @@ const s = StyleSheet.create({
   benchRow: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 10 },
   benchRowLine: { borderBottomWidth: 1, borderBottomColor: colors.border },
   benchName: { fontSize: 15, fontWeight: '800', color: colors.ink },
-  benchMeta: { flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 2 },
+  benchMeta: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', columnGap: 10, rowGap: 2, marginTop: 2 },
   benchAge: { fontSize: 12, fontWeight: '700', color: colors.muted },
   benchSale: { fontSize: 11, fontWeight: '900', color: colors.blue },
   benchRowMain: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 12 },

@@ -26,7 +26,7 @@ and long scrolling chip rows for choices. They looked busy and felt harder than 
   2026-10-10 (user): the pitch holds the 11 starters with a horizontal bench row at its bottom
   (a pop-up swap panel was tried and rejected). Tapping a pitch player shows a "Details" button
   next to them and sorts the bench row by rating in that position, best first, with SUB /
-  RESERVE labels; tap a bench player or another position to swap. Substitutes and Reserves are
+  RESERVE labels; tap a bench player or another position to swap, or empty grass to cancel. Substitutes and Reserves are
   also lists below the pitch: tap one to select (highlighted), then one in the other list to swap
   sub and reserve, or a pitch position to bring them on; each row has a Details button. The
   chosen bench is saved (GameState.bench, optional) and a substitute coming on leaves his bench

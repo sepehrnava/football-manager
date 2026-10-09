@@ -8,6 +8,7 @@ import {
   positionsForLine,
   roundMoney,
   wageDemand,
+  withExtraPositions,
 } from './players';
 import { DEFAULT_COUNTRY, packPlayersFor, type PackPlayer } from './leagues';
 import { scoutCost } from './staff';
@@ -62,7 +63,7 @@ function fromPack(rng: Rng, id: string, pp: PackPlayer, clubId: string): Player 
     ...base,
     name: pp.name,
     flag: pp.flag,
-    positions: pp.positions,
+    positions: withExtraPositions(pp.positions, pp.name),
     potential: pp.potential ?? base.potential,
   };
 }
