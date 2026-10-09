@@ -18,6 +18,7 @@ import {
   Stat,
   TrendTag,
 } from '../ui/components';
+import { ShirtAvatar } from '../ui/avatar';
 import { animateNextLayout, FadeIn } from '../ui/motion';
 import { colors, lineColors } from '../ui/theme';
 import { PlayerSheet } from './PlayerSheet';
@@ -265,6 +266,7 @@ function PlayerRow({
   target?: Position;
   selected?: boolean;
 }) {
+  const { state } = useCareer();
   const r = target ? ratingAt(player, target) : player.rating;
   const drop = player.rating - r;
   return (
@@ -275,6 +277,7 @@ function PlayerRow({
       accessibilityState={{ selected: !!selected }}
       style={({ pressed }) => [s.row, !last && s.rowBorder, selected && s.rowSelected, pressed && s.rowPressed]}
     >
+      <ShirtAvatar crest={userClub(state).crest} label={String(player.number ?? '')} size={40} />
       <View style={s.rowMain}>
         <Text style={s.rowName} numberOfLines={1}>
           {player.flag} {player.name}

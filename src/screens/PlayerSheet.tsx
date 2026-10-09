@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 import { SQUAD_MAX } from '../game/constants';
-import { canTrade, clubById } from '../game/game';
+import { canTrade, clubById, userClub } from '../game/game';
 import { scoutCost } from '../game/staff';
 import { askingPrice, needsCover, quickSalePrice, releaseBlocker } from '../game/market';
 import {
@@ -18,6 +18,7 @@ import {
 import type { Player } from '../game/types';
 import { useCareer } from '../state/GameContext';
 import { Bar, Button, ClubCrest, PosTags, RangeBadge, RatingBadge, Row, Sheet, TrendTag } from '../ui/components';
+import { ShirtAvatar } from '../ui/avatar';
 import { FadeIn } from '../ui/motion';
 import { colors, formatMoney } from '../ui/theme';
 
@@ -254,6 +255,7 @@ function SquadView({ player: p, onClose }: { player: Player; onClose: () => void
       }
     >
       <View style={s.hero}>
+        <ShirtAvatar crest={userClub(state).crest} label={String(p.number ?? '')} size={64} />
         <RatingBadge value={p.rating} size={64} />
         <View style={s.heroText}>
           <PosTags positions={p.positions} size={18} />

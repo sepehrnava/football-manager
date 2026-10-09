@@ -6,6 +6,7 @@ import {
 } from './constants';
 import { CUP_RULES, cupProgress, drawCups, playCupStages } from './cups';
 import { leagueTable, makeFixtures, pickScorers, playMatch } from './league';
+import { assignNumbers } from './numbers';
 import {
   acceptOffer,
   advanceWorld,
@@ -703,7 +704,15 @@ function nextSeason(state: GameState, rng: Rng): GameState {
   return openWindow(withCups(next, rng, rankings), rng);
 }
 
+/** Every state change, then shirt numbers for anyone new in the squad (also fills old saves). */
 export function reducer(state: GameState | null, action: Action): GameState | null {
+  const next = step(state, action);
+  if (!next) return next;
+  const squad = assignNumbers(next.squad);
+  return squad === next.squad ? next : { ...next, squad };
+}
+
+function step(state: GameState | null, action: Action): GameState | null {
   if (action.type === 'new') return createGame(action);
   if (action.type === 'load') return action.state;
   if (action.type === 'reset') return null;

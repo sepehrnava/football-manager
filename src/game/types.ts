@@ -57,6 +57,8 @@ export interface Player {
   retiring?: boolean;
   /** On the user's transfer list: clubs make offers when a window is open. */
   listed?: boolean;
+  /** Shirt number in the user's squad; given on joining and kept. */
+  number?: number;
 }
 
 export interface Club {
