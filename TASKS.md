@@ -37,6 +37,7 @@ Keep current work and a short completed baseline; avoid session logs.
 | T030: Crest shapes; CB–midfield chemistry links | S017-AC01–AC03, S011 | Done | tsc, lint, web and BlueStacks screenshots; chemistry mean 67.2 before and after |
 | T031: Sign in and cloud save | S018-AC01–AC05 | In progress | Firebase fully configured (apps, Firestore + rules, Google and Apple enabled, env and EAS vars); next: development build and device tests |
 | T032: Remote updates (EAS Update) | D013 | Done (config) | Expo project linked, channels in eas.json; first update needs a store or preview build |
+| T039: Academy intake; wider timeline | S023-AC01, AC02 | Done | Headless cycle, web flow on an older save |
 | T038: Multiple positions; Bench in the stats row | S022-AC01–AC03 | Done | Headless distribution, web reload of an old save |
 | T037: Bench strength bonus; offers arrive over time | S021-AC01–AC03 | Done | Headless bench distribution, web flows |
 | T036: Choose the bench (swap subs and reserves) | S016 revision | Done | Headless bench swap and substitution; web flow, no console errors |

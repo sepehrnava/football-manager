@@ -20,7 +20,8 @@ and long scrolling chip rows for choices. They looked busy and felt harder than 
   at full strength, a soft gold background behind the active tab, and a small round green
   Play / Kick off the size of a tab.
 - Club: plain heading with position, roadmap without box or emoji (current stop marked by a
-  still soft-gold highlight; the pulsing ring overlapped the line and was removed), one tappable next-match
+  still soft-gold highlight; the pulsing ring overlapped the line and was removed; 80 px per
+  stop and no grey ring on upcoming stops, the grey line stays between them), one tappable next-match
   row, one list for notes, Staff (moved from Squad) and Daily; plain news lines.
 - Squad: Formation and Tactic pickers plus Best XI; strength numbers without a card. Revised
   2026-10-10 (user): the pitch holds the 11 starters with a horizontal bench row at its bottom

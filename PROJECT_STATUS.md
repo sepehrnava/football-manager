@@ -38,6 +38,8 @@ Updated: 2026-10-09. Replace outdated entries; keep this as a snapshot.
   Firestore (free plan), restore and account deletion (S018, D012). Firebase project
   top-squad-fm-97218 is fully set up, Google and Apple sign-in enabled; untested on a device.
 - Remote updates with EAS Update (Expo project @sepehrnava/top-squad, channels per build) (D013).
+- Academy intake: each pre-season promote 1 of 3 prospects (potential range judged by the
+  youth coach); replaces the automatic graduate (S023).
 - Most players have 2–3 positions (stable per player, older saves upgraded on load); potential
   shows as "▲84" under rating badges in lists for growing players (S022).
 - Bench strength (−2 to +3 power from bench depth) and transfer-list bids that arrive over

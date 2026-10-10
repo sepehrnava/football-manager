@@ -25,6 +25,7 @@ import type { NewsItem } from '../game/types';
 import { MatchSheet } from './MatchSheet';
 import { BuildSquadCard } from './BuildSquad';
 import { Roadmap } from './Roadmap';
+import { AcademySheet } from './AcademySheet';
 import { MoneySheet } from './MoneySheet';
 import { StaffSheet } from './StaffSheet';
 import { useOffers } from './useOffers';
@@ -48,6 +49,7 @@ export function ClubScreen({
   const [allNews, setAllNews] = useState(false);
   const [staffOpen, setStaffOpen] = useState(false);
   const [moneyOpen, setMoneyOpen] = useState(false);
+  const [academyOpen, setAcademyOpen] = useState(false);
   const news = state.news ?? [];
 
   const club = userClub(state);
@@ -61,6 +63,10 @@ export function ClubScreen({
 
   // Short notes, only when something needs attention.
   const notes: { text: string; onPress?: () => void; color?: string }[] = [];
+  const intake = state.phase === 'window' && !state.challenge ? (state.academy?.prospects.length ?? 0) : 0;
+  if (intake) {
+    notes.push({ text: `Academy intake: promote 1 of ${intake} prospects`, onPress: () => setAcademyOpen(true), color: colors.green });
+  }
   if (status !== 'ok') notes.push({ text: MONEY_STATUS_TEXT[status], color: colors.red });
   const inCups = (state.cups ?? []).filter((c) => cupProgress(c, USER_ID) && !cupProgress(c, USER_ID)!.out);
   if (inCups.length) notes.push({ text: `Still in the ${inCups.map((c) => c.name).join(' and ')}`, onPress: onOpenLeague });
@@ -122,6 +128,7 @@ export function ClubScreen({
         </FadeIn>
       ) : null}
       <MoneySheet visible={moneyOpen} onClose={() => setMoneyOpen(false)} />
+      <AcademySheet visible={academyOpen} onClose={() => setAcademyOpen(false)} />
 
       <FadeIn delay={140} style={s.list}>
           {notes.map((n) => (

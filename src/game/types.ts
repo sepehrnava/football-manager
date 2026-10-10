@@ -251,6 +251,8 @@ export interface GameState {
   world: Player[];
   /** Players the user is keeping an eye on. Missing in older saves. */
   watch?: string[];
+  /** This pre-season's academy prospects, until one is promoted or the season kicks off. */
+  academy?: { season: number; prospects: Player[] } | null;
   /** Scouting level per player id: 0 rough, 1 good, 2 exact. */
   scouting: Record<string, number>;
   talks: Record<string, Talk>;

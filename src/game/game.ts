@@ -9,6 +9,7 @@ import {
   FORMATIONS,
   STYLES,
 } from './constants';
+import { academyIntake, promoteProspect } from './academy';
 import { CUP_RULES, cupProgress, drawCups, playCupStages } from './cups';
 import { leagueTable, makeFixtures, pickScorers, playMatch } from './league';
 import {
@@ -82,6 +83,7 @@ export type Action =
   | { type: 'assign'; slot: number; playerId: string | null }
   /** Swap a substitute and a reserve (either order). */
   | { type: 'benchSwap'; a: string; b: string }
+  | { type: 'promoteProspect'; playerId: string }
   | { type: 'autoPick' }
   | { type: 'captain'; playerId: string }
   | { type: 'watch'; playerId: string }
@@ -442,6 +444,7 @@ export function createGame(action: Extract<Action, { type: 'new' }>): GameState 
   state = refreshClubs(state);
   state = withCups(state, rng, topRankings(state, false));
   state = makeOffers(state, rng);
+  state = academyIntake(state, rng);
   return withSeed(state, rng);
 }
 
@@ -779,8 +782,8 @@ function endSeason(state: GameState, rng: Rng): GameState {
       contract: years > 0 ? { ...p.contract, years } : { wage: renewalDemand(withResult, grown), years: 2 },
     });
   }
-  // At least one academy graduate joins every season, more if the squad is short.
-  const graduates = academyFill(squad, rng, state.nextId, 1);
+  // The academy only fills a squad that is short; new talent comes from the pre-season intake.
+  const graduates = academyFill(squad, rng, state.nextId, 0);
   squad.push(...graduates.players);
   const nextId = graduates.nextId;
   const academy = graduates.players.map((p) => p.name);
@@ -871,7 +874,7 @@ function nextSeason(state: GameState, rng: Rng): GameState {
   const rankings = state.cupRankings
     ? new Map(Object.entries(state.cupRankings))
     : topRankings(next, false);
-  return openWindow(withCups(next, rng, rankings), rng);
+  return academyIntake(openWindow(withCups(next, rng, rankings), rng), rng);
 }
 
 export function reducer(state: GameState | null, action: Action): GameState | null {
@@ -885,7 +888,11 @@ export function reducer(state: GameState | null, action: Action): GameState | nu
 
 function step(state: GameState | null, action: Action): GameState | null {
   if (action.type === 'new') return createGame(action);
-  if (action.type === 'load') return withPositions(withCrestShapes(action.state));
+  if (action.type === 'load') {
+    const s = withPositions(withCrestShapes(action.state));
+    // Saves from before the academy: give this window its intake once (null means already decided).
+    return s.academy === undefined && s.phase === 'window' && !s.challenge ? academyIntake(s, createRng(s.seed)) : s;
+  }
   if (action.type === 'reset') return null;
   if (!state) return state;
   const rng = createRng(state.seed);
@@ -916,6 +923,8 @@ function step(state: GameState | null, action: Action): GameState | null {
       if (spot >= 0 && leaving && !lineup.includes(leaving)) bench[spot] = leaving;
       return { ...state, lineup, bench };
     }
+    case 'promoteProspect':
+      return promoteProspect(state, action.playerId);
     case 'benchSwap': {
       const bench = benchFor(state.squad, state.lineup, BENCH_SIZE, state.bench).map((p) => p.id);
       const [inB, outB] = bench.includes(action.a) ? [action.a, action.b] : [action.b, action.a];
@@ -965,7 +974,8 @@ function step(state: GameState | null, action: Action): GameState | null {
       // A team needs a full matchday squad before it can kick off.
       if (state.phase !== 'window' || !squadNeeds(state.squad).ready) return state;
       const topped = topUpClubs(state, rng);
-      return done(ensureLineup({ ...topped, phase: 'season', offers: [], talks: {} }));
+      // Prospects nobody promoted leave the academy at kick-off.
+      return done(ensureLineup({ ...topped, phase: 'season', offers: [], talks: {}, academy: null }));
     }
     case 'playRound':
       return done(playRound(state, rng));
