@@ -25,8 +25,11 @@ export function makeFixtures(rng: Rng, clubIds: string[]): Fixture[] {
   return [...half, ...second];
 }
 
+/** Rating points per e-fold of expected goals: higher means stronger teams dominate less. */
+const GOAL_SLOPE = 24;
+
 export function expectedGoals(attack: number, defense: number, home: boolean) {
-  const lambda = 1.3 * Math.exp((attack - defense) / 20) * (home ? 1.12 : 0.92);
+  const lambda = 1.3 * Math.exp((attack - defense) / GOAL_SLOPE) * (home ? 1.12 : 0.92);
   return Math.max(0.15, Math.min(4.5, lambda));
 }
 

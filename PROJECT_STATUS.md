@@ -41,6 +41,7 @@ Updated: 2026-10-10. Replace outdated entries; keep this as a snapshot.
   SHA-1s.
 - First launch shows a welcome screen with the platform's sign-in button or "Continue as guest"; shown once, skipped on web/Expo Go and when a career exists (S026).
 - Squad tab: with a pitch position selected, Find lists players for it and buys without leaving the lineup; offers have Check squad (XI position, power before/after, replacement, same-position players) in the match overlay and on Transfers (S027).
+- Harder game: older stars cost nearly as much as prime players and matches favour the stronger side less (S028); a mid-table Second Division buyer wins the title 2/24 instead of 9/24 in headless runs; the user's play-test decides if more is needed.
 - Remote updates with EAS Update (Expo project @sepehrnava/top-squad, channels per build) (D013).
 - Academy intake: each pre-season promote 1 of 3 prospects (potential range judged by the
   youth coach) from the always-open Academy row; replaces the automatic graduate (S023, S025).
@@ -52,7 +53,7 @@ Updated: 2026-10-10. Replace outdated entries; keep this as a snapshot.
   breakdown sheet, and each deal's effect on the season end (S020).
 - Ads (S019, D014): rewarded sponsor bonus (1% of wages per ad, unlimited in windows) and free scouting, one
   capped interstitial at the season break; simulated in development, Google test ads in builds.
-- Play offers "Match by match" (default) or "Auto-play" (1.8 s per matchday), remembered across
+- Play offers "Match by match" (default) or "Auto-play" (1.3 s per matchday), remembered across
   careers; the result plays out with sliding crests, a ticking score, a WIN/DRAW/LOSS stamp,
   confetti on wins, a shake on losses and ▲/▼ table moves; the screen opens still and plays only on a tap, also after switching mode; there is no Skip button (S024).
 - Retiring players are tagged on the pitch and in the bench strip and named in the Club note; Staff

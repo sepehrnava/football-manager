@@ -45,6 +45,7 @@ a backend are approved only for optional sign-in and cloud save (S018, Firebase)
 | S025 | [Visible retirements and academy](specs/025-retiring-and-academy.md) | Implemented; Android observation pending |
 | S026 | [Welcome screen with sign-in](specs/026-welcome-screen.md) | Implemented; device observation pending |
 | S027 | [Transfers in context](specs/027-transfers-in-context.md) | Implemented; device observation pending |
+| S028 | [A harder game and quicker auto-play](specs/028-harder-and-quicker.md) | Implemented; user play-test pending |
 
 Use [the template](specs/_template.md) for the next feature. Number specs sequentially.
 Keep IDs stable; criteria use S002-AC01 style IDs referenced by tasks and evidence.

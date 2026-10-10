@@ -12,8 +12,9 @@ function ageFactor(age: number) {
   if (age <= 21) return 1.5;
   if (age <= 24) return 1.25;
   if (age <= 28) return 1;
-  if (age <= 31) return 0.7;
-  return 0.45;
+  // Older stars still play at full strength this season, so they cost nearly as much as prime players.
+  if (age <= 31) return 0.85;
+  return 0.7;
 }
 
 /** Transfer value in dollars. */

@@ -37,6 +37,7 @@ Keep current work and a short completed baseline; avoid session logs.
 | T030: Crest shapes; CB–midfield chemistry links | S017-AC01–AC03, S011 | Done | tsc, lint, web and BlueStacks screenshots; chemistry mean 67.2 before and after |
 | T031: Sign in and cloud save | S018-AC01–AC05 | In progress | Firebase fully configured (apps, Firestore + rules, Google and Apple enabled, env and EAS vars); next: development build and device tests |
 | T032: Remote updates (EAS Update) | D013 | Done (config) | Expo project linked, channels in eas.json; first update needs a store or preview build |
+| T046: Harder game (older stars priced higher, flatter matches) and quicker auto-play | S028-AC01–AC05 | Done | Headless bots (title rate for a mid-table Second Division buyer 9/24 → 2/24; 0 sacked), web timing; user play-test pending |
 | T045: Find players from the Squad tab; check squad before selling | S027-AC01–AC04 | Done | tsc, lint, web flows (find, sign, offer check), headless saleImpact; Android pending |
 | T044: Welcome screen at first launch (sign in or guest) | S026-AC01–AC04 | Done | tsc, lint, web export; sign-in untested on a device |
 | T043: One academy after merging: intake prospects in the always-open Academy row and sheet; window call-up dropped | S023-AC01, AC02; S025-AC03 | Done | tsc, lint, headless intake cycle, web flow; Android pending |

@@ -31,7 +31,7 @@ export function ScoreTicker({
 }) {
   const steps = Math.max(home, away);
   // One beat per goal, shortened for big scores so the count fits between matchdays.
-  const stepMs = steps ? Math.min(260, 900 / steps) : 0;
+  const stepMs = steps ? Math.min(200, 700 / steps) : 0;
   const [step, setStep] = useState(0);
   const [pop] = useState(() => new Animated.Value(1));
   useEffect(() => {

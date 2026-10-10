@@ -21,7 +21,7 @@ function longWord(name: string) {
 }
 
 /** Time between matchdays in auto-play: enough to watch the result and the table move. */
-const STEP_MS = 1800;
+const STEP_MS = 1300;
 /** The first match of a run (and every match played one at a time) starts sooner. */
 const FIRST_STEP_MS = 400;
 
@@ -324,7 +324,7 @@ function MyMatch({ fixture }: { fixture: Fixture }) {
               </Text>
             </View>
           </SlideIn>
-          <ScoreTicker home={r.home} away={r.away} delay={300} style={s.score} onDone={() => setDone(true)} />
+          <ScoreTicker home={r.home} away={r.away} delay={150} style={s.score} onDone={() => setDone(true)} />
           <SlideIn from="right">
             <View style={s.team}>
               <ClubCrest club={away} size={52} />
