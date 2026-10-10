@@ -1,0 +1,34 @@
+- generic [ref=f2e6]:
+  - generic [ref=f2e7]:
+    - generic [ref=f2e10]:
+      - generic [ref=f2e11]:
+        - generic [aria-hidden] [ref=f2e12]: TOP SQUAD
+        - generic [aria-hidden] [ref=f2e13]: TOP SQUAD
+        - generic [aria-hidden] [ref=f2e14]: TOP SQUAD
+        - generic [aria-hidden] [ref=f2e15]: TOP SQUAD
+        - generic [aria-hidden] [ref=f2e16]: TOP SQUAD
+        - generic [aria-hidden] [ref=f2e17]: TOP SQUAD
+        - generic [aria-hidden] [ref=f2e18]: TOP SQUAD
+        - generic [aria-hidden] [ref=f2e19]: TOP SQUAD
+        - generic [aria-hidden] [ref=f2e20]: TOP SQUAD
+        - generic [aria-hidden] [ref=f2e21]: TOP SQUAD
+        - generic [aria-hidden] [ref=f2e22]: TOP SQUAD
+        - generic [aria-hidden] [ref=f2e23]: TOP SQUAD
+        - generic [aria-hidden] [ref=f2e24]: TOP SQUAD
+        - generic [aria-hidden] [ref=f2e25]: TOP SQUAD
+        - generic [ref=f2e26]: TOP SQUAD
+      - generic [ref=f2e27]: FOOTBALL MANAGER
+    - generic [ref=f2e28]:
+      - button "Create your club" [ref=f2e30] [cursor=pointer]:
+        - generic [ref=f2e31]: YOU
+        - generic [ref=f2e43]: ›
+      - button "Manage a club" [ref=f2e45] [cursor=pointer]:
+        - generic [ref=f2e46]: ARS
+        - generic [ref=f2e52]: ›
+      - button "Daily challenge" [ref=f2e54] [cursor=pointer]:
+        - generic [ref=f2e61]: ›
+    - generic [ref=f2e63]:
+      - button "Random club" [ref=f2e64] [cursor=pointer]
+      - generic [ref=f2e65]: ·
+      - button "Honours" [ref=f2e66] [cursor=pointer]
+  - generic [ref=f2e67]: Top Squad is an independent game. Club and player names are used only to identify real clubs and players and belong to their respective owners. It is not licensed by, affiliated with, or endorsed by any club, league, players' association or player. Crests are original simple designs, and all ratings, values and game data are created by the game, not taken from any real database or other game.

@@ -1,0 +1,237 @@
+- generic [ref=e5]:
+  - generic [ref=e6]:
+    - button "Honours" [ref=e7] [cursor=pointer]:
+      - generic [ref=e8]: BHA
+      - generic [ref=e17]: $18.0M
+    - generic [ref=e19]: Transfer window
+    - button "Settings" [ref=e20] [cursor=pointer]
+  - generic [ref=e26]:
+    - generic [ref=e27]:
+      - generic [ref=e28]: BHA
+      - generic [ref=e37]:
+        - generic [ref=e38]: Brighton & Hove Albion
+        - generic [ref=e39]: English First Division
+      - generic [ref=e40]:
+        - generic [ref=e41]: –
+        - generic [ref=e42]: 0 pts
+    - generic [ref=e43]:
+      - generic [ref=e44]:
+        - generic [ref=e45]: SEASON
+        - generic [ref=e46]: 0/38
+      - generic [ref=e48]:
+        - button "START Open" [ref=e49] [cursor=pointer]:
+          - generic [ref=e50]: START
+          - generic [ref=e51]: ⇄
+          - generic [ref=e57]: Open
+        - button "MD1 H · AVL" [ref=e58] [cursor=pointer]:
+          - generic [ref=e59]: MD1
+          - generic [ref=e60]: AVL
+          - generic [ref=e68]: H · AVL
+        - button "MD2 H · MUN" [ref=e69] [cursor=pointer]:
+          - generic [ref=e70]: MD2
+          - generic [ref=e71]: MUN
+          - generic [ref=e78]: H · MUN
+        - button "MD3 H · MCI" [ref=e79] [cursor=pointer]:
+          - generic [ref=e80]: MD3
+          - generic [ref=e81]: MCI
+          - generic [ref=e88]: H · MCI
+        - button "MD4 H · NFO" [ref=e89] [cursor=pointer]:
+          - generic [ref=e90]: MD4
+          - generic [ref=e91]: NFO
+          - generic [ref=e98]: H · NFO
+        - button "MD5 H · LEE" [ref=e99] [cursor=pointer]:
+          - generic [ref=e100]: MD5
+          - generic [ref=e101]: LEE
+          - generic [ref=e109]: H · LEE
+        - button "MD6 H · CHE" [ref=e110] [cursor=pointer]:
+          - generic [ref=e111]: MD6
+          - generic [ref=e112]: CHE
+          - generic [ref=e119]: H · CHE
+        - button "MD7 H · EVE" [ref=e120] [cursor=pointer]:
+          - generic [ref=e121]: MD7
+          - generic [ref=e122]: EVE
+          - generic [ref=e129]: H · EVE
+        - button "MD8 H · WHU" [ref=e130] [cursor=pointer]:
+          - generic [ref=e131]: MD8
+          - generic [ref=e132]: WHU
+          - generic [ref=e140]: H · WHU
+        - button "MD9 H · BRE" [ref=e141] [cursor=pointer]:
+          - generic [ref=e142]: MD9
+          - generic [ref=e143]: BRE
+          - generic [ref=e157]: H · BRE
+        - button "MD10 H · FUL" [ref=e158] [cursor=pointer]:
+          - generic [ref=e159]: MD10
+          - generic [ref=e160]: FUL
+          - generic [ref=e168]: H · FUL
+        - button "MD11 H · LIV" [ref=e169] [cursor=pointer]:
+          - generic [ref=e170]: MD11
+          - generic [ref=e171]: LIV
+          - generic [ref=e178]: H · LIV
+        - button "MD12 H · BUR" [ref=e179] [cursor=pointer]:
+          - generic [ref=e180]: MD12
+          - generic [ref=e181]: BUR
+          - generic [ref=e189]: H · BUR
+        - button "MD13 A · ARS" [ref=e190] [cursor=pointer]:
+          - generic [ref=e191]: MD13
+          - generic [ref=e192]: ARS
+          - generic [ref=e200]: A · ARS
+        - button "MD14 A · CRY" [ref=e201] [cursor=pointer]:
+          - generic [ref=e202]: MD14
+          - generic [ref=e203]: CRY
+          - generic [ref=e217]: A · CRY
+        - button "MD15 A · SUN" [ref=e218] [cursor=pointer]:
+          - generic [ref=e219]: MD15
+          - generic [ref=e220]: SUN
+          - generic [ref=e234]: A · SUN
+        - button "MD16 A · BOU" [ref=e235] [cursor=pointer]:
+          - generic [ref=e236]: MD16
+          - generic [ref=e237]: BOU
+          - generic [ref=e251]: A · BOU
+        - button "MD17 A · NEW" [ref=e252] [cursor=pointer]:
+          - generic [ref=e253]: MD17
+          - generic [ref=e254]: NEW
+          - generic [ref=e268]: A · NEW
+        - button "MD18 A · TOT" [ref=e269] [cursor=pointer]:
+          - generic [ref=e270]: MD18
+          - generic [ref=e271]: TOT
+          - generic [ref=e279]: A · TOT
+        - button "MD19 A · WOL" [ref=e280] [cursor=pointer]:
+          - generic [ref=e281]: MD19
+          - generic [ref=e282]: WOL
+          - generic [ref=e289]: A · WOL
+        - button "WINDOW After MD19" [disabled]:
+          - generic [ref=e290]: WINDOW
+          - generic [ref=e291]: ⇄
+          - generic [ref=e297]: After MD19
+        - button "MD20 A · AVL" [ref=e298] [cursor=pointer]:
+          - generic [ref=e299]: MD20
+          - generic [ref=e300]: AVL
+          - generic [ref=e308]: A · AVL
+        - button "MD21 A · MUN" [ref=e309] [cursor=pointer]:
+          - generic [ref=e310]: MD21
+          - generic [ref=e311]: MUN
+          - generic [ref=e318]: A · MUN
+        - button "MD22 A · MCI" [ref=e319] [cursor=pointer]:
+          - generic [ref=e320]: MD22
+          - generic [ref=e321]: MCI
+          - generic [ref=e328]: A · MCI
+        - button "MD23 A · NFO" [ref=e329] [cursor=pointer]:
+          - generic [ref=e330]: MD23
+          - generic [ref=e331]: NFO
+          - generic [ref=e338]: A · NFO
+        - button "MD24 A · LEE" [ref=e339] [cursor=pointer]:
+          - generic [ref=e340]: MD24
+          - generic [ref=e341]: LEE
+          - generic [ref=e349]: A · LEE
+        - button "MD25 A · CHE" [ref=e350] [cursor=pointer]:
+          - generic [ref=e351]: MD25
+          - generic [ref=e352]: CHE
+          - generic [ref=e359]: A · CHE
+        - button "MD26 A · EVE" [ref=e360] [cursor=pointer]:
+          - generic [ref=e361]: MD26
+          - generic [ref=e362]: EVE
+          - generic [ref=e369]: A · EVE
+        - button "MD27 A · WHU" [ref=e370] [cursor=pointer]:
+          - generic [ref=e371]: MD27
+          - generic [ref=e372]: WHU
+          - generic [ref=e380]: A · WHU
+        - button "MD28 A · BRE" [ref=e381] [cursor=pointer]:
+          - generic [ref=e382]: MD28
+          - generic [ref=e383]: BRE
+          - generic [ref=e397]: A · BRE
+        - button "MD29 A · FUL" [ref=e398] [cursor=pointer]:
+          - generic [ref=e399]: MD29
+          - generic [ref=e400]: FUL
+          - generic [ref=e408]: A · FUL
+        - button "MD30 A · LIV" [ref=e409] [cursor=pointer]:
+          - generic [ref=e410]: MD30
+          - generic [ref=e411]: LIV
+          - generic [ref=e418]: A · LIV
+        - button "MD31 A · BUR" [ref=e419] [cursor=pointer]:
+          - generic [ref=e420]: MD31
+          - generic [ref=e421]: BUR
+          - generic [ref=e429]: A · BUR
+        - button "MD32 H · ARS" [ref=e430] [cursor=pointer]:
+          - generic [ref=e431]: MD32
+          - generic [ref=e432]: ARS
+          - generic [ref=e440]: H · ARS
+        - button "MD33 H · CRY" [ref=e441] [cursor=pointer]:
+          - generic [ref=e442]: MD33
+          - generic [ref=e443]: CRY
+          - generic [ref=e457]: H · CRY
+        - button "MD34 H · SUN" [ref=e458] [cursor=pointer]:
+          - generic [ref=e459]: MD34
+          - generic [ref=e460]: SUN
+          - generic [ref=e474]: H · SUN
+        - button "MD35 H · BOU" [ref=e475] [cursor=pointer]:
+          - generic [ref=e476]: MD35
+          - generic [ref=e477]: BOU
+          - generic [ref=e491]: H · BOU
+        - button "MD36 H · NEW" [ref=e492] [cursor=pointer]:
+          - generic [ref=e493]: MD36
+          - generic [ref=e494]: NEW
+          - generic [ref=e508]: H · NEW
+        - button "MD37 H · TOT" [ref=e509] [cursor=pointer]:
+          - generic [ref=e510]: MD37
+          - generic [ref=e511]: TOT
+          - generic [ref=e519]: H · TOT
+        - button "MD38 H · WOL" [ref=e520] [cursor=pointer]:
+          - generic [ref=e521]: MD38
+          - generic [ref=e522]: WOL
+          - generic [ref=e529]: H · WOL
+        - button "FINAL ~12th" [ref=e530] [cursor=pointer]:
+          - generic [ref=e531]: FINAL
+          - generic [ref=e532]: ★
+          - generic [ref=e538]: ~12th
+    - generic [ref=e539]:
+      - generic [ref=e540]: NEXT MATCH
+      - button "Next match against Aston Villa" [ref=e541] [cursor=pointer]:
+        - generic [ref=e542]: AVL
+        - generic [ref=e545]:
+          - generic [ref=e546]: Aston Villa
+          - generic [ref=e547]: Home · Matchday 1
+        - generic [ref=e548]:
+          - generic [ref=e549]: 32%
+          - generic [ref=e550]: to win
+        - generic [ref=e551]: ›
+    - generic [ref=e552]:
+      - generic [ref=e553]: MONEY
+      - button "Season money forecast" [ref=e554] [cursor=pointer]:
+        - generic [ref=e555]:
+          - generic [ref=e556]: $18.0M
+          - generic [ref=e557]: NOW
+        - generic [ref=e558]:
+          - generic [ref=e559]: ~$15.6M
+          - generic [ref=e560]: SEASON END
+        - generic [ref=e561]:
+          - generic [ref=e562]: $15.6M
+          - generic [ref=e563]: SAFE TO SPEND
+        - generic [ref=e564]: ›
+    - generic [ref=e565]:
+      - button "5 offers for your players" [ref=e566] [cursor=pointer]:
+        - generic [ref=e575]: ›
+      - button "Steele and Milner retire after this season" [ref=e576] [cursor=pointer]:
+        - generic [ref=e585]: ›
+      - button "Staff" [ref=e586] [cursor=pointer]:
+        - generic [ref=e594]: ★★★★★
+        - generic [ref=e595]: ›
+      - button "Academy" [ref=e596] [cursor=pointer]:
+        - generic [ref=e604]: 0 players
+        - generic [ref=e605]: ›
+      - button "Daily challenge" [ref=e606] [cursor=pointer]:
+        - generic [ref=e613]: ›
+  - generic [ref=e614]:
+    - tab "Club" [ref=e615] [cursor=pointer]:
+      - generic [ref=e616]:
+        - img [ref=e618]:
+          - generic [ref=e625]: BHA
+          - generic [ref=e626]: BHA
+        - generic [ref=e627]: Club
+    - tab "Squad" [ref=e628] [cursor=pointer]
+    - button "Kick off" [ref=e635] [cursor=pointer]
+    - tab "Transfers" [ref=e642] [cursor=pointer]:
+      - generic [ref=e643]:
+        - img [ref=e645]:
+          - generic [ref=e648]: $
+        - generic [ref=e649]: Transfers
+    - tab "League" [ref=e650] [cursor=pointer]

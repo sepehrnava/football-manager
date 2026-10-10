@@ -37,6 +37,8 @@ Updated: 2026-10-10. Replace outdated entries; keep this as a snapshot.
 - Optional sign-in (Apple on iOS, Google on Android build) with gzip cloud backup in Firebase
   Firestore (free plan), restore and account deletion (S018, D012). Firebase project
   top-squad-fm-97218 is fully set up, Google and Apple sign-in enabled; untested on a device.
+  App ID is com.d3studio.topsquad; its Firebase Android app has the debug and EAS keystore
+  SHA-1s.
 - First launch shows a welcome screen with the platform's sign-in button or "Continue as guest"; shown once, skipped on web/Expo Go and when a career exists (S026).
 - Squad tab: with a pitch position selected, Find lists players for it and buys without leaving the lineup; offers have Check squad (XI position, power before/after, replacement, same-position players) in the match overlay and on Transfers (S027).
 - Remote updates with EAS Update (Expo project @sepehrnava/top-squad, channels per build) (D013).

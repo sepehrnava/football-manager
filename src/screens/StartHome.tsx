@@ -1,5 +1,6 @@
 import { useEffect, useState, type ReactNode } from 'react';
-import { Animated, Easing, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Animated, Easing, Pressable, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { todayKey } from '../game/challenge';
 import { clubCrest } from '../game/game';
@@ -19,16 +20,24 @@ const SHAPE: [number, number][] = [
   [40, 18], [42, 50], [40, 82],
 ];
 
+/** Room the start screen needs below the pitch: menu rows, links and the disclaimer. */
+const BELOW_HERO = 430;
+
 /**
- * Upright pitch panel with two faint teams and the logo on the centre circle. It grows
- * to fill free space. Markings are placed in pixels from the measured size: percentage
- * offsets resolve differently on Android.
+ * Upright pitch panel with two faint teams and the logo on the centre circle. Its height
+ * depends only on the window, so the welcome and start screens show the same pitch.
+ * Markings are placed in pixels from the measured size: percentage offsets resolve
+ * differently on Android.
  */
 export function Hero() {
   const [size, setSize] = useState<{ w: number; h: number } | null>(null);
+  const screen = useWindowDimensions();
+  const insets = useSafeAreaInsets();
+  // Both screens pad by insets plus 16 on top and 24 at the bottom.
+  const height = Math.max(280, screen.height - insets.top - insets.bottom - 40 - BELOW_HERO);
   return (
     <View
-      style={s.hero}
+      style={[s.hero, { height }]}
       onLayout={(e) => {
         const { width: w, height: h } = e.nativeEvent.layout;
         if (!size || size.w !== w || size.h !== h) setSize({ w, h });
@@ -262,8 +271,6 @@ export function StartLinks({
 
 const s = StyleSheet.create({
   hero: {
-    flex: 1,
-    minHeight: 280,
     overflow: 'hidden',
     alignItems: 'center',
     justifyContent: 'center',
