@@ -70,16 +70,11 @@ export function SimScreen({ until: initialUntil, onClose }: { until?: number; on
     setRunStart(state.round);
     setRunning(true);
   };
+  // Switching mode only stops and sets the mode: the green button starts play.
   const changeMode = (next: PlayMode) => {
     setPlayMode(next);
-    if (next === 'auto') return playOn();
-    // Match by match: stop here; the next tap plays one match.
     setUntil(undefined);
     setRunning(false);
-  };
-  const skip = () => {
-    animateNextLayout();
-    dispatch({ type: 'simToStop' });
   };
 
   const played = state.round;
@@ -127,13 +122,7 @@ export function SimScreen({ until: initialUntil, onClose }: { until?: number; on
             </View>
             <Bar value={(played / rounds) * 100} color={colors.ink} />
           </View>
-          {stopText ? (
-            <View style={s.spacer} />
-          ) : (
-            <Pressable onPress={skip} style={[s.close, s.skip]} accessibilityRole="button" accessibilityLabel="Skip to the end">
-              <Text style={s.closeText}>Skip</Text>
-            </Pressable>
-          )}
+          <View style={s.spacer} />
         </View>
 
         <ScrollView contentContainerStyle={s.content}>
@@ -394,7 +383,6 @@ const s = StyleSheet.create({
     justifyContent: 'center',
   },
   closeText: { fontSize: 15, fontWeight: '900', color: colors.muted },
-  skip: { width: undefined, paddingHorizontal: 14 },
   content: { gap: 12, paddingBottom: 12 },
   offer: { backgroundColor: colors.ink, borderRadius: 20, padding: 16, gap: 8 },
   offerTop: { flexDirection: 'row', alignItems: 'center', gap: 12 },

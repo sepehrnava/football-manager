@@ -14,7 +14,7 @@ card simply faded in, and Play always ran every match up to the next stop, which
 
 In scope: the matchday timer, a remembered play mode (match by match or auto-play) and
 animations on the simulation screen (SimScreen).
-Excluded: match engine, results, new packages, sound or haptics. Skip stays instant.
+Excluded: match engine, results, new packages, sound or haptics. The Skip button is removed (2026-10-10): it jumped over a whole season in one tap.
 
 ## Acceptance criteria
 
@@ -24,13 +24,14 @@ Excluded: match engine, results, new packages, sound or haptics. Skip stays inst
 | S024-AC02 | The user's result plays out: crests slide in from both sides, the score ticks up goal by goal with a pop (up to 0.26 s per goal, 0.9 s at most), then a WIN/DRAW/LOSS stamp slams down; a win bursts confetti, a loss shakes the card | Web frame captures | Passed (web) |
 | S024-AC03 | A live dot pulses while matches run; the matchday title pops on change; before kick-off a ball bounces | Web frame captures | Passed (web) |
 | S024-AC04 | The user's table row shows places gained (green ▲) or lost (red ▼) since the last result (none after the first matchday) | Web flow | Passed (web) |
-| S024-AC05 | Pause, continue, skip and the window offer still work, with no console errors | Web flow | Passed (web) |
+| S024-AC05 | Pause, continue and the window offer still work, with no console errors | Web flow | Passed (web) |
 | S024-AC07 | The match screen has a "Match by match / Auto-play" switch (default match by match). Match by match plays one match per NEXT MATCH tap; auto-play runs to the next stop with PAUSE/CONTINUE; switching stops or starts at once; the choice is remembered across careers. A "play to here" target from a match preview always runs on its own | Web flow | Passed (web) |
 | S024-AC08 | Tapping Play opens the match screen without playing, in either mode, and shows it still ("Ready for matchday N" and the table; no result animation, ball or place moves) until a match is played: match by match shows NEXT MATCH, auto-play shows PLAY; a "play to here" target still runs at once (user, 2026-10-10) | Web flow | Passed (web): match by match stayed at Kick-off for 3.5 s; auto-play reopened after a pause stayed put for 4 s, PLAY then ran 3 matchdays in 4.2 s; 0 console errors. Opening mid-season shows no animation, even after 2.5 s; the result animation starts only after NEXT MATCH. "Play to here" not exercised (code path unchanged) |
+| S024-AC09 | Switching between Match by match and Auto-play never plays a match: it only sets the mode; the green button (NEXT MATCH, PLAY or CONTINUE) starts play. There is no Skip button | Web flow | Passed (web): before the change, switching to Auto-play played a match within 0.5 s; after, none in 3 s |
 | S024-AC06 | All of the above look smooth on Android | Device observation | Pending |
 
 ## Implementation and validation
 
 Tasks T040, T041. UI: src/screens/SimScreen.tsx, src/ui/matchFx.tsx (core Animated only).
 The play mode is stored in the cross-career meta (`playMode`, src/game/meta.ts).
-Checks: tsc, lint, web export, headless Chrome flow (Arsenal, kick off, timings, frames, skip).
+Checks: tsc, lint, web export, headless Chrome flow (Arsenal, kick off, timings, frames).

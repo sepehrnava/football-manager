@@ -52,7 +52,7 @@ Updated: 2026-10-10. Replace outdated entries; keep this as a snapshot.
   capped interstitial at the season break; simulated in development, Google test ads in builds.
 - Play offers "Match by match" (default) or "Auto-play" (1.8 s per matchday), remembered across
   careers; the result plays out with sliding crests, a ticking score, a WIN/DRAW/LOSS stamp,
-  confetti on wins, a shake on losses and ▲/▼ table moves; the screen opens waiting for a tap and never plays on its own (S024).
+  confetti on wins, a shake on losses and ▲/▼ table moves; the screen opens still and plays only on a tap, also after switching mode; there is no Skip button (S024).
 - Retiring players are tagged on the pitch and in the bench strip and named in the Club note; Staff
   and Academy are their own rows on the Club tab, every Club row has an icon, and Next match
   and Money have no white cards; the Academy sheet shows the youth coach, the intake and
@@ -81,7 +81,7 @@ Updated: 2026-10-10. Replace outdated entries; keep this as a snapshot.
   `adb` at 127.0.0.1:5555.
 - Save format v2: careers saved before S004 start over.
 - 2026-10-10 S024/S025: web auto-play ~1.84 s per matchday, match-by-match flow and mode memory,
-  result animation frames, skip to window, retiring tags (Brighton); merged Academy sheet promote flow; 0 console errors.
+  result animation frames, retiring tags (Brighton); merged Academy sheet promote flow; 0 console errors.
 - 2026-10-10 S008-AC08: headless 180 seasons (38 with a division move), final tables match the
   season-end position (before the fix 76 of 120 differed). Club, market and squad at 320/360 px.
 - 2026-10-09 S010: 12 leagues × 3 clubs with staff wages, 0 sacked; 30 daily challenges
