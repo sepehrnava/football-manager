@@ -38,6 +38,8 @@ Updated: 2026-10-10. Replace outdated entries; keep this as a snapshot.
   Firestore (free plan), restore and account deletion (S018, D012). Firebase project
   top-squad-fm-97218 is fully set up, Google and Apple sign-in enabled; untested on a device.
 - Remote updates with EAS Update (Expo project @sepehrnava/top-squad, channels per build) (D013).
+- Academy intake: each pre-season promote 1 of 3 prospects (potential range judged by the
+  youth coach) from the always-open Academy row; replaces the automatic graduate (S023, S025).
 - Most players have 2–3 positions (stable per player, older saves upgraded on load); potential
   shows as "▲84" under rating badges in lists for growing players (S022).
 - Bench strength (−2 to +3 power from bench depth) and transfer-list bids that arrive over
@@ -48,11 +50,11 @@ Updated: 2026-10-10. Replace outdated entries; keep this as a snapshot.
   capped interstitial at the season break; simulated in development, Google test ads in builds.
 - Play offers "Match by match" (default) or "Auto-play" (1.8 s per matchday), remembered across
   careers; the result plays out with sliding crests, a ticking score, a WIN/DRAW/LOSS stamp,
-  confetti on wins, a shake on losses and ▲/▼ table moves (S023).
+  confetti on wins, a shake on losses and ▲/▼ table moves (S024).
 - Retiring players are tagged on the pitch and in the bench strip and named in the Club note; Staff
   and Academy are their own rows on the Club tab, every Club row has an icon, and Next match
-  and Money have no white cards; the Academy
-  shows the youth coach and academy players and allows one call-up per window (S024).
+  and Money have no white cards; the Academy sheet shows the youth coach, the intake and
+  the academy players (S025).
 - The bench strip under the pitch shows only while choosing a player (S012); market rows wrap
   long position lists instead of overlapping.
 - Fixed: after a season ended, its tables dropped games against clubs that had moved division,
@@ -70,14 +72,14 @@ Updated: 2026-10-10. Replace outdated entries; keep this as a snapshot.
 - S004 web flows (scout, reject, counter, sign, free agent, renew, offers): no errors.
 - S005 balance, 30 careers × 6 seasons: frugal/rescue never sacked, reckless sacked
   2/30, smart trading climbs to ~4th. Simplified screens checked in Chrome.
-- Android display not yet observed (S001-AC03, S002-AC08, S003-AC06, S004-AC09, S005-AC08, S011-AC05, S012-AC04, S013-AC04, S014-AC03, S015-AC05, S016-AC05, S023-AC06, S024-AC05).
+- Android display not yet observed (S001-AC03, S002-AC08, S003-AC06, S004-AC09, S005-AC08, S011-AC05, S012-AC04, S013-AC04, S014-AC03, S015-AC05, S016-AC05, S023-AC03, S024-AC06, S025-AC05).
 - 2026-10-09 S015: start screen web flows (create, manage, daily, honours, random club by
   difficulty → career started); 0 console errors on a fresh load. Start screen layout seen
   on BlueStacks via adb screenshot (S015-AC05 partly); Expo Go on BlueStacks works with
   `adb` at 127.0.0.1:5555.
 - Save format v2: careers saved before S004 start over.
-- 2026-10-10 S023/S024: web auto-play ~1.84 s per matchday, match-by-match flow and mode memory,
-  result animation frames, skip to window, retiring tags (Brighton), academy call-up; 0 console errors.
+- 2026-10-10 S024/S025: web auto-play ~1.84 s per matchday, match-by-match flow and mode memory,
+  result animation frames, skip to window, retiring tags (Brighton); merged Academy sheet promote flow; 0 console errors.
 - 2026-10-10 S008-AC08: headless 180 seasons (38 with a division move), final tables match the
   season-end position (before the fix 76 of 120 differed). Club, market and squad at 320/360 px.
 - 2026-10-09 S010: 12 leagues × 3 clubs with staff wages, 0 sacked; 30 daily challenges

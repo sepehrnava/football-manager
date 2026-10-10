@@ -23,7 +23,8 @@ function makeStops(rounds: number, mid: number): Stop[] {
   ];
 }
 
-const ITEM_W = 62;
+// Wide enough that matchdays don't feel crowded.
+const ITEM_W = 80;
 
 /** The whole season as a path: windows, every matchday and the finish line. */
 export function Roadmap({
@@ -106,7 +107,7 @@ export function Roadmap({
         const home = f.homeId === USER_ID;
         const opp = clubById(state, home ? f.awayId : f.homeId);
         const r = f.result;
-        let ring: string = colors.border;
+        let ring: string = 'transparent';
         let caption = `${home ? 'H' : 'A'} · ${opp.short}`;
         if (r) {
           const us = home ? r.home : r.away;
@@ -199,9 +200,10 @@ const s = StyleSheet.create({
   window: {
     width: NODE,
     height: NODE,
+    // Plain until open (green) or the finish (gold): no grey ring.
     borderRadius: 14,
     borderWidth: 3,
-    borderColor: colors.border,
+    borderColor: 'transparent',
     backgroundColor: colors.card,
     alignItems: 'center',
     justifyContent: 'center',

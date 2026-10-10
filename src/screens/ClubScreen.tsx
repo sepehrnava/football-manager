@@ -16,7 +16,6 @@ import { compName } from '../game/leagues';
 import { cupProgress } from '../game/cups';
 import { matchInsight, percent, userFixture } from '../game/insights';
 import { surname } from '../game/players';
-import { academyCallUpBlocker } from '../game/market';
 import { useCareer } from '../state/GameContext';
 import { ClubCrest, Sheet } from '../ui/components';
 import { ClipboardIcon, HourglassIcon, SproutIcon, SwapIcon, TrophyIcon, WarningIcon } from '../ui/icons';
@@ -51,8 +50,8 @@ export function ClubScreen({
   const [sheetRound, setSheetRound] = useState<number | null>(null);
   const [allNews, setAllNews] = useState(false);
   const [staffOpen, setStaffOpen] = useState(false);
-  const [academyOpen, setAcademyOpen] = useState(false);
   const [moneyOpen, setMoneyOpen] = useState(false);
+  const [academyOpen, setAcademyOpen] = useState(false);
   const news = state.news ?? [];
 
   const club = userClub(state);
@@ -66,6 +65,8 @@ export function ClubScreen({
 
   // Short notes, only when something needs attention.
   const notes: { text: string; icon: ReactNode; onPress?: () => void; color?: string }[] = [];
+  // Pre-season academy prospects waiting for a decision (shown on the Academy row).
+  const intake = state.phase === 'window' && !state.challenge ? (state.academy?.prospects.length ?? 0) : 0;
   if (status !== 'ok') notes.push({ text: MONEY_STATUS_TEXT[status], icon: <WarningIcon size={34} />, color: colors.red });
   const inCups = (state.cups ?? []).filter((c) => cupProgress(c, USER_ID) && !cupProgress(c, USER_ID)!.out);
   if (inCups.length) {
@@ -160,10 +161,10 @@ export function ClubScreen({
           icon={<SproutIcon size={34} />}
           title="Academy"
           value={
-            !academyCallUpBlocker(state) ? (
-              <Text style={s.ready}>Call-up ready</Text>
+            intake ? (
+              <Text style={s.ready}>Promote 1 of {intake}</Text>
             ) : (
-              <Text style={s.count}>{state.squad.filter((p) => p.fromAcademy).length} players</Text>
+              <Text style={s.count}>{plural(state.squad.filter((p) => p.fromAcademy).length, 'player')}</Text>
             )
           }
           onPress={() => setAcademyOpen(true)}
@@ -199,6 +200,10 @@ export function ClubScreen({
       ) : null}
     </ScrollView>
   );
+}
+
+function plural(n: number, word: string) {
+  return `${n} ${word}${n === 1 ? '' : 's'}`;
 }
 
 /** Money now, at season end and safe to spend, in one tappable row. Opens the breakdown. */
