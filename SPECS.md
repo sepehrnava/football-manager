@@ -40,6 +40,7 @@ a backend are approved only for optional sign-in and cloud save (S018, Firebase)
 | S020 | [Season money forecast](specs/020-money-forecast.md) | Implemented; Android observation pending |
 | S021 | [Bench strength and realistic transfer-list interest](specs/021-bench-strength-and-listing.md) | Implemented; Android observation pending |
 | S022 | [Multiple positions](specs/022-multiple-positions.md) | Implemented; Android observation pending |
+| S023 | [Match pace and animations](specs/023-match-pace-and-animations.md) | Implemented; Android observation pending |
 
 Use [the template](specs/_template.md) for the next feature. Number specs sequentially.
 Keep IDs stable; criteria use S002-AC01 style IDs referenced by tasks and evidence.

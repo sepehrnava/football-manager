@@ -8,6 +8,7 @@ import { playerValue, surname } from '../game/players';
 import type { Fixture } from '../game/types';
 import { useCareer } from '../state/GameContext';
 import { Bar, Button, Card, ClubCrest } from '../ui/components';
+import { BouncingBall, Confetti, LiveDot, ScoreTicker, Shake, SlideIn, Stamp } from '../ui/matchFx';
 import { animateNextLayout, FadeIn } from '../ui/motion';
 import { colors, formatMoney } from '../ui/theme';
 import { AchievementToast } from './Honours';
@@ -17,8 +18,10 @@ function longWord(name: string) {
   return name.split(' ').some((w) => w.length > 11);
 }
 
-/** Time between matchdays: quick, but slow enough to follow the table. */
-const STEP_MS = 650;
+/** Time between matchdays: slow enough to follow the result animation and the table. */
+const STEP_MS = 850;
+/** The first match of a run starts sooner. */
+const FIRST_STEP_MS = 325;
 
 /**
  * Plays rounds on a timer until the next stop (transfer window or season end),
@@ -43,7 +46,7 @@ export function SimScreen({ until: initialUntil, onClose }: { until?: number; on
   useEffect(() => {
     if (!active) return;
     // The first match of a run starts quickly; later ones follow the speed.
-    const delay = state.round === startRound ? 250 : STEP_MS;
+    const delay = state.round === startRound ? FIRST_STEP_MS : STEP_MS;
     const t = setTimeout(() => {
       animateNextLayout();
       dispatch({ type: 'playRound' });
@@ -71,6 +74,12 @@ export function SimScreen({ until: initialUntil, onClose }: { until?: number; on
   );
   const table = compTable(state);
   const comp = userComp(state);
+  // Places gained or lost since the last result shown (none before the first match: that order is not a table yet).
+  const myPos = table.findIndex((r) => r.clubId === USER_ID);
+  const [move, setMove] = useState({ round: lastRound, pos: myPos, delta: 0 });
+  if (move.round !== lastRound) {
+    setMove({ round: lastRound, pos: myPos, delta: move.round < 0 ? 0 : move.pos - myPos });
+  }
 
   const stopText =
     state.phase === 'window'
@@ -89,9 +98,14 @@ export function SimScreen({ until: initialUntil, onClose }: { until?: number; on
             <Text style={s.closeText}>✕</Text>
           </Pressable>
           <View style={s.headerMid}>
-            <Text style={s.md}>
-              {played === 0 ? 'Kick-off' : `Matchday ${played} / ${rounds}`}
-            </Text>
+            <View style={s.mdRow}>
+              {active ? <LiveDot /> : null}
+              <FadeIn key={played} from="scale" duration={200}>
+                <Text style={s.md}>
+                  {played === 0 ? 'Kick-off' : `Matchday ${played} / ${rounds}`}
+                </Text>
+              </FadeIn>
+            </View>
             <Bar value={(played / rounds) * 100} color={colors.ink} />
           </View>
           {stopText ? (
@@ -107,11 +121,12 @@ export function SimScreen({ until: initialUntil, onClose }: { until?: number; on
           {offer ? <OfferCard key={offer.id} offerId={offer.id} /> : null}
 
           {mine ? (
-            <FadeIn key={`r${lastRound}`} from="scale" duration={220}>
-              <MyMatch fixture={mine} />
-            </FadeIn>
+            <MyMatch key={`r${lastRound}`} fixture={mine} />
           ) : (
-            <Text style={s.wait}>Kick-off…</Text>
+            <View style={s.waitBox}>
+              <BouncingBall />
+              <Text style={s.wait}>Kick-off…</Text>
+            </View>
           )}
 
           {others.length ? (
@@ -143,6 +158,14 @@ export function SimScreen({ until: initialUntil, onClose }: { until?: number; on
                   <Text style={[s.tname, me && s.bold]} numberOfLines={1}>
                     {c.name}
                   </Text>
+                  {me && move.delta ? (
+                    <FadeIn key={`m${move.round}`} from="scale" delay={250} duration={200}>
+                      <Text style={[s.move, { color: move.delta > 0 ? colors.green : colors.red }]}>
+                        {move.delta > 0 ? '▲' : '▼'}
+                        {Math.abs(move.delta)}
+                      </Text>
+                    </FadeIn>
+                  ) : null}
                   <Text style={s.gd}>{r.gf - r.ga > 0 ? '+' : ''}{r.gf - r.ga}</Text>
                   <Text style={s.pts}>{r.points}</Text>
                 </View>
@@ -220,8 +243,10 @@ function OfferCard({ offerId }: { offerId: string }) {
   );
 }
 
+/** The user's result, played out like a game: crests slide in, the score ticks up, then the verdict lands. */
 function MyMatch({ fixture }: { fixture: Fixture }) {
   const { state } = useCareer();
+  const [done, setDone] = useState(false);
   const home = clubById(state, fixture.homeId);
   const away = clubById(state, fixture.awayId);
   const r = fixture.result!;
@@ -230,31 +255,42 @@ function MyMatch({ fixture }: { fixture: Fixture }) {
   const verdict = us > them ? 'WIN' : us < them ? 'LOSS' : 'DRAW';
   const color = us > them ? colors.green : us < them ? colors.red : colors.draw;
   return (
-    <Card style={s.myMatch}>
-      <View style={[s.verdict, { backgroundColor: color }]}>
-        <Text style={s.verdictText}>{verdict}</Text>
-      </View>
-      <View style={s.scoreRow}>
-        <View style={s.team}>
-          <ClubCrest club={home} size={52} />
-          <Text style={[s.teamName, longWord(home.name) && s.teamNameLong]} numberOfLines={2}>
-            {home.name}
-          </Text>
+    <Shake active={done && us < them}>
+      <Card style={s.myMatch}>
+        <View style={s.verdictSlot}>
+          {done ? (
+            <Stamp style={[s.verdict, { backgroundColor: color }]}>
+              <Text style={s.verdictText}>{verdict}</Text>
+            </Stamp>
+          ) : null}
         </View>
-        <Text style={s.score}>
-          {r.home} – {r.away}
-        </Text>
-        <View style={s.team}>
-          <ClubCrest club={away} size={52} />
-          <Text style={[s.teamName, longWord(away.name) && s.teamNameLong]} numberOfLines={2}>
-            {away.name}
-          </Text>
+        <View style={s.scoreRow}>
+          <SlideIn from="left">
+            <View style={s.team}>
+              <ClubCrest club={home} size={52} />
+              <Text style={[s.teamName, longWord(home.name) && s.teamNameLong]} numberOfLines={2}>
+                {home.name}
+              </Text>
+            </View>
+          </SlideIn>
+          <ScoreTicker home={r.home} away={r.away} delay={160} style={s.score} onDone={() => setDone(true)} />
+          <SlideIn from="right">
+            <View style={s.team}>
+              <ClubCrest club={away} size={52} />
+              <Text style={[s.teamName, longWord(away.name) && s.teamNameLong]} numberOfLines={2}>
+                {away.name}
+              </Text>
+            </View>
+          </SlideIn>
         </View>
-      </View>
-      {r.scorers?.length ? (
-        <Text style={s.scorers}>Goals: {r.scorers.map(surname).join(', ')}</Text>
-      ) : null}
-    </Card>
+        {r.scorers?.length ? (
+          <FadeIn delay={200}>
+            <Text style={s.scorers}>Goals: {r.scorers.map(surname).join(', ')}</Text>
+          </FadeIn>
+        ) : null}
+        {done && us > them ? <Confetti /> : null}
+      </Card>
+    </Shake>
   );
 }
 
@@ -281,6 +317,7 @@ const s = StyleSheet.create({
   root: { flex: 1, backgroundColor: colors.bg, paddingHorizontal: 16 },
   header: { flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 12 },
   headerMid: { flex: 1, gap: 6 },
+  mdRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 },
   md: { fontSize: 18, fontWeight: '900', color: colors.ink, textAlign: 'center' },
   spacer: { width: 42, height: 42 },
   teamNameLong: { fontSize: 12 },
@@ -305,8 +342,10 @@ const s = StyleSheet.create({
   offerButton: { flex: 1 },
   momentKicker: { color: colors.gold, fontWeight: '900', fontSize: 12, letterSpacing: 1.5 },
   momentText: { color: '#CFCFC8', fontWeight: '600', fontSize: 14 },
-  wait: { textAlign: 'center', fontSize: 18, fontWeight: '800', color: colors.muted, marginVertical: 40 },
+  waitBox: { alignItems: 'center', gap: 10, marginVertical: 28 },
+  wait: { textAlign: 'center', fontSize: 18, fontWeight: '800', color: colors.muted },
   myMatch: { alignItems: 'center', gap: 10 },
+  verdictSlot: { height: 27, justifyContent: 'center' },
   verdict: { paddingHorizontal: 14, paddingVertical: 4, borderRadius: 10 },
   verdictText: { color: '#FFFFFF', fontWeight: '900', letterSpacing: 2 },
   scoreRow: { flexDirection: 'row', alignItems: 'center', width: '100%' },
@@ -324,6 +363,7 @@ const s = StyleSheet.create({
   me: { backgroundColor: colors.faint, borderRadius: 8, borderWidth: 2, borderColor: colors.ink },
   pos: { width: 20, fontWeight: '900', color: colors.ink },
   tname: { flex: 1, fontSize: 13, fontWeight: '700', color: colors.ink },
+  move: { fontSize: 11, fontWeight: '900' },
   bold: { fontWeight: '900' },
   gd: { width: 34, textAlign: 'right', fontSize: 12, fontWeight: '700', color: colors.muted },
   pts: { width: 28, textAlign: 'right', fontWeight: '900', color: colors.ink },
