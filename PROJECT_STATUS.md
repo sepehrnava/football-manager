@@ -52,7 +52,7 @@ Updated: 2026-10-10. Replace outdated entries; keep this as a snapshot.
   capped interstitial at the season break; simulated in development, Google test ads in builds.
 - Play offers "Match by match" (default) or "Auto-play" (1.8 s per matchday), remembered across
   careers; the result plays out with sliding crests, a ticking score, a WIN/DRAW/LOSS stamp,
-  confetti on wins, a shake on losses and ▲/▼ table moves (S024).
+  confetti on wins, a shake on losses and ▲/▼ table moves; the screen opens waiting for a tap and never plays on its own (S024).
 - Retiring players are tagged on the pitch and in the bench strip and named in the Club note; Staff
   and Academy are their own rows on the Club tab, every Club row has an icon, and Next match
   and Money have no white cards; the Academy sheet shows the youth coach, the intake and

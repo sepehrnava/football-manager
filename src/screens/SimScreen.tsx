@@ -27,14 +27,16 @@ const FIRST_STEP_MS = 400;
 
 /**
  * Plays matches in the user's saved mode: one at a time ("Next match"), or on a timer until
- * the next stop (transfer window or season end). A `until` target from a match preview always
- * runs on its own until that round. The mode can be switched here at any time.
+ * the next stop (transfer window or season end). It opens waiting for a tap; only an `until`
+ * target from a match preview runs on its own until that round. The mode can be switched here at any time.
  */
 export function SimScreen({ until: initialUntil, onClose }: { until?: number; onClose: () => void }) {
   const { state, dispatch } = useCareer();
   const { meta, setPlayMode } = useGame();
   const insets = useSafeAreaInsets();
-  const [running, setRunning] = useState(true);
+  // Opens waiting for a tap, so a saved auto-play mode never starts on its own. Only a "play to here" target runs at once.
+  const [running, setRunning] = useState(initialUntil !== undefined);
+  const [openedAt] = useState(state.round);
   const [until, setUntil] = useState(initialUntil);
   const [runStart, setRunStart] = useState(state.round);
   const mode: PlayMode = meta.playMode ?? 'step';
@@ -140,7 +142,7 @@ export function SimScreen({ until: initialUntil, onClose }: { until?: number; on
           ) : (
             <View style={s.waitBox}>
               <BouncingBall />
-              <Text style={s.wait}>Kick-off…</Text>
+              <Text style={s.wait}>{running ? 'Kick-off…' : 'Ready to kick off'}</Text>
             </View>
           )}
 
@@ -205,7 +207,7 @@ export function SimScreen({ until: initialUntil, onClose }: { until?: number; on
               ) : active ? (
                 <Button label="PAUSE" variant="light" onPress={() => setRunning(false)} />
               ) : (
-                <Button label="CONTINUE" variant="green" onPress={playOn} />
+                <Button label={played === openedAt ? 'PLAY' : 'CONTINUE'} variant="green" onPress={playOn} />
               )}
             </>
           )}
