@@ -2,7 +2,7 @@
 
 State: Implemented; Android observation pending.
 Source: user requests (2026-10-10): the Club tab says a player retires, but the Squad pitch area
-does not show who; the academy is hidden and should be its own button; Club rows need icons.
+does not show who; the academy is hidden and should be its own row; Club rows need icons; no white cards.
 
 ## Problem
 
@@ -12,8 +12,8 @@ background (season-end graduates, cover after a sale, a fill button while the sq
 
 ## Scope and exclusions
 
-In scope: retirement tags in the bench strip, names in the Club note, Staff and Academy buttons
-and icons for the Club tab rows, an Academy sheet, and one academy call-up per transfer window.
+In scope: retirement tags in the bench strip, names in the Club note, Staff and Academy rows,
+icons for every Club tab row, plain Next match and Money sections, an Academy sheet, and one academy call-up per transfer window.
 Excluded: academy facilities, upgrades or a separate youth squad.
 
 ## Acceptance criteria
@@ -22,7 +22,8 @@ Excluded: academy facilities, upgrades or a separate youth squad.
 | --- | --- | --- | --- |
 | S024-AC01 | A retiring player shows a red LAST SEASON tag on the pitch and in the bench strip (subs and reserves) | Web: Brighton (Steele 36, Milner 40) | Passed (web) |
 | S024-AC02 | The Club note names up to two retiring players ("Steele and Milner retire after this season"), else gives the count; it opens the Squad tab | Web | Passed (web) |
-| S024-AC03 | The Club tab always shows Staff and Academy as two buttons with icons (Academy shows "Call-up ready" when one is available, else the academy player count); Academy opens a sheet with the youth coach and the academy players in the squad | Web at 320 and 360 px | Passed (web) |
+| S024-AC03 | The Club tab list always has Staff (stars) and Academy rows with icons, in the same style as the Daily challenge row (Academy shows "Call-up ready" when one is available, else the academy player count); Academy opens a sheet with the youth coach and the academy players in the squad | Web at 360 px | Passed (web) |
+| S024-AC07 | Next match and Money sit on the page background (no white cards) | Web at 360 px | Passed (web) |
 | S024-AC06 | Every row in the Club tab list has an icon like the Daily challenge: offers (arrows), retirements (hourglass), cups (trophy), money trouble (warning) | Web | Passed (web) |
 | S024-AC04 | In a transfer window, with fewer than 25 players, the user can call up one youngster (16–18, $50K wage) per window; otherwise the button is disabled with the reason | Web: call-up added 1 player, then "Next call-up in the next window" | Passed (web) |
 | S024-AC05 | All of the above on Android | Device observation | Pending |

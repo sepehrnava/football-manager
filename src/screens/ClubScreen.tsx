@@ -139,33 +139,35 @@ export function ClubScreen({
       ) : null}
       <MoneySheet visible={moneyOpen} onClose={() => setMoneyOpen(false)} />
 
-      <FadeIn delay={130}>
-        <Text style={s.headText}>CLUB</Text>
-        <View style={s.tiles}>
-          <Tile icon={<ClipboardIcon size={34} />} title="Staff" onPress={() => setStaffOpen(true)}>
+      <FadeIn delay={140} style={s.list}>
+        {notes.map((n) => (
+          <MenuRow key={n.text} compact icon={n.icon} title={n.text} titleColor={n.color} onPress={n.onPress} />
+        ))}
+        <MenuRow
+          compact
+          icon={<ClipboardIcon size={34} />}
+          title="Staff"
+          value={
             <Text style={s.stars}>
               {'★'.repeat(coachStars)}
               <Text style={s.starsOff}>{'★'.repeat(5 - coachStars)}</Text>
             </Text>
-          </Tile>
-          <Tile icon={<SproutIcon size={34} />} title="Academy" onPress={() => setAcademyOpen(true)}>
-            {!academyCallUpBlocker(state) ? (
-              <Text style={s.ready} numberOfLines={1}>
-                Call-up ready
-              </Text>
+          }
+          onPress={() => setStaffOpen(true)}
+        />
+        <MenuRow
+          compact
+          icon={<SproutIcon size={34} />}
+          title="Academy"
+          value={
+            !academyCallUpBlocker(state) ? (
+              <Text style={s.ready}>Call-up ready</Text>
             ) : (
-              <Text style={s.count} numberOfLines={1}>
-                {state.squad.filter((p) => p.fromAcademy).length} players
-              </Text>
-            )}
-          </Tile>
-        </View>
-      </FadeIn>
-
-      <FadeIn delay={150} style={s.list}>
-        {notes.map((n) => (
-          <MenuRow key={n.text} compact icon={n.icon} title={n.text} titleColor={n.color} onPress={n.onPress} />
-        ))}
+              <Text style={s.count}>{state.squad.filter((p) => p.fromAcademy).length} players</Text>
+            )
+          }
+          onPress={() => setAcademyOpen(true)}
+        />
         {!state.challenge ? <DailyRow compact /> : null}
       </FadeIn>
       <StaffSheet visible={staffOpen} onClose={() => setStaffOpen(false)} />
@@ -196,27 +198,6 @@ export function ClubScreen({
         </Sheet>
       ) : null}
     </ScrollView>
-  );
-}
-
-/** A square club button: icon, title and a short status. */
-function Tile({ icon, title, onPress, children }: { icon: ReactNode; title: string; onPress: () => void; children: ReactNode }) {
-  return (
-    <Pressable
-      onPress={onPress}
-      accessibilityRole="button"
-      accessibilityLabel={title}
-      style={({ pressed }) => [s.tile, pressed && { opacity: 0.6 }]}
-    >
-      <View style={s.tileTop}>
-        {icon}
-        <Text style={s.chevron}>›</Text>
-      </View>
-      <Text style={s.tileTitle} numberOfLines={1}>
-        {title}
-      </Text>
-      {children}
-    </Pressable>
   );
 }
 
@@ -308,15 +289,7 @@ const s = StyleSheet.create({
   headText: { fontSize: 12, fontWeight: '900', letterSpacing: 1.5, color: colors.muted },
   headMeta: { fontSize: 13, fontWeight: '800', color: colors.muted },
   more: { fontSize: 13, fontWeight: '800', color: colors.ink },
-  match: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    marginTop: 8,
-    backgroundColor: colors.card,
-    borderRadius: 18,
-    padding: 14,
-  },
+  match: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 10 },
   matchName: { fontSize: 17, fontWeight: '900', color: colors.ink },
   matchMeta: { fontSize: 13, fontWeight: '700', color: colors.muted, marginTop: 1 },
   matchOdds: { fontSize: 20, fontWeight: '900', color: colors.ink },
@@ -333,10 +306,6 @@ const s = StyleSheet.create({
   },
   noteText: { flex: 1, fontSize: 15, fontWeight: '800', color: colors.ink },
   stars: { fontSize: 13, color: colors.gold },
-  tiles: { flexDirection: 'row', gap: 10, marginTop: 8 },
-  tile: { flex: 1, gap: 2, backgroundColor: colors.card, borderRadius: 18, padding: 14 },
-  tileTop: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 },
-  tileTitle: { fontSize: 16, fontWeight: '900', color: colors.ink },
   ready: { fontSize: 13, fontWeight: '800', color: colors.green },
   count: { fontSize: 13, fontWeight: '700', color: colors.muted },
   starsOff: { color: colors.border },

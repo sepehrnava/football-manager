@@ -50,7 +50,8 @@ Updated: 2026-10-10. Replace outdated entries; keep this as a snapshot.
   careers; the result plays out with sliding crests, a ticking score, a WIN/DRAW/LOSS stamp,
   confetti on wins, a shake on losses and ▲/▼ table moves (S023).
 - Retiring players are tagged on the pitch and in the bench strip and named in the Club note; Staff
-  and Academy are their own buttons on the Club tab and every Club row has an icon; the Academy
+  and Academy are their own rows on the Club tab, every Club row has an icon, and Next match
+  and Money have no white cards; the Academy
   shows the youth coach and academy players and allows one call-up per window (S024).
 - The bench strip under the pitch shows only while choosing a player (S012); market rows wrap
   long position lists instead of overlapping.

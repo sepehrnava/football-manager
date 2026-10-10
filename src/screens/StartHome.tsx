@@ -164,7 +164,8 @@ export function MenuRow({
   icon?: ReactNode;
   title: string;
   note?: string;
-  value?: string;
+  /** Text on the right (muted), or any small element such as stars. */
+  value?: ReactNode;
   /** Without it the row is plain information (no arrow). */
   onPress?: () => void;
   last?: boolean;
@@ -185,7 +186,7 @@ export function MenuRow({
         <Text style={[s.rowTitle, compact && s.rowTitleCompact, titleColor ? { color: titleColor } : null]}>{title}</Text>
         {note ? <Text style={s.rowNote}>{note}</Text> : null}
       </View>
-      {value ? <Text style={s.rowValue}>{value}</Text> : null}
+      {typeof value === 'string' ? <Text style={s.rowValue}>{value}</Text> : value}
       {onPress ? <Text style={s.arrow}>›</Text> : null}
     </Pressable>
   );
