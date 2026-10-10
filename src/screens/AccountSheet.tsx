@@ -18,7 +18,7 @@ function when(time: number) {
 }
 
 /** The sign-in button for this platform: Apple on iOS, Google on Android. */
-function SignInButton() {
+export function SignInButton() {
   const { provider, signIn, busy } = useAccount();
   if (busy === 'signIn') return <ActivityIndicator color={colors.ink} style={s.spinner} />;
   if (provider === 'apple') {

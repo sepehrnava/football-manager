@@ -1,6 +1,8 @@
 // Build-time additions to app.json:
 // - Google's Firebase file for Android, once downloaded into the project root (README, Cloud save).
 // - AdMob app IDs from EXPO_PUBLIC_ADMOB_*_APP_ID, else Google's public test app IDs (README, Ads).
+// The "react-native-google-mobile-ads" key in app.json is read by that library's Gradle script;
+// without a non-empty key, its Android build fails (googleMobileAdsJson does not exist).
 const fs = require('fs');
 
 const TEST_APP_IDS = {
