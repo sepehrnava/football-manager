@@ -200,7 +200,7 @@ export function SquadScreen({ onFindPlayers }: { onFindPlayers: () => void }) {
                 onPress={() => tapSlot(i)}
                 accessibilityLabel={
                   p
-                    ? `${sl.pos}: ${p.name}, ${r}${p.rating > r ? `, out of position −${p.rating - r}` : ', natural position'}`
+                    ? `${sl.pos}: ${p.name}, ${r}${p.rating > r ? `, out of position −${p.rating - r}` : ', natural position'}${p.retiring ? ', retiring after this season' : ''}`
                     : `Empty ${sl.pos} slot`
                 }
                 style={[s.token, { left: `${sl.x * 100}%`, top: `${sl.y * 100}%` }]}
@@ -387,7 +387,7 @@ function BenchStrip({
               <Pressable
                 onPress={() => onPress(p.id)}
                 accessibilityRole="button"
-                accessibilityLabel={`Bench ${p.name}`}
+                accessibilityLabel={`Bench ${p.name}${p.retiring ? ', retiring after this season' : ''}`}
                 accessibilityState={{ selected: on }}
                 style={s.benchToken}
               >
@@ -407,6 +407,7 @@ function BenchStrip({
                   {surname(p.name)}
                 </Text>
                 <Text style={s.benchRole}>{bench.has(p.id) ? 'SUB' : 'RESERVE'}</Text>
+                {p.retiring ? <Text style={s.retiring}>LAST SEASON</Text> : null}
               </Pressable>
             </View>
           );

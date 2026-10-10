@@ -62,6 +62,8 @@ export interface Player {
   retiring?: boolean;
   /** On the user's transfer list: clubs make offers when a window is open. */
   listed?: boolean;
+  /** Came up through the user's academy (not set in older saves). */
+  fromAcademy?: boolean;
 }
 
 export interface Club {
@@ -284,4 +286,6 @@ export interface GameState {
   news?: NewsItem[];
   /** Set only in a Daily Challenge game. */
   challenge?: Challenge;
+  /** The transfer window ("season-round") whose academy call-up was used. */
+  academyCallUp?: string;
 }

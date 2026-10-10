@@ -26,7 +26,11 @@ export interface Meta {
   achievements: Record<string, string>;
   /** Earned but not yet announced. */
   fresh: string[];
+  /** How Play runs matches: one at a time, or on their own until the next stop. */
+  playMode?: PlayMode;
 }
+
+export type PlayMode = 'step' | 'auto';
 
 export const EMPTY_META: Meta = {
   version: 1,

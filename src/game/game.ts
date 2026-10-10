@@ -17,6 +17,7 @@ import {
   buildWorld,
   clubSquad,
   canTrade,
+  academyCallUp,
   academyFill,
   makeOffers,
   placeBid,
@@ -74,6 +75,8 @@ export type Action =
       country?: string;
     }
   | { type: 'fillAcademy' }
+  /** One academy youngster joins the squad (once per window). */
+  | { type: 'academyCallUp' }
   | { type: 'load'; state: GameState }
   | { type: 'reset' }
   | { type: 'formation'; formation: FormationId }
@@ -961,6 +964,8 @@ function step(state: GameState | null, action: Action): GameState | null {
       const fill = academyFill(state.squad, rng, state.nextId);
       return done({ ...state, squad: [...state.squad, ...fill.players], nextId: fill.nextId });
     }
+    case 'academyCallUp':
+      return done(academyCallUp(state, rng));
     case 'startSeason': {
       // A team needs a full matchday squad before it can kick off.
       if (state.phase !== 'window' || !squadNeeds(state.squad).ready) return state;

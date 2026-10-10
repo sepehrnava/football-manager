@@ -15,6 +15,8 @@ import {
 import { compName } from '../game/leagues';
 import { cupProgress } from '../game/cups';
 import { matchInsight, percent, userFixture } from '../game/insights';
+import { surname } from '../game/players';
+import { academyCallUpBlocker } from '../game/market';
 import { useCareer } from '../state/GameContext';
 import { ClubCrest, Sheet } from '../ui/components';
 import { FadeIn } from '../ui/motion';
@@ -27,6 +29,7 @@ import { BuildSquadCard } from './BuildSquad';
 import { Roadmap } from './Roadmap';
 import { MoneySheet } from './MoneySheet';
 import { StaffSheet } from './StaffSheet';
+import { AcademySheet } from './AcademySheet';
 import { useOffers } from './useOffers';
 
 /** Home: the club, the season roadmap, and one card that says what to do next. */
@@ -47,6 +50,7 @@ export function ClubScreen({
   const [sheetRound, setSheetRound] = useState<number | null>(null);
   const [allNews, setAllNews] = useState(false);
   const [staffOpen, setStaffOpen] = useState(false);
+  const [academyOpen, setAcademyOpen] = useState(false);
   const [moneyOpen, setMoneyOpen] = useState(false);
   const news = state.news ?? [];
 
@@ -55,7 +59,7 @@ export function ClubScreen({
   const myRow = table.find((r) => r.clubId === USER_ID)!;
   const position = table.indexOf(myRow) + 1;
   const status = moneyStatus(state);
-  const retiring = state.squad.filter((p) => p.retiring).length;
+  const retiring = state.squad.filter((p) => p.retiring).map((p) => surname(p.name));
   const coachStars = state.staff?.coach?.stars ?? 0;
   const next = userFixture(state, state.round);
 
@@ -70,9 +74,12 @@ export function ClubScreen({
       onPress: onOpenTransfers,
     });
   }
-  if (retiring) {
+  if (retiring.length) {
     notes.push({
-      text: `${retiring} ${retiring > 1 ? 'players retire' : 'player retires'} after this season`,
+      text:
+        retiring.length > 2
+          ? `${retiring.length} players retire after this season`
+          : `${retiring.join(' and ')} ${retiring.length > 1 ? 'retire' : 'retires'} after this season`,
       onPress: onOpenSquad,
     });
   }
@@ -147,9 +154,23 @@ export function ClubScreen({
           </Text>
           <Text style={s.chevron}>›</Text>
         </Pressable>
+        <Pressable
+          onPress={() => setAcademyOpen(true)}
+          accessibilityRole="button"
+          style={({ pressed }) => [s.note, pressed && { opacity: 0.6 }]}
+        >
+          <Text style={s.noteText}>Academy</Text>
+          {!academyCallUpBlocker(state) ? (
+            <Text style={s.ready}>Call-up ready</Text>
+          ) : (
+            <Text style={s.count}>{state.squad.filter((p) => p.fromAcademy).length} players</Text>
+          )}
+          <Text style={s.chevron}>›</Text>
+        </Pressable>
         {!state.challenge ? <DailyRow compact /> : null}
       </FadeIn>
       <StaffSheet visible={staffOpen} onClose={() => setStaffOpen(false)} />
+      <AcademySheet visible={academyOpen} onClose={() => setAcademyOpen(false)} />
 
       {news.length ? (
         <FadeIn delay={180}>
@@ -292,6 +313,8 @@ const s = StyleSheet.create({
   },
   noteText: { flex: 1, fontSize: 15, fontWeight: '800', color: colors.ink },
   stars: { fontSize: 13, color: colors.gold },
+  ready: { fontSize: 13, fontWeight: '800', color: colors.green },
+  count: { fontSize: 13, fontWeight: '700', color: colors.muted },
   starsOff: { color: colors.border },
   chevron: { fontSize: 24, fontWeight: '900', color: colors.borderDark, marginLeft: 8 },
   newsLine: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingVertical: 6 },

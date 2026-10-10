@@ -46,8 +46,12 @@ Updated: 2026-10-10. Replace outdated entries; keep this as a snapshot.
   breakdown sheet, and each deal's effect on the season end (S020).
 - Ads (S019, D014): rewarded sponsor bonus (1% of wages per ad, unlimited in windows) and free scouting, one
   capped interstitial at the season break; simulated in development, Google test ads in builds.
-- Matches after kick-off run ~30% slower; the result plays out with sliding crests, a ticking
-  score, a WIN/DRAW/LOSS stamp, confetti on wins, a shake on losses and ▲/▼ table moves (S023).
+- Play offers "Match by match" (default) or "Auto-play" (1.8 s per matchday), remembered across
+  careers; the result plays out with sliding crests, a ticking score, a WIN/DRAW/LOSS stamp,
+  confetti on wins, a shake on losses and ▲/▼ table moves (S023).
+- Retiring players are tagged on the pitch and in the bench strip and named in the Club note; an
+  Academy row on the Club tab shows the youth coach and academy players and allows one
+  call-up per transfer window (S024).
 - Game rules in src/game (pure TypeScript); screens in src/screens; theme in src/ui.
 - npm lockfile, lint configuration, and setup instructions in README.md.
 - Spec-driven documentation and selective context-reading workflow.
@@ -61,13 +65,14 @@ Updated: 2026-10-10. Replace outdated entries; keep this as a snapshot.
 - S004 web flows (scout, reject, counter, sign, free agent, renew, offers): no errors.
 - S005 balance, 30 careers × 6 seasons: frugal/rescue never sacked, reckless sacked
   2/30, smart trading climbs to ~4th. Simplified screens checked in Chrome.
-- Android display not yet observed (S001-AC03, S002-AC08, S003-AC06, S004-AC09, S005-AC08, S011-AC05, S012-AC04, S013-AC04, S014-AC03, S015-AC05, S016-AC05, S023-AC06).
+- Android display not yet observed (S001-AC03, S002-AC08, S003-AC06, S004-AC09, S005-AC08, S011-AC05, S012-AC04, S013-AC04, S014-AC03, S015-AC05, S016-AC05, S023-AC06, S024-AC05).
 - 2026-10-09 S015: start screen web flows (create, manage, daily, honours, random club by
   difficulty → career started); 0 console errors on a fresh load. Start screen layout seen
   on BlueStacks via adb screenshot (S015-AC05 partly); Expo Go on BlueStacks works with
   `adb` at 127.0.0.1:5555.
 - Save format v2: careers saved before S004 start over.
-- 2026-10-10 S023: web timing ~0.89 s per matchday (was 650 ms timer), result animation frames, skip to window, 0 console errors.
+- 2026-10-10 S023/S024: web auto-play ~1.84 s per matchday, match-by-match flow and mode memory,
+  result animation frames, skip to window, retiring tags (Brighton), academy call-up; 0 console errors.
 - 2026-10-09 S010: 12 leagues × 3 clubs with staff wages, 0 sacked; 30 daily challenges
   generated in ~70 ms each; web flows for hiring, challenge, toast, honours, news.
 

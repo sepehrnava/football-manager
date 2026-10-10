@@ -5,8 +5,9 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { clubById, compTable, seasonRounds, USER_ID, userComp } from '../game/game';
 import { zoneOf } from '../game/leagues';
 import { playerValue, surname } from '../game/players';
+import type { PlayMode } from '../game/meta';
 import type { Fixture } from '../game/types';
-import { useCareer } from '../state/GameContext';
+import { useCareer, useGame } from '../state/GameContext';
 import { Bar, Button, Card, ClubCrest } from '../ui/components';
 import { BouncingBall, Confetti, LiveDot, ScoreTicker, Shake, SlideIn, Stamp } from '../ui/matchFx';
 import { animateNextLayout, FadeIn } from '../ui/motion';
@@ -18,22 +19,25 @@ function longWord(name: string) {
   return name.split(' ').some((w) => w.length > 11);
 }
 
-/** Time between matchdays: slow enough to follow the result animation and the table. */
-const STEP_MS = 850;
-/** The first match of a run starts sooner. */
-const FIRST_STEP_MS = 325;
+/** Time between matchdays in auto-play: enough to watch the result and the table move. */
+const STEP_MS = 1800;
+/** The first match of a run (and every match played one at a time) starts sooner. */
+const FIRST_STEP_MS = 400;
 
 /**
- * Plays rounds on a timer until the next stop (transfer window or season end),
- * or until `until` rounds have been played. Without a target it also pauses
- * before key matches so the user can react. Pause any time to go match by match.
+ * Plays matches in the user's saved mode: one at a time ("Next match"), or on a timer until
+ * the next stop (transfer window or season end). A `until` target from a match preview always
+ * runs on its own until that round. The mode can be switched here at any time.
  */
 export function SimScreen({ until: initialUntil, onClose }: { until?: number; onClose: () => void }) {
   const { state, dispatch } = useCareer();
+  const { meta, setPlayMode } = useGame();
   const insets = useSafeAreaInsets();
   const [running, setRunning] = useState(true);
   const [until, setUntil] = useState(initialUntil);
-  const [startRound] = useState(state.round);
+  const [runStart, setRunStart] = useState(state.round);
+  const mode: PlayMode = meta.playMode ?? 'step';
+  const auto = mode === 'auto' || until !== undefined;
   const inSeason = state.phase === 'season';
   const reached = until !== undefined && state.round >= until;
   // When a window opens, clubs' bids are shown right here, one at a time.
@@ -46,17 +50,27 @@ export function SimScreen({ until: initialUntil, onClose }: { until?: number; on
   useEffect(() => {
     if (!active) return;
     // The first match of a run starts quickly; later ones follow the speed.
-    const delay = state.round === startRound ? FIRST_STEP_MS : STEP_MS;
+    const delay = state.round === runStart ? FIRST_STEP_MS : STEP_MS;
     const t = setTimeout(() => {
       animateNextLayout();
       dispatch({ type: 'playRound' });
+      // Match by match: stop after each one.
+      if (!auto) setRunning(false);
     }, delay);
     return () => clearTimeout(t);
-  }, [active, state.round, startRound, dispatch]);
+  }, [active, auto, state.round, runStart, dispatch]);
 
   const playOn = () => {
     setUntil(undefined);
+    setRunStart(state.round);
     setRunning(true);
+  };
+  const changeMode = (next: PlayMode) => {
+    setPlayMode(next);
+    if (next === 'auto') return playOn();
+    // Match by match: stop here; the next tap plays one match.
+    setUntil(undefined);
+    setRunning(false);
   };
   const skip = () => {
     animateNextLayout();
@@ -182,15 +196,49 @@ export function SimScreen({ until: initialUntil, onClose }: { until?: number; on
             </>
           ) : reached ? (
             <Button label="DONE" variant="green" onPress={onClose} />
-          ) : active ? (
-            <Button label="PAUSE" variant="light" onPress={() => setRunning(false)} />
           ) : (
-            <Button label="CONTINUE" variant="green" onPress={playOn} />
+            <>
+              <ModeSwitch mode={auto ? 'auto' : 'step'} onChange={changeMode} />
+              {!auto ? (
+                <Button label="NEXT MATCH" variant="green" disabled={active} onPress={playOn} />
+              ) : active ? (
+                <Button label="PAUSE" variant="light" onPress={() => setRunning(false)} />
+              ) : (
+                <Button label="CONTINUE" variant="green" onPress={playOn} />
+              )}
+            </>
           )}
         </View>
       </View>
       <AchievementToast />
     </Modal>
+  );
+}
+
+const MODES: { id: PlayMode; label: string }[] = [
+  { id: 'step', label: 'Match by match' },
+  { id: 'auto', label: 'Auto-play' },
+];
+
+/** Two-way switch for how matches are played; the choice is remembered. */
+function ModeSwitch({ mode, onChange }: { mode: PlayMode; onChange: (mode: PlayMode) => void }) {
+  return (
+    <View style={s.modes} accessibilityRole="radiogroup">
+      {MODES.map((m) => {
+        const on = m.id === mode;
+        return (
+          <Pressable
+            key={m.id}
+            onPress={() => !on && onChange(m.id)}
+            accessibilityRole="radio"
+            accessibilityState={{ selected: on }}
+            style={[s.mode, on && s.modeOn]}
+          >
+            <Text style={[s.modeText, on && s.modeTextOn]}>{m.label}</Text>
+          </Pressable>
+        );
+      })}
+    </View>
   );
 }
 
@@ -368,5 +416,17 @@ const s = StyleSheet.create({
   gd: { width: 34, textAlign: 'right', fontSize: 12, fontWeight: '700', color: colors.muted },
   pts: { width: 28, textAlign: 'right', fontWeight: '900', color: colors.ink },
   controls: { gap: 8, paddingTop: 8 },
+  modes: {
+    flexDirection: 'row',
+    backgroundColor: colors.faint,
+    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: colors.border,
+    padding: 3,
+  },
+  mode: { flex: 1, paddingVertical: 8, borderRadius: 9, alignItems: 'center' },
+  modeOn: { backgroundColor: colors.ink },
+  modeText: { fontSize: 13, fontWeight: '800', color: colors.muted },
+  modeTextOn: { color: '#FFFFFF' },
   stop: { textAlign: 'center', fontSize: 16, fontWeight: '900', color: colors.ink },
 });

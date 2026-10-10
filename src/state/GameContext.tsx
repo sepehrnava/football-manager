@@ -14,7 +14,7 @@ import {
 import { careerAchievements } from '../game/achievements';
 import { createChallenge, todayKey } from '../game/challenge';
 import { reducer, type Action } from '../game/game';
-import { EMPTY_META, recordChallenge, unlock, type Meta } from '../game/meta';
+import { EMPTY_META, recordChallenge, unlock, type Meta, type PlayMode } from '../game/meta';
 import type { GameState } from '../game/types';
 import type { Backup } from '../cloud/backup';
 import { clearGame, loadGame, loadMeta, saveGame, saveMeta, type Slot } from './saveStore';
@@ -29,12 +29,14 @@ type AppAction =
   | Action
   | { type: 'switch'; slot: Slot; game: GameState | null }
   | { type: 'meta'; meta: Meta }
+  | { type: 'playMode'; mode: PlayMode }
   | { type: 'seen' };
 
 /** Game actions go to the game; finishing a challenge also updates the meta. */
 function appReducer(app: App, action: AppAction): App {
   if (action.type === 'switch') return { ...app, slot: action.slot, game: action.game };
   if (action.type === 'meta') return { ...app, meta: action.meta };
+  if (action.type === 'playMode') return { ...app, meta: { ...app.meta, playMode: action.mode } };
   if (action.type === 'seen') return { ...app, meta: { ...app.meta, fresh: app.meta.fresh.slice(1) } };
   const game = reducer(app.game, action);
   if (game === app.game || !game) return { ...app, game };
@@ -53,6 +55,8 @@ interface GameContextValue {
   /** Which game is open: the career or today's Daily Challenge. */
   slot: Slot;
   meta: Meta;
+  /** Remembers how Play runs matches (kept across careers). */
+  setPlayMode: (mode: PlayMode) => void;
   resetCareer: () => void;
   openChallenge: () => Promise<void>;
   leaveChallenge: () => Promise<void>;
@@ -109,6 +113,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
   };
 
   const seenAchievement = useCallback(() => dispatch({ type: 'seen' }), []);
+  const setPlayMode = useCallback((mode: PlayMode) => dispatch({ type: 'playMode', mode }), []);
   // Each new achievement is announced for a few seconds, then the next one.
   const announcing = meta.fresh[0];
   useEffect(() => {
@@ -164,6 +169,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
         loaded,
         slot,
         meta,
+        setPlayMode,
         resetCareer,
         openChallenge,
         leaveChallenge,

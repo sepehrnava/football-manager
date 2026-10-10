@@ -258,6 +258,9 @@ export function offersLeft(talk: { attempts: number; last: string | null } | und
 
 // ---------------------------------------------------------------- academy
 
+/** Academy players sign cheap first contracts. */
+export const ACADEMY_WAGE = 50_000;
+
 /**
  * Academy youngsters for the user's club: first for any line below its
  * minimum, then up to a full matchday squad, and at least `atLeast`.
@@ -279,12 +282,32 @@ export function academyFill(squad: Player[], rng: Rng, startId: number, atLeast 
       clubId: USER_ID,
     });
     youth.potential = clamp(youth.rating + rng.int(8, 28), youth.rating, 92);
-    // Academy players sign cheap first contracts.
-    youth.contract = { wage: 50_000, years: 3 };
+    youth.contract = { wage: ACADEMY_WAGE, years: 3 };
     youth.seasonsAtClub = 1;
+    youth.fromAcademy = true;
     players.push(youth);
   }
   return { players, nextId };
+}
+
+/** One academy call-up per transfer window; a window is identified by its season and round. */
+function windowKey(state: GameState) {
+  return `${state.season}-${state.round}`;
+}
+
+/** Why the user can't call up an academy youngster right now, or null if they can. */
+export function academyCallUpBlocker(state: GameState): string | null {
+  if (!canTrade(state)) return 'Call-ups happen in transfer windows';
+  if (state.squad.length >= SQUAD_MAX) return `Squad is full (${SQUAD_MAX})`;
+  if (state.academyCallUp === windowKey(state)) return 'Next call-up in the next window';
+  return null;
+}
+
+/** Brings one academy youngster (16–18, cheap wage) into the squad. */
+export function academyCallUp(state: GameState, rng: Rng): GameState {
+  if (academyCallUpBlocker(state)) return state;
+  const fill = academyFill(state.squad, rng, state.nextId, 1);
+  return { ...state, squad: [...state.squad, ...fill.players], nextId: fill.nextId, academyCallUp: windowKey(state) };
 }
 
 /** What a squad still lacks before it can play: 18 players and the minimum per line. */
