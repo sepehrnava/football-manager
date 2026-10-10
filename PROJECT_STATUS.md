@@ -49,9 +49,13 @@ Updated: 2026-10-10. Replace outdated entries; keep this as a snapshot.
 - Play offers "Match by match" (default) or "Auto-play" (1.8 s per matchday), remembered across
   careers; the result plays out with sliding crests, a ticking score, a WIN/DRAW/LOSS stamp,
   confetti on wins, a shake on losses and ▲/▼ table moves (S023).
-- Retiring players are tagged on the pitch and in the bench strip and named in the Club note; an
-  Academy row on the Club tab shows the youth coach and academy players and allows one
-  call-up per transfer window (S024).
+- Retiring players are tagged on the pitch and in the bench strip and named in the Club note; Staff
+  and Academy are their own buttons on the Club tab and every Club row has an icon; the Academy
+  shows the youth coach and academy players and allows one call-up per window (S024).
+- The bench strip under the pitch shows only while choosing a player (S012); market rows wrap
+  long position lists instead of overlapping.
+- Fixed: after a season ended, its tables dropped games against clubs that had moved division,
+  so the shown place could differ from the real finish (S008-AC08).
 - Game rules in src/game (pure TypeScript); screens in src/screens; theme in src/ui.
 - npm lockfile, lint configuration, and setup instructions in README.md.
 - Spec-driven documentation and selective context-reading workflow.
@@ -73,6 +77,8 @@ Updated: 2026-10-10. Replace outdated entries; keep this as a snapshot.
 - Save format v2: careers saved before S004 start over.
 - 2026-10-10 S023/S024: web auto-play ~1.84 s per matchday, match-by-match flow and mode memory,
   result animation frames, skip to window, retiring tags (Brighton), academy call-up; 0 console errors.
+- 2026-10-10 S008-AC08: headless 180 seasons (38 with a division move), final tables match the
+  season-end position (before the fix 76 of 120 differed). Club, market and squad at 320/360 px.
 - 2026-10-09 S010: 12 leagues × 3 clubs with staff wages, 0 sacked; 30 daily challenges
   generated in ~70 ms each; web flows for hiring, challenge, toast, honours, news.
 

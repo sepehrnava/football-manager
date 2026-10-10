@@ -21,7 +21,7 @@ Excluded: match engine, results, new packages, sound or haptics. Skip stays inst
 | ID | Observable result | Verification method | Evidence / state |
 | --- | --- | --- | --- |
 | S023-AC01 | Auto-play advances one matchday every 1.8 s (was 650 ms); the first match of a run starts after 0.4 s | Web timing of matchday changes | Passed (web): ~1.84 s between matchdays |
-| S023-AC02 | The user's result plays out: crests slide in from both sides, the score ticks up goal by goal with a pop, then a WIN/DRAW/LOSS stamp slams down; a win bursts confetti, a loss shakes the card | Web frame captures | Passed (web) |
+| S023-AC02 | The user's result plays out: crests slide in from both sides, the score ticks up goal by goal with a pop (up to 0.26 s per goal, 0.9 s at most), then a WIN/DRAW/LOSS stamp slams down; a win bursts confetti, a loss shakes the card | Web frame captures | Passed (web) |
 | S023-AC03 | A live dot pulses while matches run; the matchday title pops on change; before kick-off a ball bounces | Web frame captures | Passed (web) |
 | S023-AC04 | The user's table row shows places gained (green ▲) or lost (red ▼) since the last result (none after the first matchday) | Web flow | Passed (web) |
 | S023-AC05 | Pause, continue, skip and the window offer still work, with no console errors | Web flow | Passed (web) |

@@ -25,4 +25,5 @@ continental cups later. Builds on S007.
 | S008-AC04 | Careful play survives in the Second Division; youth strategy climbs | Headless: frugal, rescue, youth 0 sacked; youth ~6th of Div 2 by season 8 | Passed |
 | S008-AC05 | Generated names never duplicate real players | Headless: 17,143 generated, 0 clashes | Passed |
 | S008-AC07 | "Manage a club" first picks a league, then a club ranked by expected finish, with division-specific labels | Web: league cards, ranked Second Division list, back steps, managed Wolves | Passed (web) |
+| S008-AC08 | After a season ends, its tables (match screen, League tab) still show the final order, matching the season-end position, although clubs have already moved division | Headless: 180 seasons incl. 38 with a move, 0 mismatches (was 76 of 120) | Passed |
 | S008-AC06 | Shown correctly on Android | Device observation | Pending |

@@ -517,7 +517,7 @@ export const styles = StyleSheet.create({
     borderStyle: 'dashed',
   },
   rangeText: { color: '#A2700F', fontWeight: '900' },
-  tags: { flexDirection: 'row', gap: 6 },
+  tags: { flexDirection: 'row', flexShrink: 0, gap: 5 },
   trend: { fontWeight: '900', letterSpacing: 0.3 },
   tag: { fontWeight: '800' },
   crest: { overflow: 'hidden', borderColor: '#141414', alignItems: 'center', justifyContent: 'center' },

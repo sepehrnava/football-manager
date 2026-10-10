@@ -122,3 +122,66 @@ export function PlayIcon({ locked, size = 30 }: { locked?: boolean; size?: numbe
     </Svg>
   );
 }
+
+/** A coach's clipboard, for Staff. */
+export function ClipboardIcon({ size = 28 }: { size?: number }) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 28 28">
+      <Rect x={5} y={4.5} width={18} height={21.5} rx={3} fill="#FFFFFF" stroke={INK} strokeWidth={STROKE} />
+      <Rect x={9.5} y={2} width={9} height={5} rx={1.5} fill={colors.gold} stroke={INK} strokeWidth={STROKE} />
+      <G stroke={INK} strokeWidth={1.8} strokeLinecap="round">
+        <Path d="M9.5 12.5H18.5" />
+        <Path d="M9.5 16.5H18.5" />
+        <Path d="M9.5 20.5H15" />
+      </G>
+    </Svg>
+  );
+}
+
+/** A young sprout, for the Academy. */
+export function SproutIcon({ size = 28 }: { size?: number }) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 28 28">
+      <Path d="M14 21V12" stroke={INK} strokeWidth={STROKE} strokeLinecap="round" />
+      <Path d="M14 13C14 8.5 10.5 6 5.5 6.5C5.5 11 8.5 13.5 14 13Z" fill={colors.green} stroke={INK} strokeWidth={STROKE} strokeLinejoin="round" />
+      <Path d="M14 15.5C14 11 17.5 8.5 22.5 9C22.5 13.5 19.5 16 14 15.5Z" fill={colors.green} stroke={INK} strokeWidth={STROKE} strokeLinejoin="round" />
+      <Path d="M7.5 20.5H20.5L19 26H9Z" fill={colors.orange} stroke={INK} strokeWidth={STROKE} strokeLinejoin="round" />
+    </Svg>
+  );
+}
+
+/** Two arrows, for transfer offers. */
+export function SwapIcon({ size = 28 }: { size?: number }) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 28 28">
+      <Circle cx={14} cy={14} r={12} fill={colors.blue} stroke={INK} strokeWidth={STROKE} />
+      <G fill="none" stroke="#FFFFFF" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round">
+        <Path d="M8 11H20M16.5 7.5L20 11L16.5 14.5" />
+        <Path d="M20 17H8M11.5 13.5L8 17L11.5 20.5" />
+      </G>
+    </Svg>
+  );
+}
+
+/** An hourglass, for players in their last season. */
+export function HourglassIcon({ size = 28 }: { size?: number }) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 28 28">
+      <Path d="M8 3.5H20M8 24.5H20" stroke={INK} strokeWidth={STROKE} strokeLinecap="round" />
+      <Path d="M9 3.5H19C19 9 15.5 11.5 14 14C15.5 16.5 19 19 19 24.5H9C9 19 12.5 16.5 14 14C12.5 11.5 9 9 9 3.5Z" fill="#FFFFFF" stroke={INK} strokeWidth={STROKE} strokeLinejoin="round" />
+      <Path d="M10.8 23C11.3 20 13 18.6 14 17.6C15 18.6 16.7 20 17.2 23Z" fill={colors.gold} />
+      <Path d="M11.5 7.5H16.5C16 9.3 14.8 10.6 14 11.5C13.2 10.6 12 9.3 11.5 7.5Z" fill={colors.gold} />
+    </Svg>
+  );
+}
+
+/** A warning triangle, for money trouble. */
+export function WarningIcon({ size = 28 }: { size?: number }) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 28 28">
+      <Path d="M14 3L26 24.5H2Z" fill={colors.red} stroke={INK} strokeWidth={STROKE} strokeLinejoin="round" />
+      <Path d="M14 10.5V16.5" stroke="#FFFFFF" strokeWidth={2.6} strokeLinecap="round" />
+      <Circle cx={14} cy={20.3} r={1.5} fill="#FFFFFF" />
+    </Svg>
+  );
+}

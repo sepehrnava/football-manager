@@ -321,7 +321,7 @@ function MyMatch({ fixture }: { fixture: Fixture }) {
               </Text>
             </View>
           </SlideIn>
-          <ScoreTicker home={r.home} away={r.away} delay={160} style={s.score} onDone={() => setDone(true)} />
+          <ScoreTicker home={r.home} away={r.away} delay={300} style={s.score} onDone={() => setDone(true)} />
           <SlideIn from="right">
             <View style={s.team}>
               <ClubCrest club={away} size={52} />

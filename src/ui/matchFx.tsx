@@ -30,8 +30,8 @@ export function ScoreTicker({
   onDone?: () => void;
 }) {
   const steps = Math.max(home, away);
-  // Keep the whole count short so it fits between matchdays.
-  const stepMs = steps ? Math.min(110, 420 / steps) : 0;
+  // One beat per goal, shortened for big scores so the count fits between matchdays.
+  const stepMs = steps ? Math.min(260, 900 / steps) : 0;
   const [step, setStep] = useState(0);
   const [pop] = useState(() => new Animated.Value(1));
   useEffect(() => {

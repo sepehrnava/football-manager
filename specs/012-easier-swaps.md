@@ -26,6 +26,7 @@ substitutes list. The selected player was hard to see, and the instruction bar c
 | S012-AC01 | A selected player is clearly highlighted on the pitch and on the bench | Web screenshots | 2026-10-09: observed |
 | S012-AC02 | A pitch player and a bench player swap with two taps, without scrolling to the lists | Web flow | 2026-10-09: Gyökeres ↔ Martinelli, Eze ↔ Ødegaard |
 | S012-AC03 | The bench shows the −N penalty for the selected position | Web screenshot | 2026-10-09: observed |
+| S012-AC05 | The bench strip under the pitch appears only while a pitch position or a bench player is selected (with best options first); otherwise the Substitutes and Reserves lists are enough | Web screenshots | 2026-10-10: observed |
 | S012-AC04 | Works and feels right in Expo Go on Android | Device observation | Pending |
 
 ## Implementation and validation

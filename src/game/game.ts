@@ -178,26 +178,34 @@ function sameComp(a: Comp, b: Comp) {
   return a.country === b.country && a.division === b.division;
 }
 
-/** The competition the user's club plays in this season. */
-export function userComp(state: Pick<GameState, 'clubs'>) {
+/** Clubs move division as soon as a season ends; until the next season starts, the season summary keeps the finished one. */
+type CompState = Pick<GameState, 'clubs'> & { summary?: GameState['summary'] };
+
+/** The competition the user's club plays in this season (the finished one while its summary is shown). */
+export function userComp(state: CompState): Comp {
+  const sum = state.summary;
+  if (sum?.division) return { country: sum.country ?? DEFAULT_COUNTRY, division: sum.division };
   return compOf(state.clubs.find((c) => c.id === USER_ID)!);
 }
 
 /** The division of the user's club (within its country). */
-export function userDivision(state: Pick<GameState, 'clubs'>) {
+export function userDivision(state: CompState) {
   return userComp(state).division;
 }
 
-export function compClubs(state: Pick<GameState, 'clubs'>, comp: Comp = userComp(state)) {
+export function compClubs(state: CompState, comp: Comp = userComp(state)) {
   return state.clubs.filter((c) => sameComp(compOf(c), comp));
 }
 
-/** The table of one competition (the user's by default). */
-export function compTable(state: Pick<GameState, 'clubs' | 'fixtures'>, comp: Comp = userComp(state)) {
-  return leagueTable(
-    compClubs(state, comp),
-    state.fixtures.filter((f) => sameComp(fixtureComp(f), comp)),
-  );
+/**
+ * The table of one competition (the user's by default). Its clubs are the ones in its fixtures,
+ * so a finished season's table stays right after clubs have moved division.
+ */
+export function compTable(state: CompState & Pick<GameState, 'fixtures'>, comp: Comp = userComp(state)) {
+  const fixtures = state.fixtures.filter((f) => sameComp(fixtureComp(f), comp));
+  const ids = new Set(fixtures.flatMap((f) => [f.homeId, f.awayId]));
+  const clubs = ids.size ? state.clubs.filter((c) => ids.has(c.id)) : compClubs(state, comp);
+  return leagueTable(clubs, fixtures);
 }
 
 function roundsFor(clubCount: number) {

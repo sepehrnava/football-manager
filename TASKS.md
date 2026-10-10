@@ -37,6 +37,7 @@ Keep current work and a short completed baseline; avoid session logs.
 | T030: Crest shapes; CB–midfield chemistry links | S017-AC01–AC03, S011 | Done | tsc, lint, web and BlueStacks screenshots; chemistry mean 67.2 before and after |
 | T031: Sign in and cloud save | S018-AC01–AC05 | In progress | Firebase fully configured (apps, Firestore + rules, Google and Apple enabled, env and EAS vars); next: development build and device tests |
 | T032: Remote updates (EAS Update) | D013 | Done (config) | Expo project linked, channels in eas.json; first update needs a store or preview build |
+| T041: Season-end table fix, bench strip on demand, Club buttons and icons, market row wrap, slower goal count | S008-AC08, S012-AC05, S024-AC03, AC06 | Done | Headless 180 seasons 0 mismatches; web at 320/360 px, 0 console errors; Android pending |
 | T040: Play modes, slower auto-play; retiring tags, academy | S023-AC01, AC07; S024-AC01–AC04 | Done | Web: 1.84 s per matchday, match-by-match and mode memory, Brighton retiring tags, academy call-up; 0 console errors; Android pending |
 | T039: Slower matches, game-like result animations | S023-AC01–AC05 | Done | Web frame captures, skip flow, 0 console errors; Android pending |
 | T038: Multiple positions; Bench in the stats row | S022-AC01–AC03 | Done | Headless distribution, web reload of an old save |

@@ -283,7 +283,9 @@ function MarketRow({ player: p, note, onPress }: { player: Player; note?: string
         </Text>
         <View style={s.meta}>
           <PosTags positions={p.positions} size={12} />
-          <Text style={s.small}>Age {p.age}</Text>
+          <Text style={s.small} numberOfLines={1}>
+            Age {p.age}
+          </Text>
           {trend(p) === 'declining' || trend(p) === 'retiring' ? <TrendTag trend={trend(p)} /> : null}
           {club && p.contract.years === 1 ? <Text style={[s.small, { color: colors.green }]}>Bargain</Text> : null}
           {talk?.last === 'broken' ? <Text style={[s.small, { color: colors.red }]}>Talks off</Text> : null}
@@ -351,11 +353,12 @@ const s = StyleSheet.create({
     borderBottomColor: colors.border,
   },
   pressed: { opacity: 0.6 },
-  main: { flex: 1, gap: 3 },
+  main: { flex: 1, minWidth: 0, gap: 3 },
   name: { fontSize: 15, fontWeight: '800', color: colors.ink },
-  meta: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  // Several positions plus tags can be wider than the row: wrap whole items onto a second line.
+  meta: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', columnGap: 8, rowGap: 2 },
   small: { fontSize: 12, fontWeight: '700', color: colors.muted },
-  price: { alignItems: 'flex-end' },
+  price: { alignItems: 'flex-end', flexShrink: 0 },
   priceText: { fontSize: 15, fontWeight: '900', color: colors.ink },
   hint: { fontSize: 12, color: colors.muted, fontWeight: '600', textAlign: 'center' },
 });

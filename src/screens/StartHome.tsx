@@ -159,30 +159,34 @@ export function MenuRow({
   onPress,
   last,
   compact,
+  titleColor,
 }: {
   icon?: ReactNode;
   title: string;
   note?: string;
   value?: string;
-  onPress: () => void;
+  /** Without it the row is plain information (no arrow). */
+  onPress?: () => void;
   last?: boolean;
   /** Smaller row for lists inside a career screen. */
   compact?: boolean;
+  titleColor?: string;
 }) {
   return (
     <Pressable
       onPress={onPress}
-      accessibilityRole="button"
+      disabled={!onPress}
+      accessibilityRole={onPress ? 'button' : 'text'}
       accessibilityLabel={title}
       style={({ pressed }) => [s.row, compact && s.rowCompact, !last && s.rowLine, pressed && { opacity: 0.6 }]}
     >
       {icon ? <View style={[s.icon, compact && s.iconCompact]}>{icon}</View> : null}
       <View style={s.rowMain}>
-        <Text style={[s.rowTitle, compact && s.rowTitleCompact]}>{title}</Text>
+        <Text style={[s.rowTitle, compact && s.rowTitleCompact, titleColor ? { color: titleColor } : null]}>{title}</Text>
         {note ? <Text style={s.rowNote}>{note}</Text> : null}
       </View>
       {value ? <Text style={s.rowValue}>{value}</Text> : null}
-      <Text style={s.arrow}>›</Text>
+      {onPress ? <Text style={s.arrow}>›</Text> : null}
     </Pressable>
   );
 }

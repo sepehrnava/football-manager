@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import {
@@ -19,10 +19,11 @@ import { surname } from '../game/players';
 import { academyCallUpBlocker } from '../game/market';
 import { useCareer } from '../state/GameContext';
 import { ClubCrest, Sheet } from '../ui/components';
+import { ClipboardIcon, HourglassIcon, SproutIcon, SwapIcon, TrophyIcon, WarningIcon } from '../ui/icons';
 import { FadeIn } from '../ui/motion';
 import { colors, formatMoney, ordinal, seasonLabel } from '../ui/theme';
 import { ChallengeBanner } from './Challenge';
-import { DailyRow } from './StartHome';
+import { DailyRow, MenuRow } from './StartHome';
 import type { NewsItem } from '../game/types';
 import { MatchSheet } from './MatchSheet';
 import { BuildSquadCard } from './BuildSquad';
@@ -64,13 +65,20 @@ export function ClubScreen({
   const next = userFixture(state, state.round);
 
   // Short notes, only when something needs attention.
-  const notes: { text: string; onPress?: () => void; color?: string }[] = [];
-  if (status !== 'ok') notes.push({ text: MONEY_STATUS_TEXT[status], color: colors.red });
+  const notes: { text: string; icon: ReactNode; onPress?: () => void; color?: string }[] = [];
+  if (status !== 'ok') notes.push({ text: MONEY_STATUS_TEXT[status], icon: <WarningIcon size={34} />, color: colors.red });
   const inCups = (state.cups ?? []).filter((c) => cupProgress(c, USER_ID) && !cupProgress(c, USER_ID)!.out);
-  if (inCups.length) notes.push({ text: `Still in the ${inCups.map((c) => c.name).join(' and ')}`, onPress: onOpenLeague });
+  if (inCups.length) {
+    notes.push({
+      text: `Still in the ${inCups.map((c) => c.name).join(' and ')}`,
+      icon: <TrophyIcon size={34} />,
+      onPress: onOpenLeague,
+    });
+  }
   if (offers.length) {
     notes.push({
       text: `${offers.length} ${offers.length > 1 ? 'offers' : 'offer'} for your players`,
+      icon: <SwapIcon size={34} />,
       onPress: onOpenTransfers,
     });
   }
@@ -80,6 +88,7 @@ export function ClubScreen({
         retiring.length > 2
           ? `${retiring.length} players retire after this season`
           : `${retiring.join(' and ')} ${retiring.length > 1 ? 'retire' : 'retires'} after this season`,
+      icon: <HourglassIcon size={34} />,
       onPress: onOpenSquad,
     });
   }
@@ -130,43 +139,33 @@ export function ClubScreen({
       ) : null}
       <MoneySheet visible={moneyOpen} onClose={() => setMoneyOpen(false)} />
 
-      <FadeIn delay={140} style={s.list}>
-          {notes.map((n) => (
-            <Pressable
-              key={n.text}
-              onPress={n.onPress}
-              disabled={!n.onPress}
-              style={({ pressed }) => [s.note, pressed && { opacity: 0.6 }]}
-            >
-              <Text style={[s.noteText, n.color ? { color: n.color } : null]}>{n.text}</Text>
-              {n.onPress ? <Text style={s.chevron}>›</Text> : null}
-            </Pressable>
-          ))}
-        <Pressable
-          onPress={() => setStaffOpen(true)}
-          accessibilityRole="button"
-          style={({ pressed }) => [s.note, pressed && { opacity: 0.6 }]}
-        >
-          <Text style={s.noteText}>Staff</Text>
-          <Text style={s.stars}>
-            {'★'.repeat(coachStars)}
-            <Text style={s.starsOff}>{'★'.repeat(5 - coachStars)}</Text>
-          </Text>
-          <Text style={s.chevron}>›</Text>
-        </Pressable>
-        <Pressable
-          onPress={() => setAcademyOpen(true)}
-          accessibilityRole="button"
-          style={({ pressed }) => [s.note, pressed && { opacity: 0.6 }]}
-        >
-          <Text style={s.noteText}>Academy</Text>
-          {!academyCallUpBlocker(state) ? (
-            <Text style={s.ready}>Call-up ready</Text>
-          ) : (
-            <Text style={s.count}>{state.squad.filter((p) => p.fromAcademy).length} players</Text>
-          )}
-          <Text style={s.chevron}>›</Text>
-        </Pressable>
+      <FadeIn delay={130}>
+        <Text style={s.headText}>CLUB</Text>
+        <View style={s.tiles}>
+          <Tile icon={<ClipboardIcon size={34} />} title="Staff" onPress={() => setStaffOpen(true)}>
+            <Text style={s.stars}>
+              {'★'.repeat(coachStars)}
+              <Text style={s.starsOff}>{'★'.repeat(5 - coachStars)}</Text>
+            </Text>
+          </Tile>
+          <Tile icon={<SproutIcon size={34} />} title="Academy" onPress={() => setAcademyOpen(true)}>
+            {!academyCallUpBlocker(state) ? (
+              <Text style={s.ready} numberOfLines={1}>
+                Call-up ready
+              </Text>
+            ) : (
+              <Text style={s.count} numberOfLines={1}>
+                {state.squad.filter((p) => p.fromAcademy).length} players
+              </Text>
+            )}
+          </Tile>
+        </View>
+      </FadeIn>
+
+      <FadeIn delay={150} style={s.list}>
+        {notes.map((n) => (
+          <MenuRow key={n.text} compact icon={n.icon} title={n.text} titleColor={n.color} onPress={n.onPress} />
+        ))}
         {!state.challenge ? <DailyRow compact /> : null}
       </FadeIn>
       <StaffSheet visible={staffOpen} onClose={() => setStaffOpen(false)} />
@@ -197,6 +196,27 @@ export function ClubScreen({
         </Sheet>
       ) : null}
     </ScrollView>
+  );
+}
+
+/** A square club button: icon, title and a short status. */
+function Tile({ icon, title, onPress, children }: { icon: ReactNode; title: string; onPress: () => void; children: ReactNode }) {
+  return (
+    <Pressable
+      onPress={onPress}
+      accessibilityRole="button"
+      accessibilityLabel={title}
+      style={({ pressed }) => [s.tile, pressed && { opacity: 0.6 }]}
+    >
+      <View style={s.tileTop}>
+        {icon}
+        <Text style={s.chevron}>›</Text>
+      </View>
+      <Text style={s.tileTitle} numberOfLines={1}>
+        {title}
+      </Text>
+      {children}
+    </Pressable>
   );
 }
 
@@ -313,6 +333,10 @@ const s = StyleSheet.create({
   },
   noteText: { flex: 1, fontSize: 15, fontWeight: '800', color: colors.ink },
   stars: { fontSize: 13, color: colors.gold },
+  tiles: { flexDirection: 'row', gap: 10, marginTop: 8 },
+  tile: { flex: 1, gap: 2, backgroundColor: colors.card, borderRadius: 18, padding: 14 },
+  tileTop: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 },
+  tileTitle: { fontSize: 16, fontWeight: '900', color: colors.ink },
   ready: { fontSize: 13, fontWeight: '800', color: colors.green },
   count: { fontSize: 13, fontWeight: '700', color: colors.muted },
   starsOff: { color: colors.border },

@@ -68,18 +68,18 @@ export function SquadScreen({ onFindPlayers }: { onFindPlayers: () => void }) {
     setSel(null);
   };
 
-  // Pitch: first tap selects; a second tap on another position swaps them,
-  // and a tap on the bench brings that player on.
-  const select = (next: Selection) => {
-    setSel(next);
-    // Keep the bench row in view after picking someone on the pitch.
-    const { wrap, height, y } = view.current;
-    if (next?.kind === 'slot' && wrap && height) {
-      const bottom = wrap.y + wrap.height + 12;
+  // The bench strip opens under the pitch once a position is picked: keep it in view.
+  const onWrapLayout = (layout: { y: number; height: number }) => {
+    view.current.wrap = layout;
+    const { height, y } = view.current;
+    if (sel?.kind === 'slot' && height) {
+      const bottom = layout.y + layout.height + 12;
       if (bottom > y + height) scroller.current?.scrollTo({ y: bottom - height, animated: true });
     }
   };
 
+  // Pitch: first tap selects; a second tap on another position swaps them,
+  // and a tap on the bench brings that player on.
   const tapSlot = (i: number) => {
     if (sel?.kind === 'player') return assign(i, sel.id);
     if (sel?.kind === 'slot') {
@@ -89,7 +89,7 @@ export function SquadScreen({ onFindPlayers }: { onFindPlayers: () => void }) {
       if (from) return assign(i, from);
       if (to) return assign(sel.index, to);
     }
-    select({ kind: 'slot', index: i });
+    setSel({ kind: 'slot', index: i });
   };
 
   // A substitute or reserve: after a pitch position, brings them on; after another non-starter
@@ -176,7 +176,7 @@ export function SquadScreen({ onFindPlayers }: { onFindPlayers: () => void }) {
         </View>
         <ChemistrySheet visible={chemOpen} onClose={() => setChemOpen(false)} />
 
-        <View style={s.pitchWrap} onLayout={(e) => (view.current.wrap = e.nativeEvent.layout)}>
+        <View style={s.pitchWrap} onLayout={(e) => onWrapLayout(e.nativeEvent.layout)}>
         <View style={s.pitch} onLayout={(e) => setPitch({ w: e.nativeEvent.layout.width, h: e.nativeEvent.layout.height })}>
           {/* Empty grass: a tap clears the selection. Players sit above it and get their own taps. */}
           <Pressable
@@ -254,14 +254,15 @@ export function SquadScreen({ onFindPlayers }: { onFindPlayers: () => void }) {
             />
           ) : null}
         </View>
-        <BenchStrip
-          players={[...bench, ...reserves]}
-          benchCount={bench.length}
-          target={targetPos}
-          selectedId={sel?.kind === 'player' ? sel.id : null}
-          onPress={tapPlayer}
-          header={
-            sel ? (
+        {/* Subs and reserves show here only while choosing: the lists below hold them otherwise. */}
+        {sel ? (
+          <BenchStrip
+            players={[...bench, ...reserves]}
+            benchCount={bench.length}
+            target={targetPos}
+            selectedId={sel?.kind === 'player' ? sel.id : null}
+            onPress={tapPlayer}
+            header={
               <View style={s.benchHead}>
                 <Text style={s.benchHint} numberOfLines={1}>
                   {benchPlayer
@@ -279,11 +280,9 @@ export function SquadScreen({ onFindPlayers }: { onFindPlayers: () => void }) {
                   <Text style={s.benchBtnText}>✕</Text>
                 </Pressable>
               </View>
-            ) : (
-              <Text style={s.benchTitle}>{depthText}</Text>
-            )
-          }
-        />
+            }
+          />
+        ) : null}
         </View>
 
         {[
@@ -518,7 +517,6 @@ const s = StyleSheet.create({
   benchHint: { flex: 1, color: '#FFFFFF', fontSize: 13, fontWeight: '800' },
   benchBtn: { paddingHorizontal: 10, height: 30, borderRadius: 15, backgroundColor: 'rgba(255,255,255,0.18)', justifyContent: 'center' },
   benchBtnText: { color: '#FFFFFF', fontSize: 13, fontWeight: '900' },
-  benchTitle: { color: 'rgba(255,255,255,0.75)', fontSize: 11, fontWeight: '900', letterSpacing: 1.2, paddingHorizontal: 12 },
   benchRowStrip: { paddingHorizontal: 6, paddingTop: 10, gap: 2 },
   benchItem: { flexDirection: 'row', alignItems: 'stretch' },
   benchToken: { width: 72, alignItems: 'center' },
