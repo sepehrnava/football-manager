@@ -25,10 +25,10 @@ export function WelcomeScreen({ onDone }: { onDone: () => void }) {
 
   return (
     <View style={[s.screen, { paddingTop: insets.top + 16, paddingBottom: insets.bottom + 24 }]}>
-      <FadeIn from="scale" duration={320} style={s.hero}>
+      <FadeIn from="scale" duration={320}>
         <Hero />
       </FadeIn>
-      <FadeIn delay={500} duration={320}>
+      <FadeIn delay={500} duration={320} style={s.below}>
         <View style={s.actions}>
           {a.found ? (
             <>
@@ -56,7 +56,8 @@ export function WelcomeScreen({ onDone }: { onDone: () => void }) {
 
 const s = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.bg, paddingHorizontal: 20, maxWidth: 560, width: '100%', alignSelf: 'center' },
-  hero: { flex: 1 },
+  // The actions sit in the middle of the space under the pitch.
+  below: { flex: 1, justifyContent: 'center' },
   actions: { marginTop: 20, gap: 12 },
   text: { fontSize: 15, fontWeight: '700', color: colors.ink, textAlign: 'center' },
   guest: { fontSize: 16, fontWeight: '800', color: colors.muted, textAlign: 'center', paddingVertical: 10 },

@@ -22,7 +22,7 @@ rarely discover it and a reinstall does not lead them to their backup.
 
 | ID | Observable result | Verification method | Evidence / state |
 | --- | --- | --- | --- |
-| S026-AC01 | First launch shows the logo, this platform's sign-in button and "Continue as guest" | Device observation | Pending |
+| S026-AC01 | First launch shows the logo, this platform's sign-in button and "Continue as guest" | Device observation | Android: passed 2026-10-10 (BlueStacks, EAS preview APK); iOS pending |
 | S026-AC02 | Guest continues to the start screen; the welcome never returns after restart | Device observation | Pending |
 | S026-AC03 | Signing in with a backup offers Restore (loads career) or Not now (start screen) | Two installs, same account | Pending |
 | S026-AC04 | Web, Expo Go and installs with a saved career skip the welcome screen | Web run; code review | Web: see PROJECT_STATUS |

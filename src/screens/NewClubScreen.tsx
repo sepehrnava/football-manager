@@ -101,7 +101,7 @@ export function NewClubScreen() {
 
       {mode === null ? (
         <View style={s.start}>
-          <FadeIn from="scale" duration={320} style={s.start}>
+          <FadeIn from="scale" duration={320}>
             <Hero />
           </FadeIn>
           {/* After the logo lands, the menu rows slide in one by one, then the links. */}

@@ -75,7 +75,7 @@ Updated: 2026-10-10. Replace outdated entries; keep this as a snapshot.
 - S004 web flows (scout, reject, counter, sign, free agent, renew, offers): no errors.
 - S005 balance, 30 careers × 6 seasons: frugal/rescue never sacked, reckless sacked
   2/30, smart trading climbs to ~4th. Simplified screens checked in Chrome.
-- Android display not yet observed (S001-AC03, S002-AC08, S003-AC06, S004-AC09, S005-AC08, S011-AC05, S012-AC04, S013-AC04, S014-AC03, S015-AC05, S016-AC05, S023-AC03, S024-AC06, S025-AC05, S026-AC01–AC03).
+- Android display not yet observed (S001-AC03, S002-AC08, S003-AC06, S004-AC09, S005-AC08, S011-AC05, S012-AC04, S013-AC04, S014-AC03, S015-AC05, S016-AC05, S023-AC03, S024-AC06, S025-AC05, S026-AC02–AC03).
 - 2026-10-09 S015: start screen web flows (create, manage, daily, honours, random club by
   difficulty → career started); 0 console errors on a fresh load. Start screen layout seen
   on BlueStacks via adb screenshot (S015-AC05 partly); Expo Go on BlueStacks works with
