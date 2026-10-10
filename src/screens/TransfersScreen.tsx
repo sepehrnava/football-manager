@@ -36,6 +36,7 @@ import { wageBill } from '../game/team';
 import { MoneySheet } from './MoneySheet';
 import { useOffers } from './useOffers';
 import { PlayerSheet } from './PlayerSheet';
+import { SaleCheckSheet } from './SaleCheckSheet';
 
 const POSITIONS: (Position | 'ALL')[] = ['ALL', 'GK', 'CB', 'LB', 'RB', 'CDM', 'CM', 'CAM', 'LM', 'RM', 'LW', 'RW', 'ST'];
 const PAGE = 12;
@@ -73,6 +74,7 @@ export function TransfersScreen() {
   const [shown, setShown] = useState(PAGE);
   const [picker, setPicker] = useState<Picker>(null);
   const [detail, setDetail] = useState<{ id: string; mode: 'squad' | 'market' } | null>(null);
+  const [check, setCheck] = useState<string | null>(null);
   const open = canTrade(state);
   const status = moneyStatus(state);
   const change = (patch: Partial<Finder>) => {
@@ -154,6 +156,7 @@ export function TransfersScreen() {
                     <RatingBadge value={p.rating} size={34} />
                   </Pressable>
                   <View style={s.offerButtons}>
+                    <Button label="CHECK" variant="light" small style={s.flex} onPress={() => setCheck(p.id)} />
                     <Button label="REJECT" variant="light" small style={s.flex} onPress={() => dispatch({ type: 'rejectOffer', offerId: o.id })} />
                     <Button
                       label={`SELL ${formatMoney(o.fee)}`}
@@ -259,11 +262,12 @@ export function TransfersScreen() {
       />
       <MoneySheet visible={moneyOpen} onClose={() => setMoneyOpen(false)} />
       <PlayerSheet playerId={detail?.id ?? null} mode={detail?.mode ?? 'market'} onClose={() => setDetail(null)} />
+      <SaleCheckSheet playerId={check} onClose={() => setCheck(null)} />
     </>
   );
 }
 
-function MarketRow({ player: p, note, onPress }: { player: Player; note?: string; onPress: () => void }) {
+export function MarketRow({ player: p, note, onPress }: { player: Player; note?: string; onPress: () => void }) {
   const { state } = useCareer();
   const level = state.scouting[p.id] ?? 0;
   const fee = askingPrice(state, p);

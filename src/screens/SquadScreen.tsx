@@ -23,6 +23,7 @@ import { colors, lineColors } from '../ui/theme';
 import { BuildSquadCard } from './BuildSquad';
 import { ChemistrySheet, LinkLines } from './Chemistry';
 import { PlayerSheet } from './PlayerSheet';
+import { SlotMarketSheet } from './SlotMarketSheet';
 
 const LINE_ORDER = { GK: 0, DF: 1, MD: 2, AT: 3 };
 
@@ -45,6 +46,7 @@ export function SquadScreen({ onFindPlayers }: { onFindPlayers: () => void }) {
   const [sel, setSel] = useState<Selection>(null);
   const [detail, setDetail] = useState<string | null>(null);
   const [chemOpen, setChemOpen] = useState(false);
+  const [findSlot, setFindSlot] = useState<number | null>(null);
   const [picker, setPicker] = useState<'formation' | 'tactic' | null>(null);
   const [pitch, setPitch] = useState({ w: 0, h: 0 });
   const scroller = useRef<ScrollView>(null);
@@ -276,6 +278,11 @@ export function SquadScreen({ onFindPlayers }: { onFindPlayers: () => void }) {
                     <Text style={s.benchBtnText}>Details</Text>
                   </Pressable>
                 ) : null}
+                {selectedSlot !== null ? (
+                  <Pressable onPress={() => setFindSlot(selectedSlot)} style={s.benchBtn} accessibilityRole="button">
+                    <Text style={s.benchBtnText}>Find</Text>
+                  </Pressable>
+                ) : null}
                 <Pressable onPress={() => setSel(null)} style={s.benchBtn} accessibilityRole="button" accessibilityLabel="Cancel">
                   <Text style={s.benchBtnText}>✕</Text>
                 </Pressable>
@@ -316,6 +323,7 @@ export function SquadScreen({ onFindPlayers }: { onFindPlayers: () => void }) {
       </ScrollView>
 
       <PlayerSheet playerId={detail} mode="squad" onClose={() => setDetail(null)} />
+      <SlotMarketSheet slot={findSlot} onClose={() => setFindSlot(null)} />
     </View>
   );
 }

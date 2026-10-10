@@ -1,7 +1,9 @@
 import { counterEffect, tacticFor, USER_ID } from './game';
 import { expectedGoals } from './league';
+import { FORMATIONS } from './constants';
+import { ratingAt } from './players';
 import { userTeam } from './team';
-import type { Fixture, GameState, Style, Tactic } from './types';
+import type { Fixture, GameState, Player, Position, Style, Tactic } from './types';
 
 export function userFixture(state: GameState, round: number): Fixture | undefined {
   return state.fixtures.find(
@@ -73,4 +75,35 @@ export function matchInsight(state: GameState, fixture: Fixture): MatchInsight {
 
 export function percent(p: number) {
   return `${Math.round(p * 100)}%`;
+}
+
+export interface SaleImpact {
+  /** The XI position he plays, or null when he is not in the XI. */
+  slot: Position | null;
+  /** XI power now and after the sale (the best free player takes his place; bench bonus left out). */
+  before: number;
+  after: number;
+  /** Who takes his place in the XI. */
+  cover: Player | null;
+}
+
+/** Team power from the XI alone: the bench-depth bonus moves with the XI's average, so it would blur a sale. */
+function xiPower(state: GameState) {
+  const t = userTeam(state);
+  return Math.round((t.attack - t.bench + (t.defense - t.bench)) / 2);
+}
+
+/** What selling a player would do to the XI. Read-only: nothing in the state changes. */
+export function saleImpact(state: GameState, playerId: string): SaleImpact | null {
+  if (!state.squad.some((p) => p.id === playerId)) return null;
+  const before = xiPower(state);
+  const idx = state.lineup.indexOf(playerId);
+  const squad = state.squad.filter((p) => p.id !== playerId);
+  const captainId = state.captainId === playerId ? null : state.captainId;
+  if (idx < 0) return { slot: null, before, after: xiPower({ ...state, squad, captainId }), cover: null };
+  const pos = FORMATIONS[state.formation].slots[idx].pos;
+  const score = (p: Player) => ratingAt(p, pos) + (p.positions.includes(pos) ? 0.5 : 0);
+  const cover = squad.filter((p) => !state.lineup.includes(p.id)).sort((a, b) => score(b) - score(a))[0] ?? null;
+  const lineup = state.lineup.map((id, i) => (i === idx ? (cover?.id ?? null) : id));
+  return { slot: pos, before, after: xiPower({ ...state, squad, lineup, captainId }), cover };
 }

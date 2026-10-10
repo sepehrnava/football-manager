@@ -13,6 +13,7 @@ import { BouncingBall, Confetti, LiveDot, ScoreTicker, Shake, SlideIn, Stamp } f
 import { animateNextLayout, FadeIn } from '../ui/motion';
 import { colors, formatMoney } from '../ui/theme';
 import { AchievementToast } from './Honours';
+import { SaleCheckSheet } from './SaleCheckSheet';
 
 /** Names with a long single word (e.g. "Wolverhampton") need a smaller size to avoid breaking mid-word. */
 function longWord(name: string) {
@@ -245,6 +246,7 @@ function ModeSwitch({ mode, onChange }: { mode: PlayMode; onChange: (mode: PlayM
 /** "A club wants your player": sell now, or keep and play on. */
 function OfferCard({ offerId }: { offerId: string }) {
   const { state, dispatch } = useCareer();
+  const [checking, setChecking] = useState(false);
   const o = state.offers.find((x) => x.id === offerId);
   const p = o && state.squad.find((m) => m.id === o.playerId);
   if (!o || !p) return null;
@@ -253,6 +255,7 @@ function OfferCard({ offerId }: { offerId: string }) {
   const diff = o.fee - value;
   return (
     <FadeIn from="scale">
+      <SaleCheckSheet playerId={checking ? p.id : null} onClose={() => setChecking(false)} />
       <View style={s.offer}>
         <Text style={s.momentKicker}>TRANSFER OFFER</Text>
         <View style={s.offerTop}>
@@ -268,6 +271,9 @@ function OfferCard({ offerId }: { offerId: string }) {
             {diff >= 0 ? `${formatMoney(diff)} above` : `${formatMoney(-diff)} below`}
           </Text>{' '}
           that.
+        </Text>
+        <Text style={s.offerCheck} onPress={() => setChecking(true)} accessibilityRole="button">
+          Check my squad ›
         </Text>
         <View style={s.offerButtons}>
           <Button
@@ -386,6 +392,7 @@ const s = StyleSheet.create({
   offerTop: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   offerTitle: { flex: 1, color: '#FFFFFF', fontWeight: '900', fontSize: 19 },
   offerFee: { color: colors.gold, fontWeight: '900', fontSize: 34 },
+  offerCheck: { color: '#FFFFFF', fontWeight: '900', fontSize: 15, paddingVertical: 6, textDecorationLine: 'underline' },
   offerButtons: { flexDirection: 'row', gap: 10, marginTop: 4 },
   offerButton: { flex: 1 },
   momentKicker: { color: colors.gold, fontWeight: '900', fontSize: 12, letterSpacing: 1.5 },
