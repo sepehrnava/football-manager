@@ -43,6 +43,8 @@ export function SimScreen({ until: initialUntil, onClose }: { until?: number; on
   const auto = mode === 'auto' || until !== undefined;
   const inSeason = state.phase === 'season';
   const reached = until !== undefined && state.round >= until;
+  // Nothing played since the screen opened: show it still, so it never looks like a match is going.
+  const idle = !running && state.round === openedAt;
   // When a window opens, clubs' bids are shown right here, one at a time.
   // (Only bids made as the window opened; bids still on their way are not shown here.)
   const windowOffers = state.offers.filter((o) => !o.at);
@@ -137,16 +139,20 @@ export function SimScreen({ until: initialUntil, onClose }: { until?: number; on
         <ScrollView contentContainerStyle={s.content}>
           {offer ? <OfferCard key={offer.id} offerId={offer.id} /> : null}
 
-          {mine ? (
+          {idle ? (
+            <View style={s.waitBox}>
+              <Text style={s.wait}>{played === 0 ? 'Ready to kick off' : `Ready for matchday ${played + 1}`}</Text>
+            </View>
+          ) : mine ? (
             <MyMatch key={`r${lastRound}`} fixture={mine} />
           ) : (
             <View style={s.waitBox}>
               <BouncingBall />
-              <Text style={s.wait}>{running ? 'Kick-off…' : 'Ready to kick off'}</Text>
+              <Text style={s.wait}>Kick-off…</Text>
             </View>
           )}
 
-          {others.length ? (
+          {others.length > 0 && !idle ? (
             <FadeIn key={`o${lastRound}`} delay={80}>
               <Card style={s.others}>
                 {others.map((f, i) => (
@@ -175,7 +181,7 @@ export function SimScreen({ until: initialUntil, onClose }: { until?: number; on
                   <Text style={[s.tname, me && s.bold]} numberOfLines={1}>
                     {c.name}
                   </Text>
-                  {me && move.delta ? (
+                  {me && move.delta !== 0 && !idle ? (
                     <FadeIn key={`m${move.round}`} from="scale" delay={250} duration={200}>
                       <Text style={[s.move, { color: move.delta > 0 ? colors.green : colors.red }]}>
                         {move.delta > 0 ? '▲' : '▼'}
