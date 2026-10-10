@@ -7,17 +7,25 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:418321718874:android:748ad840e4c26d7a4d8263",
+        "mobilesdk_app_id": "1:418321718874:android:16c6ae542aa3faaa4d8263",
         "android_client_info": {
-          "package_name": "com.sepehrnava.topsquad"
+          "package_name": "com.d3studio.topsquad"
         }
       },
       "oauth_client": [
         {
-          "client_id": "418321718874-j961dn23p1dlcd8loi0khklrbgarstli.apps.googleusercontent.com",
+          "client_id": "418321718874-fq539nujikqa4rtgcg2ckmblkeqoa8rl.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.sepehrnava.topsquad",
+            "package_name": "com.d3studio.topsquad",
+            "certificate_hash": "8b1478565fe8fe087deb413fcafcada7f8732d79"
+          }
+        },
+        {
+          "client_id": "418321718874-g0iivhnd4ogr75rtdmd3rfgoda6a5hgn.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.d3studio.topsquad",
             "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
           }
         },

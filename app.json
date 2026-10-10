@@ -9,7 +9,7 @@
     "ios": {
       "supportsTablet": true,
       "usesAppleSignIn": true,
-      "bundleIdentifier": "com.sepehrnava.topsquad"
+      "bundleIdentifier": "com.d3studio.topsquad"
     },
     "android": {
       "adaptiveIcon": {
@@ -19,7 +19,7 @@
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
       "predictiveBackGestureEnabled": false,
-      "package": "com.sepehrnava.topsquad"
+      "package": "com.d3studio.topsquad"
     },
     "web": {
       "name": "Top Squad: Football Manager",
@@ -41,5 +41,8 @@
     "updates": {
       "url": "https://u.expo.dev/e795ce89-57bd-44d3-bbd0-b2358fdd8445"
     }
+  },
+  "react-native-google-mobile-ads": {
+    "android_sdk": "classic"
   }
 }
